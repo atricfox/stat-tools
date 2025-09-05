@@ -1,9 +1,8 @@
 {
   "extends": [
     "next/core-web-vitals",
-    "@typescript-eslint/recommended",
-    "prettier",
-    "plugin:prettier/recommended"
+    "plugin:@typescript-eslint/recommended",
+    "prettier"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
@@ -13,11 +12,11 @@
   },
   "plugins": ["@typescript-eslint", "prettier"],
   "rules": {
-    "prettier/prettier": "error",
     "@typescript-eslint/no-unused-vars": "error",
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-function-return-type": "off",
-    "@typescript-eslint/explicit-module-boundary-types": "off"
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@next/next/no-html-link-for-pages": "off"
   },
   "ignorePatterns": [
     "node_modules/",
@@ -25,6 +24,7 @@
     "out/",
     "dist/",
     "build/",
-    "coverage/"
+    "coverage/",
+    "scripts/*.js"
   ]
 }

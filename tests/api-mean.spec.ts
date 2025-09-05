@@ -1,9 +1,9 @@
-import { test, expect, request } from '@playwright/test';
+import { test, expect } from '@playwright/test';
 
 test.describe('API /api/mean', () => {
   test('returns correct mean for valid input', async ({ request: req }) => {
     const res = await req.post('/api/mean', {
-      data: { numbers: [1,2,3,4], precision: 2 }
+      data: { numbers: [1, 2, 3, 4], precision: 2 },
     });
     expect(res.status()).toBe(200);
     const body = await res.json();
