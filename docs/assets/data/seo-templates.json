@@ -1,0 +1,99 @@
+{
+  "meta": {
+    "notes": "JSON-LD 模板集合。将占位符替换为页面实际值（例如 {{TITLE}}、{{URL}}、{{DESCRIPTION}}、{{IMAGE}}、{{PUBLISH_DATE}}）。建议在服务器端（getStaticProps/getServerSideProps）生成并插入到 <head>。"
+  },
+
+  "organization": {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Stat Tools",
+    "url": "https://{{HOST}}/",
+    "logo": "https://{{HOST}}{{IMAGE}}",
+    "sameAs": [
+      "https://twitter.com/{{TWITTER_HANDLE}}",
+      "https://github.com/{{GITHUB_ORG}}"
+    ]
+  },
+
+  "breadcrumbTemplate": {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://{{HOST}}/"
+      },
+      {
+        "@type": "ListItem",
+        "position": 2,
+        "name": "{{PARENT}}",
+        "item": "https://{{HOST}}{{PARENT_PATH}}"
+      },
+      {
+        "@type": "ListItem",
+        "position": 3,
+        "name": "{{TITLE}}",
+        "item": "https://{{HOST}}{{PATH}}"
+      }
+    ]
+  },
+
+  "howTo_mean": {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    "name": "How to calculate the arithmetic mean (average)",
+    "description": "Step-by-step example showing how the mean is calculated using Stat Tools' Mean Calculator.",
+    "totalTime": "PT5M",
+    "estimatedCost": { "@type": "MonetaryAmount", "currency": "USD", "value": "0" },
+    "step": [
+      { "@type": "HowToStep", "position": 1, "name": "Enter numbers", "text": "Enter the list of numbers into the Mean Calculator. Non-numeric values will be ignored if the option is set." },
+      { "@type": "HowToStep", "position": 2, "name": "Submit", "text": "Click Calculate to compute the sum and count." },
+      { "@type": "HowToStep", "position": 3, "name": "Review result", "text": "The tool returns the mean, the calculation steps and a textual explanation." }
+    ],
+    "tool": "Mean Calculator"
+  },
+
+  "faq_mean": {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {
+        "@type": "Question",
+        "name": "What is the mean?",
+        "acceptedAnswer": { "@type": "Answer", "text": "The arithmetic mean is the sum of values divided by the number of values." }
+      },
+      {
+        "@type": "Question",
+        "name": "How does Stat Tools handle non-numeric values?",
+        "acceptedAnswer": { "@type": "Answer", "text": "By default non-numeric values are ignored when the 'ignore_non_numeric' option is enabled; otherwise an error is shown." }
+      }
+    ]
+  },
+
+  "webpage_mean_example": {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Mean Calculator - Stat Tools",
+    "url": "https://{{HOST}}{{PATH}}",
+    "description": "Calculate the arithmetic mean of a list of numbers and get a step-by-step explanation.",
+    "breadcrumb": { "@id": "https://{{HOST}}{{PATH}}#breadcrumb" },
+    "mainEntity": { "@id": "https://{{HOST}}{{PATH}}#howto" }
+  },
+
+  "webpage_stddev_example": {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Standard Deviation Calculator - Stat Tools",
+    "url": "https://{{HOST}}{{PATH}}",
+    "description": "Compute standard deviation and see worked steps and interpretation.",
+    "breadcrumb": { "@id": "https://{{HOST}}{{PATH}}#breadcrumb" },
+    "mainEntity": { "@id": "https://{{HOST}}{{PATH}}#howto" }
+  },
+
+  "examples": {
+    "mean_input_example": { "numbers": [90,85,78,92], "precision": 2, "ignore_non_numeric": true },
+    "mean_output_example": { "mean": 86.25, "count": 4, "sum": 345, "steps": ["sum=345","count=4","mean=345/4=86.25"] }
+  }
+}

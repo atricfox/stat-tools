@@ -1,0 +1,53 @@
+{
+  "events": [
+    {
+      "name": "page_view",
+      "description": "Page view on tool page",
+      "params": [
+        { "key": "page_path", "type": "string", "required": true }
+      ]
+    },
+    {
+      "name": "calc_execute",
+      "description": "User executes calculation",
+      "params": [
+        { "key": "tool", "type": "string", "required": true },
+        { "key": "input_count", "type": "integer", "required": false },
+        { "key": "precision", "type": "integer", "required": false },
+        { "key": "ignore_non_numeric", "type": "boolean", "required": false },
+        { "key": "source", "type": "string", "required": false, "notes": "ui or api" }
+      ]
+    },
+    {
+      "name": "calc_error",
+      "description": "Validation or calculation error",
+      "params": [
+        { "key": "error_code", "type": "string", "required": true },
+        { "key": "message", "type": "string", "required": false }
+      ]
+    },
+    {
+      "name": "copy_result",
+      "description": "User copies result or steps",
+      "params": [
+        { "key": "tool", "type": "string", "required": true },
+        { "key": "copy_type", "type": "string", "required": true, "notes": "value or steps" }
+      ]
+    },
+    {
+      "name": "expand_steps",
+      "description": "User expands step-by-step explanation",
+      "params": [
+        { "key": "tool", "type": "string", "required": true }
+      ]
+    },
+    {
+      "name": "share_link",
+      "description": "User shares or generates a link",
+      "params": [
+        { "key": "tool", "type": "string", "required": true },
+        { "key": "share_type", "type": "string", "required": false, "notes": "url or social" }
+      ]
+    }
+  ]
+}

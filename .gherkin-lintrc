@@ -1,0 +1,10 @@
+{
+  "rules": {
+    "no-empty-background": "error",
+    "no-empty-scenario": "error",
+    "scenario-name-format": {
+      "severity": "warn",
+      "value": "^[A-Z].*"
+    }
+  }
+}

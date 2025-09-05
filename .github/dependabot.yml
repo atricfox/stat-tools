@@ -1,0 +1,62 @@
+# GitHub Dependabot 配置
+# 文档: https://docs.github.com/en/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
+
+version: 2
+updates:
+  # 监控 npm 依赖
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 10
+    reviewers:
+      - "@stat-tools/maintainers"  # 替换为实际的维护者团队
+    labels:
+      - "dependencies"
+      - "automated"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
+    # 仅更新直接依赖，避免过多噪音
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-patch"]
+    # 分组相关依赖更新
+    groups:
+      next-ecosystem:
+        patterns:
+          - "next"
+          - "react*"
+          - "@types/react*"
+      testing-tools:
+        patterns:
+          - "@playwright/test"
+          - "vitest"
+          - "@types/*"
+      linting-tools:
+        patterns:
+          - "eslint*"
+          - "prettier"
+          - "@typescript-eslint/*"
+      cloudflare-tools:
+        patterns:
+          - "@cloudflare/*"
+          - "wrangler"
+
+  # 监控 GitHub Actions 依赖
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "09:00"
+      timezone: "Asia/Shanghai"
+    open-pull-requests-limit: 5
+    labels:
+      - "github-actions"
+      - "automated"
+    commit-message:
+      prefix: "ci"

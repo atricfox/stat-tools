@@ -1,0 +1,138 @@
+name: CI & Deploy (build, publish Worker, deploy Pages)
+# Quick examples to set SIGN_SECRET locally (copy to your shell):
+# macOS / Linux (bash / zsh):
+#   echo -n "your-very-secure-secret" | wrangler secret put SIGN_SECRET
+# Windows PowerShell:
+#   [System.Text.Encoding]::UTF8.GetBytes("your-very-secure-secret") | wrangler secret put SIGN_SECRET
+# Windows cmd (note: may include newline):
+#   echo|set /p="your-very-secure-secret" | wrangler secret put SIGN_SECRET
+#
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Install & Build
+    runs-on: ubuntu-latest
+    outputs:
+      build-succeeded: ${{ steps.build.outcome }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        id: build
+        run: npm run build
+
+      - name: Upload build artifact (optional)
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: .next
+
+  publish-worker:
+    name: Publish Worker via wrangler
+    needs: build
+    runs-on: ubuntu-latest
+    if: needs.build.outputs['build-succeeded'] == 'success' || always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Ensure wrangler available
+        run: npm exec -- npx --yes wrangler --version
+
+      - name: Optionally set SIGN_SECRET for Worker
+        if: ${{ secrets.SIGN_SECRET != '' }}
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          SIGN_SECRET: ${{ secrets.SIGN_SECRET }}
+        run: |
+          # Write secret into the worker namespace for production env
+          # Note: This step runs only if the repository secret SIGN_SECRET is set. It's optional.
+          printf "%s" "$SIGN_SECRET" | npm exec -- npx --yes wrangler secret put SIGN_SECRET --env production
+
+      - name: Publish Worker
+        env:
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+        run: |
+          npm exec -- npx --yes wrangler publish --env production --verbose
+
+  deploy-pages:
+    name: Deploy Cloudflare Pages
+    needs: build
+    runs-on: ubuntu-latest
+    if: needs.build.outputs['build-succeeded'] == 'success' || always()
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/pages-action@v1
+        with:
+          apiToken: ${{ secrets.CF_PAGES_TOKEN }}
+          accountId: ${{ secrets.CF_ACCOUNT_ID }}
+          projectName: ${{ secrets.CF_PAGES_PROJECT }}
+
+  smoke-test:
+    name: CI Smoke Tests
+    needs: deploy-pages
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install deps (for curl)
+        run: npm ci --no-audit --no-fund || true
+
+      - name: Run smoke script
+        env:
+          # Optionally set BASE_URL in repository secrets or pass in as env to workflow_dispatch
+          BASE_URL: ${{ secrets.BASE_URL }}
+        run: |
+          chmod +x tests/ci-smoke.sh
+          ./tests/ci-smoke.sh
+
+# Required GitHub Secrets (add in repository Settings → Secrets → Actions):
+# - CF_API_TOKEN : Cloudflare API Token with permissions to publish Workers/R2 as needed.
+# - CF_PAGES_TOKEN : Cloudflare Pages API token for Pages deployment.
+# - CF_ACCOUNT_ID : Cloudflare Account ID (used by Pages action).
+# - CF_PAGES_PROJECT : Pages project name (as configured in Cloudflare Pages).
+# Optional:
+# - SIGN_SECRET : HMAC secret for Worker signed URLs (CI will set it into the Worker if present).
