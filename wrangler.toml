@@ -13,8 +13,7 @@ workers_dev = true
 # zone_id = "YOUR_ZONE_ID"
 
 # NOTE: For security, set SIGN_SECRET via `wrangler secret put SIGN_SECRET`
-[vars]
-SIGN_SECRET = "" # leave empty; set via wrangler secret put
+// NOTE: Do not define secrets in [vars]. Use `wrangler secret put SIGN_SECRET` instead.
 
 [r2_buckets]
 export_bucket = { binding = "EXPORT_BUCKET", bucket_name = "stat-tools-exports" }

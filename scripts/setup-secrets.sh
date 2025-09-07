@@ -43,6 +43,49 @@ if [ "$NO_WRANGLER" -eq 0 ]; then
     else
       echo "Skipping wrangler secret put. You can run the command manually (see README)."
     fi
+
+    # SENTRY_DSN for Workers
+    read -p "Do you want to set SENTRY_DSN for Workers via wrangler secret put? [y/N]: " yn_sentry
+    yn_sentry=${yn_sentry:-N}
+    if [[ "$yn_sentry" =~ ^[Yy]$ ]]; then
+      read -s -p "Enter SENTRY_DSN (production): " SENTRY_DSN_VALUE
+      echo
+      if [ -n "$SENTRY_DSN_VALUE" ]; then
+        printf "%s" "$SENTRY_DSN_VALUE" | wrangler secret put SENTRY_DSN --env production
+        echo "SENTRY_DSN written to Worker (production env)."
+      fi
+    fi
+
+    # Cloudflare Pages variables/secrets (optional)
+    read -p "Configure Cloudflare Pages variables/secrets as well? [y/N]: " yn_pages
+    yn_pages=${yn_pages:-N}
+    if [[ "$yn_pages" =~ ^[Yy]$ ]]; then
+      read -p "Enter CF_PAGES_PROJECT (or set CF_PAGES_PROJECT env): " CF_PAGES_PROJECT_VALUE
+      CF_PAGES_PROJECT_VALUE=${CF_PAGES_PROJECT_VALUE:-${CF_PAGES_PROJECT:-}}
+      if [ -z "$CF_PAGES_PROJECT_VALUE" ]; then
+        echo "CF_PAGES_PROJECT empty; skipping Pages variables."
+      else
+        # Server-side secret for Pages
+        read -s -p "Enter SENTRY_DSN for Pages (server-side secret): " PAGES_SENTRY_DSN
+        echo
+        if [ -n "$PAGES_SENTRY_DSN" ]; then
+          printf "%s" "$PAGES_SENTRY_DSN" | wrangler pages project secret put SENTRY_DSN --project-name "$CF_PAGES_PROJECT_VALUE"
+          echo "SENTRY_DSN stored for Pages project $CF_PAGES_PROJECT_VALUE."
+        fi
+        # Public DSN (optional)
+        read -p "Enter NEXT_PUBLIC_SENTRY_DSN for Pages (optional): " PAGES_PUBLIC_DSN
+        PAGES_PUBLIC_DSN=${PAGES_PUBLIC_DSN:-}
+        if [ -n "$PAGES_PUBLIC_DSN" ]; then
+          wrangler pages project variable put NEXT_PUBLIC_SENTRY_DSN --project-name "$CF_PAGES_PROJECT_VALUE" --value "$PAGES_PUBLIC_DSN"
+          echo "NEXT_PUBLIC_SENTRY_DSN set for Pages project $CF_PAGES_PROJECT_VALUE."
+        fi
+        # Environment name
+        read -p "Set NEXT_PUBLIC_ENVIRONMENT for Pages [production/staging/preview] (default: production): " PAGES_ENV
+        PAGES_ENV=${PAGES_ENV:-production}
+        wrangler pages project variable put NEXT_PUBLIC_ENVIRONMENT --project-name "$CF_PAGES_PROJECT_VALUE" --value "$PAGES_ENV"
+        echo "NEXT_PUBLIC_ENVIRONMENT=$PAGES_ENV set for Pages project $CF_PAGES_PROJECT_VALUE."
+      fi
+    fi
   else
     echo "wrangler not found in PATH; skipping wrangler secret step. Install wrangler to use this feature." >&2
   fi

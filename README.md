@@ -169,6 +169,38 @@ echo|set /p="your-very-secure-secret" | wrangler secret put SIGN_SECRET
 
 ```bash
 wrangler publish --name stat-tools-worker
+
+### Sentry 配置（Pages 与 Workers）
+
+生产建议启用服务端错误上报（Sentry）：
+
+1) 使用脚本快速配置（推荐）
+
+```bash
+# 交互式注入 SIGN_SECRET、SENTRY_DSN，并可选配置 Pages 变量
+scripts/setup-secrets.sh
+```
+
+2) 手动命令
+
+Cloudflare Pages：
+
+```bash
+# Server-side secret
+wrangler pages project secret put SENTRY_DSN --project-name "$CF_PAGES_PROJECT"
+
+# Public variables (optional)
+wrangler pages project variable put NEXT_PUBLIC_SENTRY_DSN --project-name "$CF_PAGES_PROJECT" --value "$YOUR_PUBLIC_DSN"
+wrangler pages project variable put NEXT_PUBLIC_ENVIRONMENT --project-name "$CF_PAGES_PROJECT" --value "production"
+```
+
+Cloudflare Workers：
+
+```bash
+echo -n "$YOUR_SENTRY_DSN" | wrangler secret put SENTRY_DSN --env production
+```
+
+提示：DSN 不应写入版本库/配置文件，必须使用 `wrangler secret put` 或 Pages Secret 注入。
 ```
 
 ### CI / GitHub Actions（已包含示例）

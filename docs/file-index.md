@@ -5,25 +5,24 @@
 
 ## 📊 文档统计
 
-- **文档文件**: 47 个
-- **目录数量**: 18 个  
-- **总大小**: 160.4KB
+- **文档文件**: 71 个
+- **目录数量**: 17 个  
+- **总大小**: 424.4KB
 
 ### 按文件类型分布
 
-- **.md**: 33 个文件
+- **.md**: 57 个文件
 - **.feature**: 11 个文件
 - **.json**: 3 个文件
 
 ## 🗂️ 文档结构
-
-📁 **00-overview/**
 
 📁 **01-getting-started/**
   📄 [00-README.md](01-getting-started/00-README.md) _(718B)_
   📄 [01-project-overview.md](01-getting-started/01-project-overview.md) _(1.8KB)_
   📄 [02-setup-guide.md](01-getting-started/02-setup-guide.md) _(2.5KB)_
   📄 [03-development-workflow.md](01-getting-started/03-development-workflow.md) _(4.7KB)_
+  📄 [统计工具网站SEO商业策略.md](01-getting-started/统计工具网站SEO商业策略.md) _(37.8KB)_
 
 📁 **02-requirements/**
   📁 **calculators/**
@@ -32,15 +31,27 @@
     📄 [03-weighted-mean.md](02-requirements/calculators/03-weighted-mean.md) _(7.7KB)_
     📄 [04-gpa-calculator.md](02-requirements/calculators/04-gpa-calculator.md) _(8.4KB)_
 
+  📁 **user-stories/**
+    📄 [00-README.md](02-requirements/user-stories/00-README.md) _(3.5KB)_
+    📄 [US-001.md](02-requirements/user-stories/US-001.md) _(6.0KB)_
+    📄 [US-002.md](02-requirements/user-stories/US-002.md) _(5.3KB)_
+    📄 [US-003.md](02-requirements/user-stories/US-003.md) _(5.8KB)_
+    📄 [US-004.md](02-requirements/user-stories/US-004.md) _(5.2KB)_
+    📄 [US-005.md](02-requirements/user-stories/US-005.md) _(3.4KB)_
+    📄 [US-006.md](02-requirements/user-stories/US-006.md) _(5.2KB)_
+    📄 [US-007.md](02-requirements/user-stories/US-007.md) _(4.3KB)_
+    📄 [US-008.md](02-requirements/user-stories/US-008.md) _(5.7KB)_
+    📄 [US-009.md](02-requirements/user-stories/US-009.md) _(5.3KB)_
+    📄 [US-010.md](02-requirements/user-stories/US-010.md) _(5.6KB)_
+    📄 [US-011.md](02-requirements/user-stories/US-011.md) _(5.7KB)_
+    📄 [US-012.md](02-requirements/user-stories/US-012.md) _(5.9KB)_
+    📄 [US-013.md](02-requirements/user-stories/US-013.md) _(6.2KB)_
+    📄 [US-014.md](02-requirements/user-stories/US-014.md) _(5.7KB)_
+    📄 [US-015.md](02-requirements/user-stories/US-015.md) _(6.3KB)_
+
   📄 [00-README.md](02-requirements/00-README.md) _(2.5KB)_
   📄 [01-mvp-goals.md](02-requirements/01-mvp-goals.md) _(6.3KB)_
-  📄 [02-functional-specs.md](02-requirements/02-functional-specs.md) _(4.7KB)_
-  📄 [03-technical-architecture.md](02-requirements/03-technical-architecture.md) _(9.4KB)_
-  📄 [04-deployment-cloudflare.md](02-requirements/04-deployment-cloudflare.md) _(13.0KB)_
-  📄 [05-api-routes.md](02-requirements/05-api-routes.md) _(7.7KB)_
-  📄 [06-nextjs-architecture.md](02-requirements/06-nextjs-architecture.md) _(6.5KB)_
-  📄 [07-nextjs-runtime-decision.md](02-requirements/07-nextjs-runtime-decision.md) _(7.0KB)_
-  📄 [08-hub-and-seo.md](02-requirements/08-hub-and-seo.md) _(8.2KB)_
+  📄 [02-functional-specs.md](02-requirements/02-functional-specs.md) _(4.4KB)_
 
 📁 **03-acceptance/**
   📁 **calculators/**
@@ -58,10 +69,25 @@
   🧪 [06-hub-and-seo.feature](03-acceptance/06-hub-and-seo.feature) _(401B)_
 
 📁 **04-architecture/**
+  📁 **adr/**
+    📄 [0001-ui-technology-stack.md](04-architecture/adr/0001-ui-technology-stack.md) _(4.4KB)_
+    📄 [0006-vps-coolify-deployment.md](04-architecture/adr/0006-vps-coolify-deployment.md) _(7.8KB)_
+    📄 [README.md](04-architecture/adr/README.md) _(2.0KB)_
+
+  📄 [01-system-overview.md](04-architecture/01-system-overview.md) _(9.3KB)_
+  📄 [03-api-design.md](04-architecture/03-api-design.md) _(15.4KB)_
+  📄 [05-ui-component-system.md](04-architecture/05-ui-component-system.md) _(17.1KB)_
+  📄 [06-design-system.md](04-architecture/06-design-system.md) _(14.3KB)_
+  📄 [07-state-management.md](04-architecture/07-state-management.md) _(21.5KB)_
+  📄 [08-accessibility-strategy.md](04-architecture/08-accessibility-strategy.md) _(19.7KB)_
 
 📁 **05-development/**
+  📄 [01-developer-guide.md](05-development/01-developer-guide.md) _(20.4KB)_
+  📄 [02-documentation-workflow.md](05-development/02-documentation-workflow.md) _(14.2KB)_
 
 📁 **06-operations/**
+  📄 [01-deployment.md](06-operations/01-deployment.md) _(19.9KB)_
+  📄 [02-monitoring.md](06-operations/02-monitoring.md) _(26.0KB)_
 
 📁 **07-audit/**
   📄 [01-repo-audit.md](07-audit/01-repo-audit.md) _(6.6KB)_
@@ -72,6 +98,7 @@
 
 📁 **09-archive/**
   📁 **legacy/**
+    📄 [首发 5 页的线框草图 & 埋点事件表.md](09-archive/legacy/首发 5 页的线框草图 & 埋点事件表.md) _(20.4KB)_
     📄 [api-routes-frs.md](09-archive/legacy/api-routes-frs.md) _(49B)_
     📄 [FRS-index.md](09-archive/legacy/FRS-index.md) _(44B)_
     📄 [gpa-calculator.md](09-archive/legacy/gpa-calculator.md) _(49B)_
@@ -82,7 +109,6 @@
     📄 [standard-deviation-calculator.md](09-archive/legacy/standard-deviation-calculator.md) _(64B)_
     📄 [technical-architecture.md](09-archive/legacy/technical-architecture.md) _(57B)_
     📄 [weighted-mean-calculator.md](09-archive/legacy/weighted-mean-calculator.md) _(59B)_
-    📄 [首发 5 页的线框草图 & 埋点事件表.md](09-archive/legacy/首发 5 页的线框草图 & 埋点事件表.md) _(20.4KB)_
 
 
 📁 **10-principles/**
@@ -93,13 +119,9 @@
     ⚙️ [ga4-events.json](assets/data/ga4-events.json) _(1.7KB)_
     ⚙️ [seo-templates.json](assets/data/seo-templates.json) _(3.6KB)_
 
-  📁 **diagrams/**
-
-  📁 **images/**
-
 
 📄 [00-README.md](00-README.md) _(2.6KB)_
-📄 [file-index.md](file-index.md) _(5.2KB)_
+📄 [file-index.md](file-index.md) _(6.5KB)_
 
 
 ## 🔍 文档导航

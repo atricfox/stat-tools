@@ -1,71 +1,47 @@
 {
-  "name": "stat-tools",
+  "name": "statcal",
   "version": "0.1.0",
   "private": true,
-  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "playwright test",
-    "test:worker": "vitest run src/workers",
-    "test:worker:watch": "vitest src/workers",
-    "test:coverage": "vitest run --coverage src/workers",
-    "test:coverage:ui": "vitest --ui --coverage src/workers",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "prepare": "husky install",
-    "setup:env": "bash ./scripts/setup-env.sh",
-    "update-docs-index": "node ./scripts/update-docs-index.js",
-    "check-docs": "node ./scripts/check-docs.js",
-    "lint-md": "markdownlint \"**/*.md\" -c .markdownlint.json",
-    "lint-gh": "gherkin-lint \"docs/03-acceptance/**/*.feature\" || true",
-    "docs-check": "npm run check-docs && npm run lint-md && npm run lint-gh"
+    "lint": "next lint",
+    "type-check": "tsc --noEmit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.2.1",
+    "@sentry/nextjs": "^8.20.0",
+    "@types/decimal.js": "^0.0.32",
+    "decimal.js": "^10.6.0",
+    "lucide-react": "^0.400.0",
     "next": "^15.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-hook-form": "^7.62.0",
+    "zod": "^4.1.5"
   },
   "devDependencies": {
-    "@commitlint/cli": "^18.0.0",
-    "@commitlint/config-conventional": "^18.0.0",
-    "@playwright/test": "^1.35.0",
-    "@types/node": "^20.4.2",
-    "@types/react": "^19.0.0",
-    "@types/react-dom": "^19.0.0",
-    "@typescript-eslint/eslint-plugin": "^6.21.0",
-    "@typescript-eslint/parser": "^6.21.0",
-    "@vitest/coverage-v8": "^1.0.0",
-    "@vitest/ui": "^1.0.0",
+    "@playwright/test": "^1.40.0",
+    "@testing-library/jest-dom": "^6.0.0",
+    "@testing-library/react": "^16.0.1",
+    "@types/node": "^20.0.0",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "autoprefixer": "^10.4.0",
+    "axe-core": "^4.9.0",
     "eslint": "^8.0.0",
     "eslint-config-next": "^15.0.0",
-    "eslint-config-prettier": "^9.1.2",
-    "eslint-plugin-prettier": "^5.5.4",
-    "gherkin-lint": "^4.2.4",
-    "husky": "^8.0.0",
-    "lint-staged": "^15.0.0",
-    "markdownlint-cli": "^0.35.0",
-    "prettier": "^3.0.0",
-    "sort-package-json": "^2.0.0",
-    "typescript": "^5.1.6",
-    "vitest": "^1.0.0"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,yml,yaml}": [
-      "prettier --write"
-    ],
-    "*.md": [
-      "markdownlint --fix"
-    ],
-    "package.json": [
-      "sort-package-json"
-    ]
+    "jest": "^29.0.0",
+    "jest-environment-jsdom": "^29.0.0",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.0.0"
   }
 }

@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    font-feature-settings: 'cv11', 'ss01';
+    font-variation-settings: 'opsz' 32;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-blue-500 text-white border-transparent;
+    @apply hover:bg-blue-600 focus:ring-blue-500;
+    @apply disabled:bg-gray-300 disabled:text-gray-500;
+    @apply transition-all duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-100 text-gray-900 border-transparent;
+    @apply hover:bg-gray-200 focus:ring-gray-500;
+    @apply transition-all duration-200;
+  }
+
+  .btn-outline {
+    @apply bg-transparent text-blue-500 border-blue-500;
+    @apply hover:bg-blue-50 focus:ring-blue-500;
+    @apply transition-all duration-200;
+  }
+}

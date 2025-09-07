@@ -26,5 +26,5 @@
     "types": ["node", "@playwright/test"]
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "tests", "specs"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "docs/**/*", "vitest.config.ts"]
 }

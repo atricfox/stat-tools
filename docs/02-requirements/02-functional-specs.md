@@ -80,10 +80,3 @@ reviewers: []
 1. PM/Owner：负责最终签发 FRS 文档并协调 Reviewer。 
 2. 安全负责人：负责安全控制与日志策略（GCP/KMS）。 
 3. 法务/合规：负责 GDPR/中国网络安全法 与 21 CFR 评估（如适用）。
-
----
-
-请 Review: Accept / Comment - <修改点> / Modify - <优先产出项>。一旦你 Accept，我会：
-
-- 将 GA4 事件表导出为 JSON 并写入 `specs/FRS/events/ga4-events.json`（下一交付物），
-- 并开始产出 `weighted-mean-calculator` 的 FRS（如果你同时确认）。
