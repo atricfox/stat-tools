@@ -14,7 +14,7 @@ Decimal.config({
 });
 
 /**
- * Parse input string and extract valid numbers
+ * Parse input string and extract valid numbers (legacy function, use parsers.ts for advanced parsing)
  */
 export function parseNumberInput(input: string): {
   validNumbers: number[];

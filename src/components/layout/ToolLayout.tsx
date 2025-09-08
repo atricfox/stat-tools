@@ -3,9 +3,11 @@
  * Provides consistent structure, navigation, and styling
  */
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
-import { ChevronRight, Home } from 'lucide-react';
+import { ChevronRight, Home, Menu, X } from 'lucide-react';
+import Breadcrumbs from '@/components/navigation/Breadcrumbs';
+import ToolNavigation from '@/components/navigation/ToolNavigation';
 
 export interface BreadcrumbItem {
   label: string;
@@ -19,6 +21,9 @@ export interface ToolLayoutProps {
   children: React.ReactNode;
   breadcrumbs?: BreadcrumbItem[];
   helpContent?: React.ReactNode;
+  showToolNavigation?: boolean;
+  showSidebar?: boolean;
+  sidebarContent?: React.ReactNode;
   className?: string;
 }
 
@@ -29,8 +34,12 @@ const ToolLayout: React.FC<ToolLayoutProps> = ({
   children,
   breadcrumbs = [],
   helpContent,
+  showToolNavigation = true,
+  showSidebar = false,
+  sidebarContent,
   className = ''
 }) => {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const defaultBreadcrumbs: BreadcrumbItem[] = [
     { label: 'Home', href: '/' },
     { label: 'Tools', href: '/tools' },

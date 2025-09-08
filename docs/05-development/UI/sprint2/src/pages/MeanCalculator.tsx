@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Calculator, Copy, RotateCcw, HelpCircle, CheckCircle, AlertCircle } from 'lucide-react';
+import Breadcrumb from '../components/Breadcrumb';
+import RelatedTools from '../components/RelatedTools';
+import PopularTools from '../components/PopularTools';
+import GoogleAdsPlaceholder from '../components/GoogleAdsPlaceholder';
 
 const MeanCalculator = () => {
   const [input, setInput] = useState('');
@@ -108,10 +112,24 @@ const MeanCalculator = () => {
   }, [input, precision]);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb items={[
+        { label: 'Calculators', href: '/#tools' },
+        { label: 'Mean Calculator' }
+      ]} />
+      
+      {/* Top Banner Ad - Full Width */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <GoogleAdsPlaceholder size="leaderboard" position="top" />
+        </div>
+      </div>
+      
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="flex items-center justify-center mb-4">
             <Calculator className="h-8 w-8 text-blue-500 mr-3" />
             <h1 className="text-3xl font-bold text-gray-900">Mean Calculator</h1>
@@ -122,9 +140,9 @@ const MeanCalculator = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Input Section */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Input Your Numbers</h2>
             
             <div className="space-y-4">
@@ -180,7 +198,8 @@ const MeanCalculator = () => {
           </div>
 
           {/* Results Section */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+          <div className="lg:col-span-1 space-y-6">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Results</h2>
             
             {!result ? (
@@ -260,6 +279,12 @@ const MeanCalculator = () => {
               </div>
             )}
           </div>
+          
+          {/* Sidebar Components */}
+          <GoogleAdsPlaceholder size="rectangle" position="sidebar" />
+          <RelatedTools currentTool="Mean Calculator" category="statistics" />
+          <PopularTools />
+        </div>
         </div>
 
         {/* Calculation Steps */}
@@ -286,6 +311,11 @@ const MeanCalculator = () => {
             </div>
           </div>
         )}
+        
+        {/* Bottom Banner Ad */}
+        <div className="mt-8">
+          <GoogleAdsPlaceholder size="banner" position="bottom" />
+        </div>
 
         {/* Help Section */}
         <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-6">

@@ -6,6 +6,7 @@ const FeaturedTools = () => {
     {
       name: 'Mean Calculator',
       slug: 'mean',
+      href: '/calculator/mean',
       description: 'Calculate arithmetic mean with step-by-step explanation',
       icon: Calculator,
       popular: true
@@ -82,7 +83,7 @@ const FeaturedTools = () => {
               return (
                 <a
                   key={index}
-                  href={`/tool/${tool.slug}`}
+                  href={tool.href || `/tool/${tool.slug}`}
                   className="p-4 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors duration-200 text-left group block focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
                   <div className="flex items-center mb-2">
@@ -104,7 +105,7 @@ const FeaturedTools = () => {
             return (
               <a
                 key={index}
-                href={`/tool/${tool.slug}`}
+                href={tool.href || `/tool/${tool.slug}`}
                 className="p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors duration-200 text-left group block focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <div className="flex items-center mb-2">

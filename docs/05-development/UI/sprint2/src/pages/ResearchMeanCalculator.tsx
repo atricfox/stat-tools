@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Microscope, Share2, Download, AlertTriangle, CheckCircle, Copy, RotateCcw } from 'lucide-react';
+import Breadcrumb from '../components/Breadcrumb';
+import RelatedTools from '../components/RelatedTools';
+import PopularTools from '../components/PopularTools';
+import GoogleAdsPlaceholder from '../components/GoogleAdsPlaceholder';
 
 const ResearchMeanCalculator = () => {
   const [input, setInput] = useState('');
@@ -209,10 +213,24 @@ Data: ${result.validNumbers.join(', ')}
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gray-50">
+      {/* Breadcrumb Navigation */}
+      <Breadcrumb items={[
+        { label: 'Calculators', href: '/#tools' },
+        { label: 'Research Mean Calculator' }
+      ]} />
+      
+      {/* Top Banner Ad - Full Width */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <GoogleAdsPlaceholder size="leaderboard" position="top" />
+        </div>
+      </div>
+      
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        
         {/* Header */}
-        <div className="text-center mb-8">
+        <div className="text-center mb-6">
           <div className="flex items-center justify-center mb-4">
             <Microscope className="h-8 w-8 text-blue-500 mr-3" />
             <h1 className="text-3xl font-bold text-gray-900">Research Mean Calculator</h1>
@@ -223,7 +241,7 @@ Data: ${result.validNumbers.join(', ')}
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
           {/* Input Section */}
           <div className="lg:col-span-1">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
@@ -307,7 +325,7 @@ Data: ${result.validNumbers.join(', ')}
           </div>
 
           {/* Results Section */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-xl font-semibold text-gray-900">Statistical Results</h2>
@@ -429,6 +447,13 @@ Data: ${result.validNumbers.join(', ')}
               )}
             </div>
           </div>
+          
+          {/* Sidebar */}
+          <div className="lg:col-span-1 space-y-6">
+            <GoogleAdsPlaceholder size="rectangle" position="sidebar" />
+            <RelatedTools currentTool="Research Mean Calculator" category="analysis" />
+            <PopularTools />
+          </div>
         </div>
 
         {/* Methodology Section */}
@@ -464,6 +489,11 @@ Data: ${result.validNumbers.join(', ')}
               </p>
             </div>
           </div>
+        </div>
+        
+        {/* Bottom Banner Ad */}
+        <div className="mt-8">
+          <GoogleAdsPlaceholder size="banner" position="bottom" />
         </div>
       </div>
     </div>
