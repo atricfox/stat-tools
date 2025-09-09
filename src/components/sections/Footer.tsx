@@ -20,11 +20,11 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Popular Tools</h3>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li><a href="#" className="hover:text-white transition-colors">Mean Calculator</a></li>
+              <li><a href="/calculator/mean" className="hover:text-white transition-colors">Mean Calculator</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Standard Deviation</a></li>
               <li><a href="#" className="hover:text-white transition-colors">t-Test Calculator</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Confidence Intervals</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">GPA Calculator</a></li>
+              <li><a href="/calculator/weighted-mean" className="hover:text-white transition-colors">GPA Calculator</a></li>
             </ul>
           </div>
 

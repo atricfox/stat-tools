@@ -112,19 +112,19 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
   const getContextualTips = () => {
     const tips = {
       student: [
-        '💡 每一步都要仔细检查计算',
-        '📝 记录每个步骤的公式',
-        '🔍 理解每个数字的含义'
+        '💡 Check each calculation step carefully',
+        '📝 Record the formula for each step',
+        '🔍 Understand the meaning of each number'
       ],
       research: [
-        '📊 验证统计假设',
-        '🧮 检查计算精度',
-        '📈 分析结果的统计意义'
+        '📊 Validate statistical assumptions',
+        '🧮 Check calculation precision',
+        '📈 Analyze statistical significance of results'
       ],
       teacher: [
-        '👥 强调概念理解',
-        '✏️ 提供练习机会',
-        '🎯 联系实际应用'
+        '👥 Emphasize conceptual understanding',
+        '✏️ Provide practice opportunities',
+        '🎯 Connect to real-world applications'
       ]
     };
     return tips[context];
@@ -137,8 +137,8 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <BookOpen className="h-5 w-5 text-blue-600 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">计算步骤</h3>
-            <span className="ml-2 text-sm text-gray-500">({steps.length} 步骤)</span>
+            <h3 className="text-lg font-semibold text-gray-900">Calculation Steps</h3>
+            <span className="ml-2 text-sm text-gray-500">({steps.length} steps)</span>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -150,7 +150,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                   ? 'bg-blue-100 text-blue-700' 
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
-              title={showAllFormulas ? '隐藏公式' : '显示公式'}
+              title={showAllFormulas ? 'Hide Formulas' : 'Show Formulas'}
             >
               {showAllFormulas ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
@@ -165,7 +165,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                       ? 'bg-red-100 text-red-700 hover:bg-red-200' 
                       : 'bg-green-100 text-green-700 hover:bg-green-200'
                   }`}
-                  title={isPlaying ? '暂停动画' : '播放动画'}
+                  title={isPlaying ? 'Pause Animation' : 'Play Animation'}
                 >
                   {isPlaying ? <PauseCircle className="h-4 w-4" /> : <PlayCircle className="h-4 w-4" />}
                 </button>
@@ -173,7 +173,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                 <button
                   onClick={resetSteps}
                   className="p-2 bg-gray-100 text-gray-600 hover:bg-gray-200 rounded-lg transition-colors"
-                  title="重置步骤"
+                  title="Reset Steps"
                 >
                   <RotateCcw className="h-4 w-4" />
                 </button>
@@ -246,7 +246,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                         copyStep(step);
                       }}
                       className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded"
-                      title="复制步骤"
+                      title="Copy Step"
                     >
                       <Copy className="h-4 w-4" />
                     </button>
@@ -270,7 +270,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                     <div className="mb-3 p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center mb-1">
                         <Target className="h-4 w-4 text-gray-600 mr-1" />
-                        <span className="text-sm font-medium text-gray-700">公式:</span>
+                        <span className="text-sm font-medium text-gray-700">Formula:</span>
                       </div>
                       <div className="font-mono text-sm text-gray-900 bg-white p-2 rounded border">
                         {step.formula}
@@ -282,7 +282,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                   <div className="mb-3 p-3 bg-blue-50 rounded-lg">
                     <div className="flex items-center mb-1">
                       <Calculator className="h-4 w-4 text-blue-600 mr-1" />
-                      <span className="text-sm font-medium text-blue-700">计算过程:</span>
+                      <span className="text-sm font-medium text-blue-700">Calculation:</span>
                     </div>
                     <div className="font-mono text-sm">
                       <div className="text-gray-700">{step.calculation}</div>
@@ -295,7 +295,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                     <div className="mb-3 p-3 bg-green-50 rounded-lg">
                       <div className="flex items-center mb-1">
                         <Lightbulb className="h-4 w-4 text-green-600 mr-1" />
-                        <span className="text-sm font-medium text-green-700">解释:</span>
+                        <span className="text-sm font-medium text-green-700">Explanation:</span>
                       </div>
                       <p className="text-sm text-green-800">{step.explanation}</p>
                     </div>
@@ -307,7 +307,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                       <div className="flex items-start">
                         <Lightbulb className="h-4 w-4 text-yellow-600 mr-2 mt-0.5" />
                         <div className="text-sm text-yellow-800">
-                          <strong>小贴士:</strong> {step.tips}
+                          <strong>Tip:</strong> {step.tips}
                         </div>
                       </div>
                     </div>
@@ -324,7 +324,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
         <div className="p-4 border-t border-gray-200 bg-gray-50 rounded-b-xl">
           <h4 className="text-sm font-medium text-gray-900 mb-2 flex items-center">
             <Lightbulb className="h-4 w-4 mr-1" />
-            学习提示
+            Study Tips
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-2 text-sm">
             {getContextualTips().map((tip, index) => (
@@ -346,7 +346,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
             />
           </div>
           <div className="text-xs text-gray-500 text-center mt-1">
-            步骤 {Math.max(0, currentStep + 1)} / {steps.length}
+            Step {Math.max(0, currentStep + 1)} / {steps.length}
           </div>
         </div>
       )}

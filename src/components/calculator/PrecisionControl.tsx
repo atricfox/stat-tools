@@ -10,7 +10,6 @@ import {
   Settings, 
   Target, 
   Zap, 
-  RefreshCw, 
   Info,
   ChevronDown,
   Hash
@@ -43,22 +42,22 @@ const PrecisionControl: React.FC<PrecisionControlProps> = ({
   // Preset values for different contexts  
   const presets = {
     student: [
-      { value: 0, label: '整数', description: '不显示小数位' },
-      { value: 1, label: '1位小数', description: '例如: 12.3' },
-      { value: 2, label: '2位小数', description: '例如: 12.34' },
-      { value: 3, label: '3位小数', description: '例如: 12.345' }
+      { value: 0, label: 'Whole', description: 'No decimal places' },
+      { value: 1, label: '1 Decimal', description: 'Example: 12.3' },
+      { value: 2, label: '2 Decimals', description: 'Example: 12.34' },
+      { value: 3, label: '3 Decimals', description: 'Example: 12.345' }
     ],
     research: [
-      { value: 2, label: 'Standard', description: '标准精度 (2位)' },
-      { value: 4, label: 'High', description: '高精度 (4位)' },
-      { value: 6, label: 'Scientific', description: '科学计算 (6位)' },
-      { value: 8, label: 'Ultra-High', description: '超高精度 (8位)' }
+      { value: 2, label: 'Standard', description: 'Standard precision (2 places)' },
+      { value: 4, label: 'High', description: 'High precision (4 places)' },
+      { value: 6, label: 'Scientific', description: 'Scientific calculation (6 places)' },
+      { value: 8, label: 'Ultra-High', description: 'Ultra-high precision (8 places)' }
     ],
     teacher: [
-      { value: 0, label: 'Whole', description: '整数结果' },
-      { value: 1, label: 'Tenths', description: '十分位' },
-      { value: 2, label: 'Hundredths', description: '百分位' },
-      { value: 4, label: 'Detailed', description: '详细结果' }
+      { value: 0, label: 'Whole', description: 'Integer results' },
+      { value: 1, label: 'Tenths', description: 'Tenths place' },
+      { value: 2, label: 'Hundredths', description: 'Hundredths place' },
+      { value: 4, label: 'Detailed', description: 'Detailed results' }
     ]
   };
 
@@ -68,11 +67,11 @@ const PrecisionControl: React.FC<PrecisionControlProps> = ({
   // Smart precision suggestions based on context
   const getSuggestion = () => {
     if (userContext === 'student') {
-      return precision > 3 ? '学生作业通常使用2-3位小数' : '';
+      return precision > 3 ? 'Student assignments typically use 2-3 decimal places' : '';
     } else if (userContext === 'research') {
-      return precision < 4 ? '研究分析建议使用4位以上精度' : '';
+      return precision < 4 ? 'Research analysis recommends 4+ decimal places' : '';
     } else {
-      return precision > 4 ? '教学展示建议使用较少小数位' : '';
+      return precision > 4 ? 'Teaching demonstrations suggest fewer decimal places' : '';
     }
   };
 
@@ -82,10 +81,6 @@ const PrecisionControl: React.FC<PrecisionControlProps> = ({
 
   const handleSliderChange = (value: number) => {
     onPrecisionChange(Math.max(minPrecision, Math.min(maxPrecision, value)));
-  };
-
-  const formatExample = (num: number, digits: number) => {
-    return num.toFixed(digits);
   };
 
   return (
@@ -114,7 +109,7 @@ const PrecisionControl: React.FC<PrecisionControlProps> = ({
             </button>
             {showTooltip && (
               <div className="absolute right-0 top-6 bg-gray-900 text-white text-xs p-2 rounded shadow-lg z-10 w-48">
-                精度控制结果的小数位数。更高精度适合科学计算，较低精度适合日常使用。
+                Controls the number of decimal places in results. Higher precision is suitable for scientific calculations, lower precision for daily use.
               </div>
             )}
           </div>
@@ -155,7 +150,7 @@ const PrecisionControl: React.FC<PrecisionControlProps> = ({
       {advancedMode && (
         <div className="mb-4 p-3 bg-gray-50 rounded-lg">
           <div className="flex items-center justify-between mb-2">
-            <label className="text-sm font-medium text-gray-700">自定义精度</label>
+            <label className="text-sm font-medium text-gray-700">Custom Precision</label>
             <input
               type="number"
               value={precision}
@@ -174,42 +169,12 @@ const PrecisionControl: React.FC<PrecisionControlProps> = ({
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
           />
           <div className="flex justify-between text-xs text-gray-500 mt-1">
-            <span>{minPrecision}位</span>
-            <span>{maxPrecision}位</span>
+            <span>{minPrecision} places</span>
+            <span>{maxPrecision} places</span>
           </div>
         </div>
       )}
 
-      {/* Example display */}
-      <div className="bg-gray-50 rounded-lg p-3">
-        <div className="flex items-center justify-between mb-2">
-          <span className="text-sm font-medium text-gray-700">示例效果</span>
-          <RefreshCw className="h-3 w-3 text-gray-400" />
-        </div>
-        
-        <div className="space-y-2 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-600">计算结果:</span>
-            <span className="font-mono text-gray-900">
-              {formatExample(123.456789, precision)}
-            </span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">标准差:</span>
-            <span className="font-mono text-gray-900">
-              {formatExample(15.789234, precision)}
-            </span>
-          </div>
-          {userContext === 'research' && precision >= 4 && (
-            <div className="flex justify-between">
-              <span className="text-gray-600">置信区间:</span>
-              <span className="font-mono text-gray-900">
-                [{formatExample(120.123456, precision)}, {formatExample(126.789012, precision)}]
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
 
       {/* Smart suggestions */}
       {getSuggestion() && (
@@ -217,7 +182,7 @@ const PrecisionControl: React.FC<PrecisionControlProps> = ({
           <div className="flex items-start">
             <Zap className="h-4 w-4 text-yellow-600 mr-2 mt-0.5" />
             <div className="text-sm text-yellow-800">
-              <strong>建议:</strong> {getSuggestion()}
+              <strong>Suggestion:</strong> {getSuggestion()}
             </div>
           </div>
         </div>
@@ -226,13 +191,13 @@ const PrecisionControl: React.FC<PrecisionControlProps> = ({
       {/* Context-specific tips */}
       {userContext === 'student' && (
         <div className="mt-3 text-xs text-gray-600">
-          <strong>提示:</strong> 作业和考试通常使用2位小数。更多位数可能让答案看起来更复杂。
+          <strong>Tip:</strong> Assignments and exams typically use 2 decimal places. More digits may make answers appear more complex.
         </div>
       )}
       
       {userContext === 'research' && precision >= 6 && (
         <div className="mt-3 text-xs text-blue-600">
-          <strong>科学计算:</strong> 高精度适合研究分析，但请注意数据的实际测量精度。
+          <strong>Scientific Computing:</strong> High precision is suitable for research analysis, but pay attention to the actual measurement precision of your data.
         </div>
       )}
 

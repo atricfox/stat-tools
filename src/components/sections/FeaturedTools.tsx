@@ -1,5 +1,5 @@
 import React from 'react'
-import { Calculator, BarChart3, TrendingUp, ArrowRight } from 'lucide-react'
+import { Calculator, BarChart3, TrendingUp, ArrowRight, GraduationCap } from 'lucide-react'
 
 const FeaturedTools = () => {
   const tools = [
@@ -12,9 +12,10 @@ const FeaturedTools = () => {
       popular: true
     },
     {
-      name: 'Standard Deviation',
+      name: 'Standard Deviation Calculator',
       slug: 'standard-deviation',
-      description: 'Sample and population standard deviation calculator',
+      href: '/calculator/standard-deviation',
+      description: 'Calculate sample and population standard deviation with comprehensive statistical analysis',
       icon: BarChart3,
       popular: true
     },
@@ -33,11 +34,20 @@ const FeaturedTools = () => {
       popular: true
     },
     {
+      name: 'Weighted Mean Calculator',
+      slug: 'weighted-mean',
+      href: '/calculator/weighted-mean',
+      description: 'Calculate weighted averages with multiple input methods',
+      icon: Calculator,
+      popular: true
+    },
+    {
       name: 'GPA Calculator',
       slug: 'gpa',
-      description: 'Calculate GPA with weighted and unweighted options',
-      icon: Calculator,
-      popular: false
+      href: '/calculator/gpa',
+      description: 'Calculate Grade Point Average with multiple grading systems (4.0/4.3/4.5)',
+      icon: GraduationCap,
+      popular: true
     },
     {
       name: 'Correlation',
