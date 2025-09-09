@@ -15,7 +15,7 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
-    "@sentry/nextjs": "^8.20.0",
+    "@sentry/nextjs": "^10.10.0",
     "@types/decimal.js": "^0.0.32",
     "decimal.js": "^10.6.0",
     "framer-motion": "^12.23.12",
