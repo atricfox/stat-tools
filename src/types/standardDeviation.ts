@@ -3,6 +3,8 @@
  * Supports both sample and population calculations with comprehensive statistical analysis
  */
 
+export type StatisticalDataInputMode = 'manual' | 'csv' | 'excel' | 'paste';
+
 export interface DataPoint {
   id: string;
   value: number;

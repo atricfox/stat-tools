@@ -60,7 +60,7 @@ const DataInput: React.FC<DataInputProps> = ({
 
   // Parse and validate input
   const processInput = useCallback((inputText: string) => {
-    if (!inputText.trim()) {
+    if (!inputText || !inputText.trim()) {
       setParseResult(null);
       setValidationResult(null);
       onValidation?.(true, {
@@ -89,7 +89,7 @@ const DataInput: React.FC<DataInputProps> = ({
 
   // Real-time processing
   useEffect(() => {
-    const timeoutId = setTimeout(() => processInput(value), 300);
+    const timeoutId = setTimeout(() => processInput(value || ''), 300);
     return () => clearTimeout(timeoutId);
   }, [value, processInput]);
 

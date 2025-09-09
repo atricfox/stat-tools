@@ -11,7 +11,7 @@ import {
 import { 
   DataCleaner, 
   CleaningOptions 
-} from '@/lib/data-cleaning';
+} from '@/lib/data-cleaner';
 import { 
   calculateMean, 
   MeanCalculationResult 

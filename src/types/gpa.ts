@@ -315,6 +315,7 @@ export interface UseGPACalculation {
     message: string;
   };
   calculateWithCurrentCourses: (system: GradePointSystem, options?: Partial<GPACalculatorState>) => Promise<void>;
+  calculateWithCompatibleCourses: (system: GradePointSystem, options?: Partial<GPACalculatorState>) => Promise<void>;
   exportCourses: (format?: 'json' | 'csv') => string;
   importCourses: (data: string, format?: 'json' | 'csv') => number;
 }
