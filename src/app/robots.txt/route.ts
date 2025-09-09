@@ -159,7 +159,7 @@ export function validateRobotsRules(): {
 // 检查URL是否被robots.txt阻止
 export function isUrlBlocked(url: string, userAgent: string = '*'): boolean {
   const path = new URL(url, SITE_URL).pathname;
-  const rules = USER_AGENT_RULES[userAgent] || USER_AGENT_RULES['*'];
+  const rules = USER_AGENT_RULES[userAgent as keyof typeof USER_AGENT_RULES] || USER_AGENT_RULES['*'];
   
   // 先检查是否明确允许
   if (rules.allow?.some(allowedPath => matchesPattern(path, allowedPath))) {

@@ -289,17 +289,17 @@ Student 4	96	94	98`
       )}
 
       {/* Context-specific features */}
-      {parseResult && context === 'research' && 'researchInfo' in parseResult && (
+      {parseResult && context === 'research' && 'researchInfo' in parseResult && parseResult.researchInfo && (
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
           <div className="text-sm text-purple-800">
             <div className="font-medium mb-1">Research Data Analysis</div>
-            {parseResult.researchInfo.hasScientificNotation && (
+            {(parseResult.researchInfo as any).hasScientificNotation && (
               <div>• Scientific notation detected</div>
             )}
-            {parseResult.researchInfo.precisionIssues.length > 0 && (
-              <div>• Precision notes: {parseResult.researchInfo.precisionIssues[0]}</div>
+            {(parseResult.researchInfo as any).precisionIssues?.length > 0 && (
+              <div>• Precision notes: {(parseResult.researchInfo as any).precisionIssues[0]}</div>
             )}
-            <div>• Suggested precision: {parseResult.researchInfo.suggestedSignificantFigures} significant figures</div>
+            <div>• Suggested precision: {(parseResult.researchInfo as any).suggestedSignificantFigures || 3} significant figures</div>
           </div>
         </div>
       )}

@@ -67,7 +67,13 @@ export default function ToolsPage() {
   };
 
   // 处理搜索结果变化
-  const handleSearchChange = (results: any[]) => {
+  const handleSearchChange = (results: {
+    tools: any[];
+    totalCount: number;
+    filteredCount: number;
+    searchTime: number;
+    suggestions: any[];
+  }) => {
     console.log('Search results:', results);
   };
 
@@ -162,8 +168,7 @@ export default function ToolsPage() {
                 config={{
                   showSearch: true,
                   showFilters: true,
-                  showFeatured: true,
-                  showCategories: true,
+                  featuredSection: true,
                   defaultView: 'grid'
                 }}
               />
@@ -221,14 +226,12 @@ export default function ToolsPage() {
             </div>
             <div className="p-6">
               <AdvancedSearch
-                onResultsChange={handleSearchChange}
-                onToolClick={handleToolClick}
-                config={{
-                  showSuggestions: true,
-                  showHistory: true,
-                  showFilters: true,
-                  enableAnalytics: false // 在演示中禁用分析
-                }}
+                onResults={handleSearchChange}
+                showSuggestions={true}
+                showHistory={true}
+                showFilters={true}
+                showSorting={true}
+                placeholder="Search for statistical calculators..."
               />
             </div>
           </div>
