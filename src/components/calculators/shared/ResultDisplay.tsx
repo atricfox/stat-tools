@@ -26,7 +26,7 @@ export default function ResultDisplay({
   if (!result) {
     return (
       <div className={`p-6 bg-gray-50 border border-gray-200 rounded-lg ${className}`}>
-        <p className="text-gray-500 text-center">暂无计算结果</p>
+        <p className="text-gray-500 text-center">No calculation results yet</p>
       </div>
     );
   }
@@ -66,20 +66,20 @@ export default function ResultDisplay({
         <div className={`p-6 border rounded-lg ${getDifficultyColor(finalResult.difficultyLevel)}`}>
           <div className="flex items-center space-x-3 mb-4">
             {getDifficultyIcon(finalResult.difficultyLevel)}
-            <h3 className="text-lg font-semibold">期末考试分数预测</h3>
+            <h3 className="text-lg font-semibold">Final Exam Score Prediction</h3>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
-              <p className="text-sm opacity-75">需要的期末分数</p>
+              <p className="text-sm opacity-75">Required Final Score</p>
               <p className="text-3xl font-bold">
-                {finalResult.isAchievable ? `${finalResult.requiredScore.toFixed(1)}分` : '无法达到'}
+                {finalResult.isAchievable ? `${finalResult.requiredScore.toFixed(1)}%` : 'Not Achievable'}
               </p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm opacity-75">当前加权分数</p>
+              <p className="text-sm opacity-75">Current Weighted Score</p>
               <p className="text-xl font-semibold">
-                {finalResult.currentWeightedScore.toFixed(1)}分
+                {finalResult.currentWeightedScore.toFixed(1)}%
               </p>
             </div>
           </div>
@@ -87,7 +87,7 @@ export default function ResultDisplay({
           {!finalResult.isAchievable && (
             <div className="mt-4 p-3 bg-white bg-opacity-50 rounded">
               <p className="text-sm">
-                最高可能分数: <strong>{finalResult.maxPossibleGrade.toFixed(1)}分</strong>
+                Maximum Possible Grade: <strong>{finalResult.maxPossibleGrade.toFixed(1)}%</strong>
               </p>
             </div>
           )}
@@ -95,14 +95,14 @@ export default function ResultDisplay({
 
         {/* Recommendation */}
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-          <h4 className="font-semibold text-blue-800 mb-2">建议</h4>
+          <h4 className="font-semibold text-blue-800 mb-2">Recommendation</h4>
           <p className="text-blue-700">{finalResult.recommendation}</p>
         </div>
 
         {/* Calculation Steps */}
         {showDetails && (
           <div className="p-4 bg-gray-50 border border-gray-200 rounded-lg">
-            <h4 className="font-semibold text-gray-800 mb-3">计算步骤</h4>
+            <h4 className="font-semibold text-gray-800 mb-3">Calculation Steps</h4>
             <ol className="space-y-2 text-sm text-gray-700">
               {finalResult.calculationSteps.map((step, index) => (
                 <li key={index} className="flex items-start space-x-2">
@@ -134,19 +134,19 @@ export default function ResultDisplay({
       <div className={`space-y-6 ${className}`}>
         {/* Main Result */}
         <div className={`p-6 border rounded-lg ${getGPAColor(semesterResult.semesterGPA)}`}>
-          <h3 className="text-lg font-semibold mb-4">学期成绩总结</h3>
+          <h3 className="text-lg font-semibold mb-4">Semester Grade Summary</h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <p className="text-sm opacity-75">学期GPA</p>
+              <p className="text-sm opacity-75">Semester GPA</p>
               <p className="text-3xl font-bold">{semesterResult.semesterGPA.toFixed(2)}</p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm opacity-75">总学分</p>
+              <p className="text-sm opacity-75">Total Credits</p>
               <p className="text-xl font-semibold">{semesterResult.totalCredits}</p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm opacity-75">课程数量</p>
+              <p className="text-sm opacity-75">Course Count</p>
               <p className="text-xl font-semibold">{semesterResult.courseCount}</p>
             </div>
           </div>
@@ -157,7 +157,7 @@ export default function ResultDisplay({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Highest Performing */}
             <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
-              <h4 className="font-semibold text-green-800 mb-3">表现最佳课程</h4>
+              <h4 className="font-semibold text-green-800 mb-3">Top Performing Courses</h4>
               <div className="space-y-2">
                 {semesterResult.performanceAnalysis.highestPerforming.slice(0, 3).map((course, index) => (
                   <div key={index} className="flex justify-between items-center text-sm">
@@ -170,7 +170,7 @@ export default function ResultDisplay({
 
             {/* Lowest Performing */}
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
-              <h4 className="font-semibold text-yellow-800 mb-3">需要关注课程</h4>
+              <h4 className="font-semibold text-yellow-800 mb-3">Courses Needing Attention</h4>
               <div className="space-y-2">
                 {semesterResult.performanceAnalysis.lowestPerforming.slice(0, 3).map((course, index) => (
                   <div key={index} className="flex justify-between items-center text-sm">
@@ -186,7 +186,7 @@ export default function ResultDisplay({
         {/* Recommendations */}
         {semesterResult.recommendations && semesterResult.recommendations.length > 0 && (
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">建议</h4>
+            <h4 className="font-semibold text-blue-800 mb-2">Recommendations</h4>
             <ul className="space-y-1 text-blue-700">
               {semesterResult.recommendations.map((rec, index) => (
                 <li key={index} className="flex items-start space-x-2">
@@ -214,10 +214,10 @@ export default function ResultDisplay({
 
     const getCompetitiveLevelText = (level: string) => {
       switch (level) {
-        case 'excellent': return '优秀';
-        case 'good': return '良好';
-        case 'average': return '一般';
-        case 'below-average': return '需要提高';
+        case 'excellent': return 'Excellent';
+        case 'good': return 'Good';
+        case 'average': return 'Average';
+        case 'below-average': return 'Below Average';
         default: return level;
       }
     };
@@ -226,23 +226,23 @@ export default function ResultDisplay({
       <div className={`space-y-6 ${className}`}>
         {/* Main Result */}
         <div className={`p-6 border rounded-lg ${getGPAColor(cumulativeResult.cumulativeGPA)}`}>
-          <h3 className="text-lg font-semibold mb-4">累积GPA计算结果</h3>
+          <h3 className="text-lg font-semibold mb-4">Cumulative GPA Results</h3>
           
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="space-y-2">
-              <p className="text-sm opacity-75">累积GPA</p>
+              <p className="text-sm opacity-75">Cumulative GPA</p>
               <p className="text-3xl font-bold">{cumulativeResult.cumulativeGPA.toFixed(2)}</p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm opacity-75">总学分</p>
+              <p className="text-sm opacity-75">Total Credits</p>
               <p className="text-xl font-semibold">{cumulativeResult.totalCredits}</p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm opacity-75">课程总数</p>
+              <p className="text-sm opacity-75">Total Courses</p>
               <p className="text-xl font-semibold">{cumulativeResult.courseCount}</p>
             </div>
             <div className="space-y-2">
-              <p className="text-sm opacity-75">竞争力水平</p>
+              <p className="text-sm opacity-75">Competitive Level</p>
               <p className="text-lg font-semibold">
                 {getCompetitiveLevelText(cumulativeResult.competitiveAnalysis.competitiveLevel)}
               </p>
@@ -253,11 +253,11 @@ export default function ResultDisplay({
         {/* Competitive Analysis */}
         {showDetails && (
           <div className="p-4 bg-indigo-50 border border-indigo-200 rounded-lg">
-            <h4 className="font-semibold text-indigo-800 mb-3">竞争力分析</h4>
+            <h4 className="font-semibold text-indigo-800 mb-3">Competitive Analysis</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <p className="text-sm text-indigo-700">
-                  您的GPA超过了 <strong>{cumulativeResult.competitiveAnalysis.percentile}%</strong> 的学生
+                  Your GPA exceeds <strong>{cumulativeResult.competitiveAnalysis.percentile}%</strong> of students
                 </p>
                 <div className="w-full bg-indigo-200 rounded-full h-2">
                   <div 
@@ -270,7 +270,7 @@ export default function ResultDisplay({
                 <p className="text-2xl font-bold text-indigo-800">
                   {cumulativeResult.competitiveAnalysis.percentile}%
                 </p>
-                <p className="text-sm text-indigo-600">排名百分位</p>
+                <p className="text-sm text-indigo-600">Percentile Ranking</p>
               </div>
             </div>
           </div>
@@ -279,7 +279,7 @@ export default function ResultDisplay({
         {/* Improvement Suggestions */}
         {cumulativeResult.competitiveAnalysis.improvementSuggestions.length > 0 && (
           <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-            <h4 className="font-semibold text-blue-800 mb-2">提升建议</h4>
+            <h4 className="font-semibold text-blue-800 mb-2">Improvement Suggestions</h4>
             <ul className="space-y-1 text-blue-700">
               {cumulativeResult.competitiveAnalysis.improvementSuggestions.map((suggestion, index) => (
                 <li key={index} className="flex items-start space-x-2">

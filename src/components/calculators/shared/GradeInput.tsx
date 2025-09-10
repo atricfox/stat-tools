@@ -77,11 +77,11 @@ export default function GradeInput({
     const errorKey = `${id}-${field}`;
 
     if (field === 'name' && (!value || value.trim() === '')) {
-      newErrors[errorKey] = '请输入作业/考试名称';
+      newErrors[errorKey] = 'Please enter assignment/exam name';
     } else if (field === 'score' && (isNaN(value) || value < 0 || value > 100)) {
-      newErrors[errorKey] = '分数必须在0-100之间';
+      newErrors[errorKey] = 'Score must be between 0-100';
     } else if (field === 'weight' && allowWeightEdit && (isNaN(value) || value < 0 || value > 100)) {
-      newErrors[errorKey] = '权重必须在0-100之间';
+      newErrors[errorKey] = 'Weight must be between 0-100';
     } else {
       delete newErrors[errorKey];
     }
@@ -94,10 +94,12 @@ export default function GradeInput({
     <div className={`space-y-4 ${className}`}>
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-semibold text-gray-800">成绩输入</h3>
+        <div className="text-sm text-gray-600">
+          {grades.length > 0 ? `${grades.length} items added` : 'No items added'}
+        </div>
         {showWeightTotal && (
           <div className="flex items-center space-x-2">
-            <span className="text-sm text-gray-600">权重总计:</span>
+            <span className="text-sm text-gray-600">Total Weight:</span>
             <span className={`text-sm font-medium ${
               Math.abs(totalWeight - 100) > 0.01 ? 'text-red-600' : 'text-green-600'
             }`}>
@@ -114,14 +116,14 @@ export default function GradeInput({
             {/* Grade Name */}
             <div className="md:col-span-5">
               <label htmlFor={`name-${grade.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                {placeholder.name || '作业/考试名称'}
+                {placeholder.name || 'Assignment/Exam Name'}
               </label>
               <input
                 id={`name-${grade.id}`}
                 type="text"
                 value={grade.name}
                 onChange={(e) => updateGradeItem(grade.id, 'name', e.target.value)}
-                placeholder={`作业 ${index + 1}`}
+                placeholder={`Assignment ${index + 1}`}
                 className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
                   errors[`${grade.id}-name`] ? 'border-red-300' : 'border-gray-300'
                 }`}
@@ -134,7 +136,7 @@ export default function GradeInput({
             {/* Score */}
             <div className="md:col-span-3">
               <label htmlFor={`score-${grade.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                {placeholder.score || '分数'}
+                {placeholder.score || 'Score'}
               </label>
               <input
                 id={`score-${grade.id}`}
@@ -156,7 +158,7 @@ export default function GradeInput({
             {/* Weight */}
             <div className="md:col-span-3">
               <label htmlFor={`weight-${grade.id}`} className="block text-sm font-medium text-gray-700 mb-1">
-                {placeholder.weight || '权重 (%)'}
+                {placeholder.weight || 'Weight (%)'}
               </label>
               <input
                 id={`weight-${grade.id}`}
@@ -181,7 +183,7 @@ export default function GradeInput({
               <button
                 onClick={() => removeGradeItem(grade.id)}
                 className="w-full md:w-auto px-3 py-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors"
-                title="删除该项"
+                title="Remove this item"
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
@@ -201,7 +203,7 @@ export default function GradeInput({
           <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
-          <span>添加成绩项目</span>
+          <span>Add Grade Item</span>
         </button>
       )}
 
@@ -213,7 +215,7 @@ export default function GradeInput({
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
             </svg>
             <p className="text-sm text-yellow-800">
-              权重总和为 {totalWeight.toFixed(1)}%，建议调整至100%以获得准确的计算结果。
+              Total weight is {totalWeight.toFixed(1)}%. Recommend adjusting to 100% for accurate calculations.
             </p>
           </div>
         </div>
@@ -223,7 +225,7 @@ export default function GradeInput({
       {grades.length > 0 && (
         <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
           <p className="text-sm text-blue-800">
-            已添加 {grades.length} 个成绩项目，权重总计 {totalWeight.toFixed(1)}%
+            Added {grades.length} grade items, total weight {totalWeight.toFixed(1)}%
           </p>
         </div>
       )}

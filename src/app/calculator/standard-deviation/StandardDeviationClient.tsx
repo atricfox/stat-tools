@@ -5,7 +5,8 @@ import {
   Share2,
   HelpCircle,
   BarChart3,
-  RefreshCw
+  RefreshCw,
+  ChevronDown
 } from 'lucide-react';
 import CalculatorLayout from '@/components/layout/CalculatorLayout';
 import PrecisionControl from '@/components/calculator/PrecisionControl';
@@ -60,7 +61,7 @@ export default function StandardDeviationClient() {
   const [precision, setPrecision] = useState(2);
   const [userMode, setUserMode] = useState<'student' | 'research' | 'teacher'>('student');
   const [showSteps, setShowSteps] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
+  const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
   const [showVisualization, setShowVisualization] = useState(false);
   // const [showSettings, setShowSettings] = useState(false); // unused
   const [showShare, setShowShare] = useState(false);
@@ -389,9 +390,9 @@ export default function StandardDeviationClient() {
           </div>
         )}
 
-        {/* Control Buttons */}
+        {/* Calculation Steps Button - Only when results available */}
         {result && (
-          <div className="flex gap-4 mt-6">
+          <div className="flex justify-center mt-6">
             <button
               onClick={() => setShowSteps(!showSteps)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -402,30 +403,35 @@ export default function StandardDeviationClient() {
             >
               {showSteps ? 'Hide' : 'Show'} Calculation Steps
             </button>
-            
-            <button
-              onClick={() => setShowHelp(!showHelp)}
-              className={`flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
-                showHelp 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <HelpCircle className="h-4 w-4 mr-2" />
-              {showHelp ? 'Hide' : 'Show'} Help
-            </button>
           </div>
         )}
 
-        {/* Help Section */}
-        {showHelp && (
-          <div className="mt-8">
-            <HelpSection
-              calculatorType="standard-deviation"
-              userMode={userMode}
-            />
+        {/* Help Section - Clickable Header for expand/collapse */}
+        <div className="mt-8">
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+            <button
+              onClick={() => setShowHelp(!showHelp)}
+              className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 -m-2 rounded-lg transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">
+                <HelpCircle className="w-5 h-5 inline mr-2" />
+                Standard Deviation Calculator Help
+              </h3>
+              <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
+                showHelp ? 'rotate-180' : ''
+              }`} />
+            </button>
+            
+            {showHelp && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <HelpSection
+                  calculatorType="standard-deviation"
+                  userMode={userMode}
+                />
+              </div>
+            )}
           </div>
-        )}
+        </div>
       </CalculatorLayout>
     </>
   );

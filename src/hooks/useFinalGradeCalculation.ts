@@ -73,7 +73,7 @@ export default function useFinalGradeCalculation({
     
     try {
       if (grades.length === 0) {
-        errors.push('请至少添加一个成绩项目');
+        errors.push('Please add at least one grade item');
       } else {
         validateGradeInputs(grades, true); // Allow normalization
       }
@@ -84,17 +84,17 @@ export default function useFinalGradeCalculation({
     }
 
     if (finalExamWeight < 1 || finalExamWeight > 100) {
-      errors.push('期末考试权重必须在1-100%之间');
+      errors.push('Final exam weight must be between 1-100%');
     }
 
     if (targetGrade <= 0 || targetGrade > 100) {
-      errors.push('目标成绩必须在1-100之间');
+      errors.push('Target grade must be between 1-100');
     }
 
     // Check if current weights + final weight makes sense
     const currentTotalWeight = grades.reduce((sum, grade) => sum + grade.weight, 0);
     if (currentTotalWeight + finalExamWeight > 105) { // Allow small tolerance
-      errors.push(`当前成绩权重(${currentTotalWeight.toFixed(1)}%) + 期末权重(${finalExamWeight}%) 超过100%`);
+      errors.push(`Current grades weight (${currentTotalWeight.toFixed(1)}%) + final exam weight (${finalExamWeight}%) exceeds 100%`);
     }
 
     return errors;
@@ -119,7 +119,7 @@ export default function useFinalGradeCalculation({
   // Calculation function
   const calculate = useCallback(async () => {
     if (!canCalculate) {
-      setError('请检查输入数据的有效性');
+      setError('Please check the validity of input data');
       return;
     }
 
@@ -142,7 +142,7 @@ export default function useFinalGradeCalculation({
       setResult(calculationResult);
       setError(null);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '计算过程中发生未知错误';
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred during calculation';
       setError(errorMessage);
       setResult(null);
     } finally {

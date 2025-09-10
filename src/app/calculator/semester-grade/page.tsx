@@ -8,12 +8,12 @@ import CalculatorLayout from '@/components/layout/CalculatorLayout';
 import SemesterGradeCalculator from '@/components/calculators/SemesterGradeCalculator';
 
 export const metadata: Metadata = {
-  title: '学期总成绩计算器 - StatCal 统计工具',
-  description: '计算学期GPA和总成绩，支持多种评分制度转换，提供详细的成绩分析和学习建议。',
-  keywords: ['学期成绩', 'GPA计算', '学期总结', '成绩分析', '评分制度', '学分计算'],
+  title: 'Semester Grade Calculator - StatCal Statistical Tools',
+  description: 'Calculate semester GPA and overall grade with support for multiple grading systems. Get detailed grade analysis and academic recommendations.',
+  keywords: ['semester grade calculator', 'GPA calculator', 'semester GPA', 'grade analysis', 'grading systems', 'credit hours'],
   openGraph: {
-    title: '学期总成绩计算器',
-    description: '计算学期GPA和总成绩，支持多种评分制度',
+    title: 'Semester Grade Calculator',
+    description: 'Calculate semester GPA and overall grade with multiple grading system support',
     type: 'website',
   },
   alternates: {
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: '学期总成绩计算器',
-  description: '计算学期GPA和总成绩，支持多种评分制度转换',
+  name: 'Semester Grade Calculator',
+  description: 'Calculate semester GPA and overall grade with multiple grading system support',
   applicationCategory: 'EducationalApplication',
   operatingSystem: 'Web Browser',
   offers: {
@@ -35,19 +35,18 @@ const jsonLd = {
     priceCurrency: 'CNY'
   },
   featureList: [
-    '多门课程批量计算',
-    '多种评分制度支持',
-    '学期GPA自动计算',
-    '成绩分析和建议',
-    '课程贡献度分析'
+    'Multiple course batch calculation',
+    'Multiple grading system support',
+    'Automatic semester GPA calculation',
+    'Grade analysis and recommendations',
+    'Course contribution analysis'
   ]
 };
 
 export default function SemesterGradeCalculatorPage() {
   const breadcrumbs = [
-    { label: '首页', href: '/' },
-    { label: '计算器', href: '/calculator' },
-    { label: '学期总成绩' }
+    { label: 'Calculators', href: '/calculator' },
+    { label: 'Semester Grade Calculator' }
   ];
 
   return (
@@ -58,8 +57,8 @@ export default function SemesterGradeCalculatorPage() {
       />
       
       <CalculatorLayout
-        title="学期总成绩计算器"
-        description="计算学期GPA和总成绩，支持多种评分制度，提供详细的成绩分析"
+        title="Semester Grade Calculator"
+        description="Calculate semester GPA and overall grade with multiple grading system support and detailed grade analysis"
         breadcrumbs={breadcrumbs}
         currentTool="semester-grade-calculator"
         toolCategory="gpa"

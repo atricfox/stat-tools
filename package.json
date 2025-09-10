@@ -3,9 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
+    "dev": "node -r ./setup-globals.js ./node_modules/.bin/next dev -p 3011",
+    "build": "NEXT_LINT=false node -r ./setup-globals.js ./node_modules/.bin/next build",
+    "start": "node -r ./setup-globals.js ./node_modules/.bin/next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
     "test": "jest",

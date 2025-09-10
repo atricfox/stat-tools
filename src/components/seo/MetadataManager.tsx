@@ -4,10 +4,7 @@
  * Features: 动态标题生成、关键词优化、Open Graph、Twitter Card
  */
 
-'use client';
-
 import { Metadata } from 'next';
-import { usePathname } from 'next/navigation';
 
 // SEO配置接口
 export interface SEOConfig {
@@ -399,26 +396,5 @@ export class MetadataManager {
   }
 }
 
-// Hook for using MetadataManager
-export function useMetadataManager() {
-  const pathname = usePathname();
-  const manager = MetadataManager.getInstance();
-  
-  // 从路径中提取工具ID
-  const getToolIdFromPath = (path: string): string | undefined => {
-    const match = path.match(/\/calculator\/([^\/]+)/);
-    return match ? match[1] : undefined;
-  };
-  
-  const toolId = getToolIdFromPath(pathname);
-  
-  return {
-    manager,
-    toolId,
-    generateMetadata: (customConfig?: Partial<SEOConfig>) => 
-      manager.generateMetadata(toolId, customConfig),
-    validateConfig: (config: SEOConfig) => manager.validateSEOConfig(config)
-  };
-}
 
 export default MetadataManager;

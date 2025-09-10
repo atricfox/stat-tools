@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useState } from 'react';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, ChevronDown } from 'lucide-react';
 import CalculatorLayout from '@/components/layout/CalculatorLayout';
 import UserModeSelector, { UserMode } from '@/components/calculator/UserModeSelector';
 import WeightedDataInput from '@/components/calculator/WeightedDataInput';
@@ -19,7 +19,7 @@ export default function WeightedMeanCalculator() {
   const [precision, setPrecision] = useState(2);
   const [inputMode, setInputMode] = useState<InputMode>('pairs');
   const [showSteps, setShowSteps] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
+  const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
 
   // Use the weighted mean calculation hook
   const {
@@ -189,14 +189,31 @@ export default function WeightedMeanCalculator() {
           />
         )}
 
-        {/* Help Section */}
-        {showHelp && (
-          <HelpSection
-            userMode={userMode}
-            calculatorType="weighted-mean"
-            className="shadow-sm"
-          />
-        )}
+        {/* Help Section - Clickable Header for expand/collapse */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+          <button
+            onClick={() => setShowHelp(!showHelp)}
+            className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 -m-2 rounded-lg transition-colors"
+          >
+            <h3 className="text-lg font-semibold text-gray-900">
+              <HelpCircle className="w-5 h-5 inline mr-2" />
+              Weighted Mean Calculator Help
+            </h3>
+            <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
+              showHelp ? 'rotate-180' : ''
+            }`} />
+          </button>
+          
+          {showHelp && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <HelpSection
+                userMode={userMode}
+                calculatorType="weighted-mean"
+                className="shadow-sm"
+              />
+            </div>
+          )}
+        </div>
 
         {/* Mode-specific placeholder information */}
         <div className="bg-gray-50 rounded-xl p-6">
@@ -257,9 +274,22 @@ export default function WeightedMeanCalculator() {
           </div>
         </div>
 
-        {/* Toggle Buttons and Share Row */}
-        {result && (
-          <div className="flex flex-wrap gap-4">
+        {/* Control Buttons - Help Always Available for SEO */}
+        <div className="flex flex-wrap gap-4">
+          <button
+            onClick={() => setShowHelp(!showHelp)}
+            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
+              showHelp 
+                ? 'bg-blue-100 text-blue-700' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <HelpCircle className="h-4 w-4 mr-2" />
+            {showHelp ? 'Hide' : 'Show'} Help
+          </button>
+          
+          {/* Calculation Steps Button - Only when results available */}
+          {result && (
             <button
               onClick={() => setShowSteps(!showSteps)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
@@ -270,26 +300,17 @@ export default function WeightedMeanCalculator() {
             >
               {showSteps ? 'Hide' : 'Show'} Calculation Steps
             </button>
-            <button
-              onClick={() => setShowHelp(!showHelp)}
-              className={`flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
-                showHelp 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              <HelpCircle className="h-4 w-4 mr-2" />
-              {showHelp ? 'Hide' : 'Show'} Help
-            </button>
-            
-            {/* Share Calculation */}
+          )}
+          
+          {/* Share Calculation - Only when results available */}
+          {result && (
             <ShareCalculation
               onCreateShare={(options) => createShareableUrl(result, options)}
               onGenerateQR={generateQRCode}
               result={result}
             />
-          </div>
-        )}
+          )}
+        </div>
 
       </div>
     </CalculatorLayout>

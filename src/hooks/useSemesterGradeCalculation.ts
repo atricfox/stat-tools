@@ -65,45 +65,45 @@ export default function useSemesterGradeCalculation({
     const errors: string[] = [];
     
     if (courses.length === 0) {
-      errors.push('请至少添加一门课程');
+      errors.push('Please add at least one course');
       return errors;
     }
 
     courses.forEach((course, index) => {
       if (!course.name || course.name.trim() === '') {
-        errors.push(`第${index + 1}门课程：请输入课程名称`);
+        errors.push(`Course ${index + 1}: Please enter course name`);
       }
 
       if (course.credits <= 0 || course.credits > 20) {
-        errors.push(`第${index + 1}门课程：学分必须在0.1-20之间`);
+        errors.push(`Course ${index + 1}: Credits must be between 0.1-20`);
       }
 
       // Validate grade based on grading scale
       if (gradingScale === 'percentage') {
         const gradeNum = typeof course.grade === 'string' ? parseFloat(course.grade) : course.grade;
         if (isNaN(gradeNum) || gradeNum < 0 || gradeNum > 100) {
-          errors.push(`第${index + 1}门课程：成绩必须在0-100之间`);
+          errors.push(`Course ${index + 1}: Grade must be between 0-100`);
         }
       } else if (gradingScale === '4.0') {
         if (typeof course.grade === 'string') {
           const validGrades = ['A+', 'A', 'A-', 'B+', 'B', 'B-', 'C+', 'C', 'C-', 'D+', 'D', 'D-', 'F'];
           if (!validGrades.includes(course.grade)) {
-            errors.push(`第${index + 1}门课程：请输入有效的字母成绩 (A+ ~ F)`);
+            errors.push(`Course ${index + 1}: Please enter a valid letter grade (A+ ~ F)`);
           }
         } else {
           if (course.grade < 0 || course.grade > 4.0) {
-            errors.push(`第${index + 1}门课程：GPA必须在0-4.0之间`);
+            errors.push(`Course ${index + 1}: GPA must be between 0-4.0`);
           }
         }
       } else if (gradingScale === '5.0') {
         if (typeof course.grade === 'string') {
           const validGrades = ['A', 'B', 'C', 'D', 'F'];
           if (!validGrades.includes(course.grade)) {
-            errors.push(`第${index + 1}门课程：请输入有效的字母成绩 (A, B, C, D, F)`);
+            errors.push(`Course ${index + 1}: Please enter a valid letter grade (A, B, C, D, F)`);
           }
         } else {
           if (course.grade < 1 || course.grade > 5) {
-            errors.push(`第${index + 1}门课程：成绩必须在1-5之间`);
+            errors.push(`Course ${index + 1}: Grade must be between 1-5`);
           }
         }
       }
@@ -128,7 +128,7 @@ export default function useSemesterGradeCalculation({
   // Calculation function
   const calculate = useCallback(async () => {
     if (!canCalculate) {
-      setError('请检查输入数据的有效性');
+      setError('Please check the validity of input data');
       return;
     }
 
@@ -149,7 +149,7 @@ export default function useSemesterGradeCalculation({
       setResult(calculationResult);
       setError(null);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : '计算过程中发生未知错误';
+      const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred during calculation';
       setError(errorMessage);
       setResult(null);
     } finally {

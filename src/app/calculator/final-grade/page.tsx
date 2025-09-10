@@ -8,12 +8,12 @@ import CalculatorLayout from '@/components/layout/CalculatorLayout';
 import FinalGradeCalculator from '@/components/calculators/FinalGradeCalculator';
 
 export const metadata: Metadata = {
-  title: '期末成绩预测计算器 - StatCal 统计工具',
-  description: '预测期末考试所需分数，帮助学生制定学习目标。支持多项成绩加权计算，提供可行性分析和学习建议。',
-  keywords: ['期末成绩预测', '成绩计算器', '学习规划', '目标分数', '加权平均', '考试预测'],
+  title: 'Final Grade Calculator - StatCal Statistical Tools',
+  description: 'Calculate the final exam score needed to achieve your target grade. Supports weighted grade calculations with feasibility analysis and study recommendations.',
+  keywords: ['final grade calculator', 'exam score predictor', 'grade calculator', 'weighted average', 'target grade', 'study planning'],
   openGraph: {
-    title: '期末成绩预测计算器',
-    description: '预测期末考试所需分数，科学制定学习目标',
+    title: 'Final Grade Calculator',
+    description: 'Calculate required final exam score to achieve your target grade',
     type: 'website',
   },
   alternates: {
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: '期末成绩预测计算器',
-  description: '预测期末考试所需分数，帮助学生制定学习目标',
+  name: 'Final Grade Calculator',
+  description: 'Calculate required final exam score to achieve your target grade',
   applicationCategory: 'EducationalApplication',
   operatingSystem: 'Web Browser',
   offers: {
@@ -35,19 +35,18 @@ const jsonLd = {
     priceCurrency: 'CNY'
   },
   featureList: [
-    '多项成绩加权计算',
-    '期末分数预测',
-    '可行性分析',
-    '学习建议',
-    '实时计算更新'
+    'Weighted grade calculations',
+    'Final exam score prediction',
+    'Feasibility analysis',
+    'Study recommendations',
+    'Real-time calculation updates'
   ]
 };
 
 export default function FinalGradeCalculatorPage() {
   const breadcrumbs = [
-    { label: '首页', href: '/' },
-    { label: '计算器', href: '/calculator' },
-    { label: '期末成绩预测' }
+    { label: 'Calculators', href: '/calculator' },
+    { label: 'Final Grade Calculator' }
   ];
 
   return (
@@ -58,8 +57,8 @@ export default function FinalGradeCalculatorPage() {
       />
       
       <CalculatorLayout
-        title="期末成绩预测计算器"
-        description="预测期末考试所需分数，制定科学的学习目标和复习计划"
+        title="Final Grade Calculator"
+        description="Calculate the final exam score needed to achieve your target grade and plan your study strategy"
         breadcrumbs={breadcrumbs}
         currentTool="final-grade-calculator"
         toolCategory="gpa"

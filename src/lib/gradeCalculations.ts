@@ -84,21 +84,57 @@ export function calculateRequiredFinalScore(
   // Generate recommendation
   let recommendation: string;
   if (!isAchievable) {
-    recommendation = `目标成绩${targetGrade}分无法达到。建议调整目标至${Math.floor(maxPossibleGrade)}分或以下。`;
+    recommendation = `Target grade of ${targetGrade} points cannot be achieved. Recommend adjusting target to ${Math.floor(maxPossibleGrade)} points or below.`;
   } else if (difficultyLevel === 'easy') {
-    recommendation = `期末考试需要${Math.ceil(requiredScore)}分，难度较低，保持当前学习状态即可。`;
+    recommendation = `Final exam requires ${Math.ceil(requiredScore)} points. Difficulty is low, maintain current study habits.`;
   } else if (difficultyLevel === 'moderate') {
-    recommendation = `期末考试需要${Math.ceil(requiredScore)}分，需要适度加强复习。`;
+    recommendation = `Final exam requires ${Math.ceil(requiredScore)} points. Moderate effort needed, increase study time.`;
   } else {
-    recommendation = `期末考试需要${Math.ceil(requiredScore)}分，需要全力冲刺！建议制定详细复习计划。`;
+    recommendation = `Final exam requires ${Math.ceil(requiredScore)} points. High effort needed! Create a detailed study plan.`;
   }
 
-  // Generate calculation steps
+  // Generate structured calculation steps
   const calculationSteps = [
-    `当前成绩加权平均: ${currentWeightedScore.toFixed(1)}%`,
-    `当前成绩贡献: ${currentWeightedScore.toFixed(1)} × ${(100-finalExamWeight)}% = ${currentContribution.toFixed(1)}%`,
-    `期末考试需贡献: ${targetGrade} - ${currentContribution.toFixed(1)} = ${requiredFinalContribution.toFixed(1)}%`,
-    `期末考试需得分: ${requiredFinalContribution.toFixed(1)} ÷ ${finalExamWeight}% = ${requiredScore.toFixed(1)}%`
+    {
+      id: 'step-1',
+      title: 'Calculate Current Weighted Average',
+      description: 'Calculate the weighted average of current grades',
+      formula: 'Weighted Average = Σ(score × weight) / Σ(weight)',
+      calculation: `${currentGrades.map(g => `${g.score} × ${g.weight}%`).join(' + ')} / ${currentGrades.reduce((sum, g) => sum + g.weight, 0)}%`,
+      result: `${currentWeightedScore.toFixed(1)}%`,
+      explanation: 'This gives us the average performance on completed assignments and exams.',
+      difficulty: 'basic' as const
+    },
+    {
+      id: 'step-2',
+      title: 'Calculate Current Grade Contribution',
+      description: 'Calculate how much current grades contribute to final grade',
+      formula: 'Current Contribution = Current Weighted Average × (100% - Final Exam Weight)',
+      calculation: `${currentWeightedScore.toFixed(1)}% × ${(100-finalExamWeight)}%`,
+      result: `${currentContribution.toFixed(1)}%`,
+      explanation: 'This shows what portion of your final grade is already determined.',
+      difficulty: 'basic' as const
+    },
+    {
+      id: 'step-3',
+      title: 'Calculate Required Final Exam Contribution',
+      description: 'Calculate how much the final exam needs to contribute',
+      formula: 'Required Final Contribution = Target Grade - Current Contribution',
+      calculation: `${targetGrade}% - ${currentContribution.toFixed(1)}%`,
+      result: `${requiredFinalContribution.toFixed(1)}%`,
+      explanation: 'This is the gap that must be filled by your final exam performance.',
+      difficulty: 'intermediate' as const
+    },
+    {
+      id: 'step-4',
+      title: 'Calculate Required Final Exam Score',
+      description: 'Calculate the minimum score needed on the final exam',
+      formula: 'Required Score = Required Final Contribution ÷ Final Exam Weight × 100',
+      calculation: `${requiredFinalContribution.toFixed(1)}% ÷ ${finalExamWeight}% × 100`,
+      result: `${requiredScore.toFixed(1)}%`,
+      explanation: `You need to score ${requiredScore.toFixed(1)}% on your final exam to achieve your target grade.`,
+      difficulty: 'intermediate' as const
+    }
   ];
 
   return {
@@ -221,7 +257,8 @@ export function calculateSemesterGPA(
         lowestPerforming: [],
         averageCredits: 0
       },
-      recommendations: ['没有有效的课程数据']
+      recommendations: ['No valid course data'],
+      calculationSteps: []
     };
   }
 
@@ -258,19 +295,87 @@ export function calculateSemesterGPA(
   // Generate recommendations
   const recommendations: string[] = [];
   if (semesterGPA >= 3.5) {
-    recommendations.push('优秀的学期表现！继续保持。');
+    recommendations.push('Excellent semester performance! Keep it up.');
   } else if (semesterGPA >= 3.0) {
-    recommendations.push('良好的学期表现，可以进一步提升。');
+    recommendations.push('Good semester performance, room for improvement.');
   } else if (semesterGPA >= 2.5) {
-    recommendations.push('学期表现一般，建议加强学习方法。');
+    recommendations.push('Average semester performance, consider improving study methods.');
   } else {
-    recommendations.push('需要重视学习问题，建议寻求学习帮助。');
+    recommendations.push('Need to address learning issues, recommend seeking academic help.');
   }
 
   if (performanceAnalysis.lowestPerforming.length > 0) {
     const lowestCourse = performanceAnalysis.lowestPerforming[0];
-    recommendations.push(`重点关注${lowestCourse.name}的学习。`);
+    recommendations.push(`Focus on improving performance in ${lowestCourse.name}.`);
   }
+
+  // Generate structured calculation steps
+  const calculationSteps = [
+    {
+      id: 'step-1',
+      title: 'Convert Grades to Grade Points',
+      description: 'Convert each course grade to grade points based on the grading scale',
+      formula: 'Grade Points = Grade Value according to grading scale',
+      calculation: coursesWithPoints.map(course => 
+        `${course.name}: ${course.grade} → ${course.gradePoints!.toFixed(2)} points`
+      ).join(', '),
+      result: `${coursesWithPoints.length} courses converted`,
+      explanation: 'Each grade is converted to numerical grade points using the selected grading scale.',
+      difficulty: 'basic' as const
+    },
+    {
+      id: 'step-2', 
+      title: 'Calculate Quality Points for Each Course',
+      description: 'Multiply grade points by credit hours for each course',
+      formula: 'Quality Points = Grade Points × Credit Hours',
+      calculation: coursesWithPoints.map(course => 
+        `${course.name}: ${course.gradePoints!.toFixed(2)} × ${course.credits} = ${(course.gradePoints! * course.credits).toFixed(2)}`
+      ).join(', '),
+      result: `Total Quality Points: ${totalGradePoints.toFixed(2)}`,
+      explanation: 'Quality points represent the weighted contribution of each course to your GPA.',
+      difficulty: 'basic' as const
+    },
+    {
+      id: 'step-3',
+      title: 'Sum Total Credits',
+      description: 'Add up all credit hours from included courses',
+      formula: 'Total Credits = Sum of all course credit hours',
+      calculation: coursesWithPoints.map(course => 
+        `${course.credits} credits`
+      ).join(' + ') + ` = ${totalCredits}`,
+      result: `${totalCredits} total credits`,
+      explanation: 'Total credits represent the academic workload for the semester.',
+      difficulty: 'basic' as const
+    },
+    {
+      id: 'step-4',
+      title: 'Calculate Semester GPA',
+      description: 'Divide total quality points by total credit hours',
+      formula: 'Semester GPA = Total Quality Points ÷ Total Credits',
+      calculation: `${totalGradePoints.toFixed(2)} ÷ ${totalCredits} = ${semesterGPA.toFixed(3)}`,
+      result: `Semester GPA: ${Math.round(semesterGPA * 100) / 100}`,
+      explanation: 'The semester GPA represents your academic performance weighted by course credits.',
+      difficulty: 'intermediate' as const
+    },
+    {
+      id: 'step-5',
+      title: 'Performance Analysis',
+      description: 'Analyze grade distribution and academic performance',
+      formula: 'Performance Level = Based on GPA thresholds',
+      calculation: `GPA ${semesterGPA.toFixed(2)} → ${
+        semesterGPA >= 3.5 ? 'Excellent (≥3.5)' :
+        semesterGPA >= 3.0 ? 'Good (3.0-3.4)' :
+        semesterGPA >= 2.5 ? 'Average (2.5-2.9)' : 'Below Average (<2.5)'
+      }`,
+      result: `Academic Level: ${
+        semesterGPA >= 3.5 ? 'Excellent' :
+        semesterGPA >= 3.0 ? 'Good' :
+        semesterGPA >= 2.5 ? 'Average' : 'Needs Improvement'
+      }`,
+      explanation: 'Performance analysis helps understand academic standing and areas for improvement.',
+      difficulty: 'intermediate' as const
+    }
+  ];
 
   return {
     weightedAverage: Math.round(semesterGPA * 100 * 10) / 10,
@@ -280,7 +385,8 @@ export function calculateSemesterGPA(
     courseCount: coursesWithPoints.length,
     gradeDistribution,
     performanceAnalysis,
-    recommendations
+    recommendations,
+    calculationSteps
   };
 }
 
@@ -337,13 +443,13 @@ export function calculateCumulativeGPA(
   // Generate improvement suggestions
   const improvementSuggestions: string[] = [];
   if (cumulativeGPA < 3.5) {
-    improvementSuggestions.push('考虑重修低分课程提高GPA');
-    improvementSuggestions.push('选择相对容易获得高分的选修课');
-    improvementSuggestions.push('寻求学术辅导和学习资源');
+    improvementSuggestions.push('Consider retaking low-grade courses to improve GPA');
+    improvementSuggestions.push('Choose electives where high grades are more achievable');
+    improvementSuggestions.push('Seek academic tutoring and learning resources');
   }
   if (cumulativeGPA >= 3.5) {
-    improvementSuggestions.push('保持当前学习水平');
-    improvementSuggestions.push('挑战更高难度的课程');
+    improvementSuggestions.push('Maintain current academic performance level');
+    improvementSuggestions.push('Challenge yourself with more advanced courses');
   }
 
   return {

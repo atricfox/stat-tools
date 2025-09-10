@@ -1,14 +1,16 @@
 "use client";
 /**
  * FinalGradeCalculator - Complete final grade prediction calculator component
- * Implements US-019: 学生预测期末考试所需分数
+ * Implements US-019: Final exam score prediction for students
  */
 
-import React from 'react';
+import React, { useState } from 'react';
+import { HelpCircle, RefreshCw, ChevronDown } from 'lucide-react';
 import useFinalGradeCalculation from '@/hooks/useFinalGradeCalculation';
-import GradeInput from './shared/GradeInput';
+import CalculationSteps, { CalculationStep } from '@/components/calculator/CalculationSteps';
+import GradeDataInput from './shared/GradeDataInput';
 import WeightSlider from './shared/WeightSlider';
-import ResultDisplay from './shared/ResultDisplay';
+import FinalGradeResultDisplay from './shared/FinalGradeResultDisplay';
 import type { GradeItem, GradingScale } from '@/types/education';
 
 interface FinalGradeCalculatorProps {
@@ -40,86 +42,111 @@ export default function FinalGradeCalculator({
     remainingWeight,
     canCalculate
   } = useFinalGradeCalculation({
-    initialGrades: [
-      {
-        id: 'sample-1',
-        name: '期中考试',
-        score: 0,
-        weight: 30,
-        category: 'exam'
-      }
-    ],
-    initialFinalWeight: 50,
+    initialGrades: [],
+    initialFinalWeight: 40,
     initialTargetGrade: 85,
-    autoCalculate: true
+    autoCalculate: false
   });
+
+  // Grade management functions for the new input component
+  const addGrade = (newGrade: Omit<GradeItem, 'id'>) => {
+    const grade: GradeItem = {
+      ...newGrade,
+      id: `grade-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    };
+    setGrades([...grades, grade]);
+  };
+
+  const updateGrade = (gradeId: string, updates: Partial<GradeItem>) => {
+    setGrades(grades.map(grade => 
+      grade.id === gradeId ? { ...grade, ...updates } : grade
+    ));
+  };
+
+  const removeGrade = (gradeId: string) => {
+    setGrades(grades.filter(grade => grade.id !== gradeId));
+  };
+
+  const clearAllGrades = () => {
+    setGrades([]);
+  };
+
+
+  // UI State for showing steps and help
+  const [showSteps, setShowSteps] = useState(false);
+  const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
 
   // Notify parent component about result changes
   React.useEffect(() => {
     onResultChange?.(result !== null);
   }, [result, onResultChange]);
 
-  return (
-    <div className={`space-y-8 ${className}`}>
-      {/* Calculator Header */}
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          期末成绩预测计算器
-        </h2>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          输入当前已有成绩和权重，设定目标分数，预测期末考试需要达到的分数
-        </p>
-      </div>
+  // Convert calculation steps to CalculationSteps format
+  const getCalculationSteps = (): CalculationStep[] => {
+    if (!result || !result.calculationSteps) return [];
+    
+    return result.calculationSteps.map(step => ({
+      id: step.id,
+      title: step.title,
+      description: step.description,
+      formula: step.formula || '',
+      calculation: step.calculation,
+      result: step.result,
+      explanation: step.explanation,
+      difficulty: step.difficulty as 'basic' | 'intermediate' | 'advanced'
+    }));
+  };
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Input Section */}
-        <div className="lg:col-span-2 space-y-6">
+  return (
+    <div className={`space-y-6 ${className}`}>
+      {/* Input Section */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+        <div className="space-y-6">
+          
           {/* Current Grades Input */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <GradeInput
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Current Grades</h3>
+            <GradeDataInput
               grades={grades}
               onGradesChange={setGrades}
-              maxItems={10}
-              allowWeightEdit={true}
-              showWeightTotal={true}
-              placeholder={{
-                name: '作业/考试名称',
-                score: '已得分数',
-                weight: '权重 (%)'
-              }}
+              onAddGrade={addGrade}
+              onUpdateGrade={updateGrade}
+              onRemoveGrade={removeGrade}
+              onClearAll={clearAllGrades}
+              maxGrades={15}
             />
           </div>
 
           {/* Configuration Section */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-800 mb-4">计算设置</h3>
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Calculation Settings</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Final Exam Weight */}
               <div>
                 <WeightSlider
-                  label="期末考试权重"
+                  label="Final Exam Weight"
                   value={finalExamWeight}
                   onChange={setFinalExamWeight}
                   min={1}
                   max={Math.min(100, remainingWeight + finalExamWeight)}
                   step={1}
                   unit="%"
-                  description={`当前剩余可分配权重: ${remainingWeight.toFixed(1)}%`}
+                  description={`Available weight: ${remainingWeight.toFixed(1)}%`}
                 />
               </div>
 
               {/* Target Grade */}
               <div>
                 <WeightSlider
-                  label="目标总分"
+                  label="Target Grade"
                   value={targetGrade}
                   onChange={setTargetGrade}
                   min={1}
                   max={100}
                   step={0.1}
-                  unit="分"
-                  description="希望在这门课程中达到的总分"
+                  unit="pts"
+                  description="Desired overall grade for this course"
                 />
               </div>
             </div>
@@ -127,7 +154,7 @@ export default function FinalGradeCalculator({
             {/* Grading Scale Selection */}
             <div className="mt-6">
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                评分制度
+                Grading Scale
               </label>
               <div className="flex flex-wrap gap-2">
                 {(['percentage', '4.0', '5.0'] as GradingScale[]).map((scale) => (
@@ -140,33 +167,11 @@ export default function FinalGradeCalculator({
                         : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                   >
-                    {scale === 'percentage' ? '百分制' : 
-                     scale === '4.0' ? '4.0制' : '5.0制'}
+                    {scale === 'percentage' ? 'Percentage' : 
+                     scale === '4.0' ? '4.0 Scale' : '5.0 Scale'}
                   </button>
                 ))}
               </div>
-            </div>
-
-            {/* Manual Calculate Button */}
-            <div className="mt-6 flex items-center justify-between">
-              <button
-                onClick={calculate}
-                disabled={!canCalculate || isCalculating}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                  canCalculate && !isCalculating
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {isCalculating ? '计算中...' : '重新计算'}
-              </button>
-              
-              <button
-                onClick={reset}
-                className="px-4 py-2 text-gray-600 hover:text-gray-800 transition-colors"
-              >
-                重置
-              </button>
             </div>
 
             {/* Validation Errors */}
@@ -176,7 +181,7 @@ export default function FinalGradeCalculator({
                   <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
                   </svg>
-                  <h4 className="text-sm font-medium text-red-800">输入验证错误</h4>
+                  <h4 className="text-sm font-medium text-red-800">Validation Errors</h4>
                 </div>
                 <ul className="text-sm text-red-700 space-y-1">
                   {validationErrors.map((error, index) => (
@@ -189,118 +194,169 @@ export default function FinalGradeCalculator({
               </div>
             )}
 
-            {/* General Error Display */}
-            {error && (
-              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
-                <div className="flex items-center">
-                  <svg className="w-5 h-5 text-red-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16c-.77.833.192 2.5 1.732 2.5z" />
-                  </svg>
-                  <p className="text-sm text-red-800">{error}</p>
-                </div>
-              </div>
-            )}
+            {/* Action Buttons */}
+            <div className="flex gap-2 justify-center pt-2">
+              {grades.length > 0 && (
+                <button
+                  onClick={calculate}
+                  disabled={!canCalculate || isCalculating}
+                  className={`px-6 py-3 rounded-lg font-medium transition-colors ${
+                    canCalculate && !isCalculating
+                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {isCalculating ? 'Calculating...' : 'Calculate Required Score'}
+                </button>
+              )}
+              
+              <button
+                onClick={reset}
+                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                title="Reset all data"
+              >
+                <RefreshCw className="h-4 w-4" />
+              </button>
+            </div>
           </div>
         </div>
+      </div>
 
-        {/* Right Column - Results and Summary */}
-        <div className="space-y-6">
+      {/* Results Section */}
+      {result && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+          <h2 className="text-xl font-semibold text-gray-900 mb-4">Final Grade Prediction</h2>
+          
           {/* Current Status Summary */}
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 p-6 rounded-lg border border-blue-200">
-            <h3 className="text-lg font-semibold text-blue-900 mb-4">当前状态</h3>
-            <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">已有成绩数量:</span>
-                <span className="font-medium text-blue-900">{grades.length} 项</span>
+          <div className="bg-blue-50 rounded-lg p-4 mb-6">
+            <h4 className="text-sm font-medium text-blue-900 mb-2">Current Status</h4>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div>
+                <div className="font-medium text-blue-700">{grades.length}</div>
+                <div className="text-blue-600">Assignments</div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">当前加权分数:</span>
-                <span className="font-medium text-blue-900">
-                  {currentWeightedScore.toFixed(1)} 分
-                </span>
+              <div>
+                <div className="font-medium text-blue-700">{currentWeightedScore.toFixed(1)}</div>
+                <div className="text-blue-600">Current Score</div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">已分配权重:</span>
-                <span className="font-medium text-blue-900">
-                  {(grades.reduce((sum, grade) => sum + grade.weight, 0)).toFixed(1)}%
-                </span>
+              <div>
+                <div className="font-medium text-blue-700">{finalExamWeight}%</div>
+                <div className="text-blue-600">Final Weight</div>
               </div>
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">期末考试权重:</span>
-                <span className="font-medium text-blue-900">{finalExamWeight}%</span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-blue-700">目标总分:</span>
-                <span className="font-medium text-blue-900">{targetGrade} 分</span>
+              <div>
+                <div className="font-medium text-blue-700">{targetGrade}</div>
+                <div className="text-blue-600">Target Grade</div>
               </div>
             </div>
           </div>
 
           {/* Results Display */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-            <ResultDisplay
-              result={result}
-              type="final-grade"
-              showDetails={true}
-              className="p-6"
-            />
-          </div>
+          <FinalGradeResultDisplay
+            result={result}
+            showDetails={true}
+          />
 
-          {/* Quick Tips */}
-          <div className="bg-green-50 p-4 rounded-lg border border-green-200">
-            <h4 className="text-green-800 font-semibold mb-2">💡 使用提示</h4>
-            <ul className="text-sm text-green-700 space-y-1">
-              <li>• 权重总和应该等于100%</li>
-              <li>• 可以添加多个已完成的作业和考试</li>
-              <li>• 系统会自动计算并更新结果</li>
-              <li>• 红色表示目标可能无法达到</li>
-              <li>• 绿色表示目标容易达到</li>
-            </ul>
-          </div>
+        </div>
+      )}
 
-          {/* Study Motivation */}
-          {result?.isAchievable && result?.difficultyLevel && (
-            <div className={`p-4 rounded-lg border ${
-              result.difficultyLevel === 'easy' 
-                ? 'bg-green-50 border-green-200'
-                : result.difficultyLevel === 'moderate'
-                ? 'bg-blue-50 border-blue-200'
-                : result.difficultyLevel === 'challenging'
-                ? 'bg-orange-50 border-orange-200'
-                : 'bg-red-50 border-red-200'
-            }`}>
-              <h4 className={`font-semibold mb-2 ${
-                result.difficultyLevel === 'easy' 
-                  ? 'text-green-800'
-                  : result.difficultyLevel === 'moderate'
-                  ? 'text-blue-800'
-                  : result.difficultyLevel === 'challenging'
-                  ? 'text-orange-800'
-                  : 'text-red-800'
-              }`}>
-                {result.difficultyLevel === 'easy' && '🎯 轻松达成'}
-                {result.difficultyLevel === 'moderate' && '📈 努力可达'}
-                {result.difficultyLevel === 'challenging' && '💪 需要冲刺'}
-                {result.difficultyLevel === 'impossible' && '🚨 调整目标'}
-              </h4>
-              <p className={`text-sm ${
-                result.difficultyLevel === 'easy' 
-                  ? 'text-green-700'
-                  : result.difficultyLevel === 'moderate'
-                  ? 'text-blue-700'
-                  : result.difficultyLevel === 'challenging'
-                  ? 'text-orange-700'
-                  : 'text-red-700'
-              }`}>
-                {result.difficultyLevel === 'easy' && '保持当前学习状态，你很有希望获得理想成绩！'}
-                {result.difficultyLevel === 'moderate' && '适当增加学习时间，制定复习计划，成功在望！'}
-                {result.difficultyLevel === 'challenging' && '需要全力以赴！建议寻求额外帮助和资源。'}
-                {result.difficultyLevel === 'impossible' && '当前目标可能过高，考虑调整期望或寻求课程帮助。'}
+      {/* Calculation Steps */}
+      {showSteps && result && (
+        <CalculationSteps
+          steps={getCalculationSteps()}
+          context="student"
+          showFormulas={true}
+          showExplanations={true}
+          interactive={true}
+          className="shadow-sm"
+        />
+      )}
+
+      {/* Calculation Steps Button - Only when results available */}
+      {result && (
+        <div className="flex justify-center">
+          <button
+            onClick={() => setShowSteps(!showSteps)}
+            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              showSteps 
+                ? 'bg-blue-100 text-blue-700' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            {showSteps ? 'Hide' : 'Show'} Calculation Steps
+          </button>
+        </div>
+      )}
+
+      {/* Help Section - Clickable Header for expand/collapse */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+        <button
+          onClick={() => setShowHelp(!showHelp)}
+          className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 -m-2 rounded-lg transition-colors"
+        >
+          <h3 className="text-lg font-semibold text-gray-900">
+            <HelpCircle className="w-5 h-5 inline mr-2" />
+            Final Grade Calculator Help
+          </h3>
+          <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
+            showHelp ? 'rotate-180' : ''
+          }`} />
+        </button>
+        
+        {showHelp && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <div className="space-y-4">
+              <div>
+              <h4 className="font-medium text-gray-900 mb-2">What is Final Grade Prediction?</h4>
+              <p className="text-gray-700">
+                This calculator helps you determine the minimum score needed on your final exam 
+                to achieve your desired overall grade in a course based on your current performance.
               </p>
             </div>
-          )}
-        </div>
+            
+            <div>
+              <h4 className="font-medium text-gray-900 mb-2">How to Use This Calculator</h4>
+              <ul className="list-disc list-inside text-gray-700 space-y-1">
+                <li>Enter your current assignment and exam scores with their weights</li>
+                <li>Set the weight percentage for your final exam</li>
+                <li>Choose your target overall grade for the course</li>
+                <li>The calculator will show the required final exam score</li>
+                <li>View detailed calculation steps and feasibility analysis</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-gray-900 mb-2">Understanding Results</h4>
+              <ul className="text-gray-700 space-y-1">
+                <li><strong>Green:</strong> Target is easily achievable</li>
+                <li><strong>Yellow:</strong> Target requires moderate effort</li>
+                <li><strong>Orange:</strong> Target is challenging but possible</li>
+                <li><strong>Red:</strong> Target may not be achievable</li>
+              </ul>
+            </div>
+            
+            <div>
+              <h4 className="font-medium text-gray-900 mb-2">Tips for Success</h4>
+              <ul className="text-gray-700 space-y-1">
+                <li>Keep your current grades updated as you receive new scores</li>
+                <li>Plan your study time based on the required final score</li>
+                <li>Consider extra credit opportunities if available</li>
+                <li>Speak with your instructor if targets seem unrealistic</li>
+              </ul>
+            </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* Error Display */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <div className="flex items-center text-red-800">
+            <span className="font-medium">Error:</span>
+          </div>
+          <p className="text-sm text-red-700 mt-1">{error}</p>
+        </div>
+      )}
     </div>
   );
 }

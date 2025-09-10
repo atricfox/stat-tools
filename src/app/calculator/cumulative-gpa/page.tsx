@@ -8,12 +8,12 @@ import CalculatorLayout from '@/components/layout/CalculatorLayout';
 import CumulativeGPACalculator from '@/components/calculators/CumulativeGPACalculator';
 
 export const metadata: Metadata = {
-  title: '累积GPA计算器 - StatCal 统计工具',
-  description: '计算多学期累积GPA，支持不同评分制度转换，为研究生申请提供准确的成绩分析和竞争力评估。',
-  keywords: ['累积GPA', 'GPA计算', '研究生申请', '成绩转换', '竞争力分析', '多学期统计'],
+  title: 'Cumulative GPA Calculator - StatCal Statistical Tools',
+  description: 'Calculate cumulative GPA across multiple semesters with grading system conversions. Perfect for graduate school applications with detailed academic analysis.',
+  keywords: ['cumulative GPA calculator', 'GPA calculation', 'graduate school', 'grade conversion', 'academic analysis', 'multi-semester GPA'],
   openGraph: {
-    title: '累积GPA计算器',
-    description: '计算多学期累积GPA，支持评分制度转换',
+    title: 'Cumulative GPA Calculator',
+    description: 'Calculate cumulative GPA across multiple semesters with grading system conversions',
     type: 'website',
   },
   alternates: {
@@ -25,8 +25,8 @@ export const metadata: Metadata = {
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: '累积GPA计算器',
-  description: '计算多学期累积GPA，支持不同评分制度转换，为研究生申请提供分析',
+  name: 'Cumulative GPA Calculator',
+  description: 'Calculate cumulative GPA across multiple semesters with grading system conversions for graduate school applications',
   applicationCategory: 'EducationalApplication',
   operatingSystem: 'Web Browser',
   offers: {
@@ -35,20 +35,19 @@ const jsonLd = {
     priceCurrency: 'CNY'
   },
   featureList: [
-    '多学期课程管理',
-    '评分制度转换',
-    '累积GPA自动计算',
-    '竞争力分析',
-    '研究生申请指导',
-    '成绩趋势分析'
+    'Multi-semester course management',
+    'Grading system conversions',
+    'Automatic cumulative GPA calculation',
+    'Competitiveness analysis',
+    'Graduate school application guidance',
+    'Grade trend analysis'
   ]
 };
 
 export default function CumulativeGPACalculatorPage() {
   const breadcrumbs = [
-    { label: '首页', href: '/' },
-    { label: '计算器', href: '/calculator' },
-    { label: '累积GPA计算' }
+    { label: 'Calculators', href: '/calculator' },
+    { label: 'Cumulative GPA Calculator' }
   ];
 
   return (
@@ -59,8 +58,8 @@ export default function CumulativeGPACalculatorPage() {
       />
       
       <CalculatorLayout
-        title="累积GPA计算器"
-        description="计算多学期累积GPA，支持评分制度转换，为研究生申请提供准确分析"
+        title="Cumulative GPA Calculator"
+        description="Calculate cumulative GPA across multiple semesters with grading system conversions for graduate school applications"
         breadcrumbs={breadcrumbs}
         currentTool="cumulative-gpa-calculator"
         toolCategory="gpa"

@@ -50,6 +50,30 @@ const FeaturedTools = () => {
       popular: true
     },
     {
+      name: 'Final Grade Calculator',
+      slug: 'final-grade',
+      href: '/calculator/final-grade',
+      description: 'Predict required final exam score to achieve target grade',
+      icon: GraduationCap,
+      popular: true
+    },
+    {
+      name: 'Semester Grade Calculator',
+      slug: 'semester-grade',
+      href: '/calculator/semester-grade',
+      description: 'Calculate weighted semester grade from multiple courses',
+      icon: GraduationCap,
+      popular: true
+    },
+    {
+      name: 'Cumulative GPA Calculator',
+      slug: 'cumulative-gpa',
+      href: '/calculator/cumulative-gpa',
+      description: 'Calculate cumulative GPA for graduate school applications',
+      icon: GraduationCap,
+      popular: true
+    },
+    {
       name: 'Correlation',
       slug: 'correlation',
       description: 'Pearson and Spearman correlation analysis',

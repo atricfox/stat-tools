@@ -52,7 +52,16 @@ export interface FinalGradeResult {
   maxPossibleGrade: number;
   difficultyLevel: 'easy' | 'moderate' | 'challenging' | 'impossible';
   recommendation: string;
-  calculationSteps: string[];
+  calculationSteps: {
+    id: string;
+    title: string;
+    description: string;
+    formula: string;
+    calculation: string;
+    result: string;
+    explanation: string;
+    difficulty: 'basic' | 'intermediate' | 'advanced';
+  }[];
 }
 
 // Semester grade calculator types
@@ -75,6 +84,16 @@ export interface SemesterGradeResult {
     averageCredits: number;
   };
   recommendations: string[];
+  calculationSteps: {
+    id: string;
+    title: string;
+    description: string;
+    formula: string;
+    calculation: string;
+    result: string;
+    explanation: string;
+    difficulty: 'basic' | 'intermediate' | 'advanced';
+  }[];
 }
 
 // Cumulative GPA calculator types
@@ -192,11 +211,11 @@ export const COMMON_GRADING_SYSTEMS: Record<GradingScale, GradingSystemConfig> =
       'F': 0
     },
     letterGrades: {
-      'A+': '优秀+', 'A': '优秀', 'A-': '优秀-',
-      'B+': '良好+', 'B': '良好', 'B-': '良好-',
-      'C+': '中等+', 'C': '中等', 'C-': '中等-',
-      'D+': '及格+', 'D': '及格', 'D-': '及格-',
-      'F': '不及格'
+      'A+': 'Excellent+', 'A': 'Excellent', 'A-': 'Excellent-',
+      'B+': 'Good+', 'B': 'Good', 'B-': 'Good-',
+      'C+': 'Average+', 'C': 'Average', 'C-': 'Average-',
+      'D+': 'Pass+', 'D': 'Pass', 'D-': 'Pass-',
+      'F': 'Fail'
     },
     passingGrade: 60,
     maxGrade: 100
