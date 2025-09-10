@@ -73,7 +73,7 @@ const RecommendationItem: React.FC<RecommendationItemProps> = ({
     
     // 发送点击事件到分析系统
     if (typeof window !== 'undefined' && config.enableClickTracking) {
-      window.gtag?.('event', 'related_tool_click', {
+      (window as any).gtag?.('event', 'related_tool_click', {
         event_category: 'Navigation',
         event_label: link.url,
         value: position + 1,
@@ -118,7 +118,7 @@ const RecommendationItem: React.FC<RecommendationItemProps> = ({
 
   return (
     <div className={getItemStyles(variant)}>
-      <Link href={link.url} className={getLinkStyles(variant)} onClick={handleClick}>
+      <Link href={link.url as any} className={getLinkStyles(variant)} onClick={handleClick}>
         <div className="flex items-center space-x-3">
           {IconComponent && variant !== 'inline' && (
             <div className="flex-shrink-0">

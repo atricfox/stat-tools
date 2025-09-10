@@ -17,7 +17,7 @@ interface CalculatorLayoutProps {
   description?: string;
   breadcrumbs: BreadcrumbItem[];
   currentTool: string;
-  toolCategory?: 'statistics' | 'gpa' | 'analysis' | 'probability';
+  toolCategory?: 'statistics' | 'gpa' | 'analysis';
   className?: string;
 }
 

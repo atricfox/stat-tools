@@ -293,7 +293,7 @@ export function useURLState() {
       params.set('state', encoded);
 
       // Update URL without navigation
-      router.replace(`${pathname}?${params.toString()}`);
+      router.replace(`${pathname}?${params.toString()}` as any);
       setState(updatedState);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update state');
@@ -313,7 +313,7 @@ export function useURLState() {
     };
 
     setState(defaultState);
-    router.replace(pathname);
+    router.replace(pathname as any);
   }, [router, pathname]);
 
   // Create shareable URL

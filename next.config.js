@@ -11,9 +11,7 @@ const nextConfig = {
     // Temporarily ignore ESLint errors during build
     ignoreDuringBuilds: true,
   },
-  experimental: {
-    typedRoutes: true,
-  },
+  typedRoutes: true,
   images: {
     formats: ['image/avif', 'image/webp'],
   },
@@ -22,6 +20,34 @@ const nextConfig = {
   
   // Enhanced webpack configuration for code splitting
   webpack: (config, { dev, isServer }) => {
+    // Add global polyfills for SSR compatibility
+    if (isServer) {
+      const originalEntry = config.entry;
+      config.entry = async () => {
+        const entries = await originalEntry();
+        
+        if (entries['main.js'] && !entries['main.js'].includes('./src/polyfills.js')) {
+          entries['main.js'].unshift('./src/polyfills.js');
+        }
+        
+        return entries;
+      };
+    }
+
+    // Fix Node.js polyfills
+    config.resolve.fallback = {
+      ...config.resolve.fallback,
+      fs: false,
+      net: false,
+      tls: false,
+      crypto: false,
+      stream: false,
+      assert: false,
+      http: false,
+      https: false,
+      os: false,
+      url: false,
+    };
     // Production optimizations
     if (!dev) {
       // Split chunks configuration

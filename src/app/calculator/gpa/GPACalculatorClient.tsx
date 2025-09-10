@@ -150,7 +150,7 @@ export default function GPACalculatorClient() {
               <GPADataInput
                 courses={courses}
                 gradeSystem={gradeSystem}
-                onCoursesChange={(_newCourses) => {
+                onCoursesChange={() => {
                   // This would require a new method in useGPACalculation
                   // For now, we'll use the existing methods
                 }}

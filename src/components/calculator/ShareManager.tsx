@@ -408,7 +408,7 @@ const ShareManager: React.FC<ShareManagerProps> = ({
                           邮件
                         </button>
                         
-                        {navigator.share && (
+                        {typeof navigator !== 'undefined' && 'share' in navigator && typeof (navigator as any).share === 'function' ? (
                           <button
                             onClick={() => handleShareVia('native', shareableUrl.url, currentState.metadata?.title)}
                             className="flex items-center px-3 py-2 bg-white text-green-700 border border-green-300 rounded-lg hover:bg-green-50 text-sm"
@@ -416,7 +416,7 @@ const ShareManager: React.FC<ShareManagerProps> = ({
                             <Share2 className="h-4 w-4 mr-1" />
                             分享
                           </button>
-                        )}
+                        ) : null}
                       </div>
 
                       {/* Expiry Info */}

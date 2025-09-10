@@ -249,23 +249,37 @@ describe('useMeanCalculator', () => {
       clipboard: { writeText: writeTextMock }
     })
 
-    const { result } = renderHook(() => useMeanCalculator())
-    
-    // Set a result first
-    act(() => {
-      result.current.setInput('1, 2, 3')
+    mockParseNumberInput.mockReturnValue({
+      validNumbers: [1, 2, 3],
+      invalidEntries: [],
     })
 
-    // Mock the result
-    result.current.result = {
+    mockCalculateMean.mockReturnValue({
       mean: 2,
       sum: 6,
       count: 3,
-      steps: [],
-      validNumbers: [1, 2, 3],
-      invalidEntries: [],
-    }
+    })
 
+    mockGenerateCalculationSteps.mockReturnValue(['1 + 2 + 3 = 6', '6 / 3 = 2'])
+
+    const { result } = renderHook(() => useMeanCalculator())
+    
+    // Set a result first and calculate
+    await act(async () => {
+      result.current.setInput('1, 2, 3')
+    })
+
+    // Check parsed data validity
+    expect(result.current.isValid).toBe(true)
+    expect(result.current.validCount).toBe(3)
+
+    await act(async () => {
+      await result.current.calculate()
+    })
+
+    // Check if result was actually set
+    expect(result.current.result).not.toBeNull()
+    
     let copyResult: boolean = false
     await act(async () => {
       copyResult = await result.current.copyResult()
@@ -275,27 +289,29 @@ describe('useMeanCalculator', () => {
     expect(writeTextMock).toHaveBeenCalledWith('Mean: 2\nCount: 3\nSum: 6')
   })
 
-  it('should export data', () => {
+  it('should export data', async () => {
     mockParseNumberInput.mockReturnValue({
       validNumbers: [1, 2, 3],
       invalidEntries: [],
     })
 
-    const { result } = renderHook(() => useMeanCalculator())
-    
-    act(() => {
-      result.current.setInput('1, 2, 3')
-    })
-
-    // Mock the result
-    result.current.result = {
+    mockCalculateMean.mockReturnValue({
       mean: 2,
       sum: 6,
       count: 3,
-      steps: [],
-      validNumbers: [1, 2, 3],
-      invalidEntries: [],
-    }
+    })
+
+    mockGenerateCalculationSteps.mockReturnValue(['1 + 2 + 3 = 6', '6 / 3 = 2'])
+
+    const { result } = renderHook(() => useMeanCalculator())
+    
+    await act(async () => {
+      result.current.setInput('1, 2, 3')
+    })
+
+    await act(async () => {
+      await result.current.calculate()
+    })
 
     const exportData = result.current.exportData()
     

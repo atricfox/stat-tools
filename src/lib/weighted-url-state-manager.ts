@@ -303,8 +303,8 @@ export class WeightedURLStateManager {
       userMode: userModeMap[compressed.u] || 'student',
       inputMode: inputModeMap[compressed.i] || 'pairs',
       strategy: {
-        zeroWeightStrategy: strategyMap[compressed.st?.z] || 'ignore',
-        missingWeightStrategy: strategyMap[compressed.st?.m] || 'zero',
+        zeroWeightStrategy: strategyMap[compressed.st?.z as keyof typeof strategyMap] || 'ignore',
+        missingWeightStrategy: strategyMap[compressed.st?.m as keyof typeof strategyMap] || 'zero',
         normalizeWeights: compressed.st?.n || false,
         precision: compressed.st?.p || 2
       },
@@ -458,7 +458,7 @@ export function useWeightedURLState() {
       params.set('v', WeightedURLStateManager['VERSION']);
 
       // Update URL without navigation
-      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+      router.replace(`${pathname}?${params.toString()}` as any, { scroll: false });
       setState(updatedState);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update weighted state');
@@ -485,7 +485,7 @@ export function useWeightedURLState() {
     };
 
     setState(defaultState);
-    router.replace(pathname);
+    router.replace(pathname as any);
   }, [router, pathname]);
 
   // Create shareable URL

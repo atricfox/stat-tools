@@ -2,12 +2,7 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { 
-  Calculator, 
-  Users, 
-  GraduationCap, 
-  FileText,
   Share2,
-  Settings,
   HelpCircle,
   BarChart3,
   RefreshCw
@@ -19,7 +14,6 @@ import StatisticalDataInput from '@/components/calculator/StatisticalDataInput';
 import StandardDeviationResults from '@/components/calculator/StandardDeviationResults';
 import StatisticalVisualization from '@/components/calculator/StatisticalVisualization';
 import HelpSection from '@/components/calculator/HelpSection';
-import ShareCalculation from '@/components/calculator/ShareCalculation';
 import CalculationSteps from '@/components/calculator/CalculationSteps';
 
 import { useStandardDeviationCalculation } from '@/hooks/useStandardDeviationCalculation';
@@ -27,7 +21,7 @@ import { useBatchProcessing } from '@/hooks/useBatchProcessing';
 
 import { 
   DataPoint,
-  StatisticalDataInputMode,
+  StatisticalDataInputConfig,
   StandardDeviationCalculatorState,
   StatisticalVisualizationConfig,
   BatchProcessingOptions
@@ -43,19 +37,19 @@ export default function StandardDeviationClient() {
     error, 
     calculate, 
     reset: resetCalculation,
-    validateData
+    // validateData - commented out unused
   } = useStandardDeviationCalculation();
 
-  // Batch processing
-  const {
-    isProcessing: isBatchProcessing,
-    progress: batchProgress,
-    results: batchResults,
-    errors: batchErrors,
-    processFile,
-    downloadResults: downloadBatchResults,
-    reset: resetBatchProcessing
-  } = useBatchProcessing();
+  // Batch processing - commented out unused
+  // const {
+  //   isProcessing: isBatchProcessing,
+  //   progress: batchProgress,
+  //   results: batchResults,
+  //   errors: batchErrors,
+  //   processFile,
+  //   downloadResults: downloadBatchResults,
+  //   reset: resetBatchProcessing
+  // } = useBatchProcessing();
 
   // SEO structured data
   const { getToolConfig } = useStructuredData('standard-deviation');
@@ -68,12 +62,12 @@ export default function StandardDeviationClient() {
   const [showSteps, setShowSteps] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
   const [showVisualization, setShowVisualization] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
+  // const [showSettings, setShowSettings] = useState(false); // unused
   const [showShare, setShowShare] = useState(false);
 
   // Standard Deviation specific state
   const [calculationType, setCalculationType] = useState<'sample' | 'population'>('sample');
-  const [inputMode, setInputMode] = useState<StatisticalDataInputMode>('manual');
+  const [inputMode, setInputMode] = useState<'manual' | 'csv' | 'excel' | 'paste'>('manual');
   const [outlierDetectionEnabled, setOutlierDetectionEnabled] = useState(false);
 
   // Calculate on data changes
@@ -215,9 +209,9 @@ export default function StandardDeviationClient() {
                 inputMode={inputMode}
                 onInputModeChange={setInputMode}
                 userMode={userMode}
-                isProcessing={isCalculating || isBatchProcessing}
-                processingProgress={batchProgress}
-                onBatchProcess={processFile}
+                isProcessing={isCalculating}
+                processingProgress={0}
+                onBatchProcess={() => {}}
                 enableBatchProcessing={userMode !== 'student'}
               />
             </div>

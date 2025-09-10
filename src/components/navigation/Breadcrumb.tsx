@@ -140,7 +140,7 @@ const BreadcrumbItemComponent: React.FC<BreadcrumbItemComponentProps> = ({
     
     // 发送面包屑点击事件到分析系统
     if (typeof window !== 'undefined' && item.href) {
-      window.gtag?.('event', 'breadcrumb_click', {
+      (window as any).gtag?.('event', 'breadcrumb_click', {
         event_category: 'Navigation',
         event_label: item.href,
         value: index + 1,
@@ -190,7 +190,7 @@ const BreadcrumbItemComponent: React.FC<BreadcrumbItemComponentProps> = ({
   if (item.href && !isLast) {
     return (
       <Link 
-        href={item.href} 
+        href={item.href as any} 
         className="hover:no-underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 rounded"
         onClick={handleClick}
         title={item.seoTitle || item.label}

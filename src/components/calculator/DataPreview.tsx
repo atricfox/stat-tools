@@ -109,7 +109,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({
       </div>
 
       {/* Statistics */}
-      {showStatistics && (
+      {showStatistics ? (
         <div className="grid grid-cols-3 gap-3 mb-3">
           <div className="text-center">
             <div className="text-xs text-gray-500">Min</div>
@@ -130,7 +130,7 @@ const DataPreview: React.FC<DataPreviewProps> = ({
             </div>
           </div>
         </div>
-      )}
+      ) : null}
 
       {/* Format Info */}
       <div className="flex items-center justify-between text-xs text-gray-500">
@@ -173,38 +173,38 @@ const DataPreview: React.FC<DataPreviewProps> = ({
       )}
 
       {/* Special Context Info */}
-      {'researchInfo' in parseResult && parseResult.researchInfo && (
+      {'scientificInfo' in (parseResult as any) && (parseResult as any).scientificInfo ? (
         <div className="mt-3 pt-3 border-t border-gray-200">
           <div className="flex items-center text-xs text-purple-600 mb-1">
             <TrendingUp className="h-3 w-3 mr-1" />
             Research Data Insights
           </div>
           <div className="text-xs text-gray-600 space-y-1">
-            {parseResult.researchInfo.hasScientificNotation && (
+            {(parseResult as any).scientificInfo.hasScientificNotation && (
               <div>• Contains scientific notation</div>
             )}
-            <div>• Suggested precision: {parseResult.researchInfo.suggestedSignificantFigures} sig figs</div>
-            {parseResult.researchInfo.outlierCandidates.length > 0 && (
-              <div>• {parseResult.researchInfo.outlierCandidates.length} potential outlier(s)</div>
+            <div>• Suggested precision: {(parseResult as any).scientificInfo.suggestedSignificantFigures} sig figs</div>
+            {(parseResult as any).scientificInfo.outlierCandidates?.length > 0 && (
+              <div>• {(parseResult as any).scientificInfo.outlierCandidates.length} potential outlier(s)</div>
             )}
           </div>
         </div>
-      )}
+      ) : null}
 
-      {'gradingInfo' in parseResult && parseResult.gradingInfo && (
+      {'gradingInfo' in (parseResult as any) && (parseResult as any).gradingInfo ? (
         <div className="mt-3 pt-3 border-t border-gray-200">
           <div className="flex items-center text-xs text-green-600 mb-1">
             <BarChart3 className="h-3 w-3 mr-1" />
             Grade Distribution
           </div>
           <div className="text-xs text-gray-600">
-            <div>• Valid grades: {parseResult.gradingInfo.validGrades.length}</div>
-            {parseResult.gradingInfo.outOfRange.length > 0 && (
-              <div>• Out of range: {parseResult.gradingInfo.outOfRange.length}</div>
+            <div>• Valid grades: {(parseResult as any).gradingInfo.validGrades.length}</div>
+            {(parseResult as any).gradingInfo.outOfRange.length > 0 && (
+              <div>• Out of range: {(parseResult as any).gradingInfo.outOfRange.length}</div>
             )}
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 };

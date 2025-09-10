@@ -362,6 +362,7 @@ export interface ValidationError {
   message: string;
   value: any;
   code: string;
+  suggestion?: string;
 }
 
 export interface ValidationWarning {

@@ -199,7 +199,8 @@ export class MetadataManager {
       openGraph: {
         title: config.openGraph?.title || config.title,
         description: config.openGraph?.description || config.description,
-        type: config.openGraph?.type || 'website',
+        // Restrict type to values allowed by Next Metadata OpenGraph
+        type: (config.openGraph?.type === 'article' ? 'article' : 'website'),
         siteName: config.openGraph?.siteName || 'StatCal',
         url: config.openGraph?.url || this.generateCanonicalUrl(toolId),
         images: config.openGraph?.images || [{

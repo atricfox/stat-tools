@@ -187,7 +187,7 @@ class ToolClassificationManager {
 
   constructor(tools: StatisticalTool[]) {
     this.tools = tools;
-    this.dataManager = new ToolsDataManager(tools);
+    this.dataManager = new ToolsDataManager();
   }
 
   // 按维度分类工具
@@ -308,7 +308,7 @@ export const ToolClassification: React.FC<ToolClassificationProps> = ({
   };
 
   // 工具数据
-  const dataManager = useMemo(() => new ToolsDataManager([]), []);
+  const dataManager = useMemo(() => new ToolsDataManager(), []);
   const allTools = dataManager.getAllTools();
   const tools = userTools || allTools;
   const classificationManager = useMemo(() => new ToolClassificationManager(tools), [tools]);

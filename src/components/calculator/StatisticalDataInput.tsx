@@ -21,6 +21,7 @@ import {
 import { 
   DataPoint, 
   StatisticalDataInputMode,
+  StatisticalDataInputConfig,
   BatchProcessingOptions,
   DataValidationResult
 } from '@/types/standardDeviation';
@@ -28,8 +29,8 @@ import {
 interface StatisticalDataInputProps {
   dataPoints: DataPoint[];
   onDataPointsChange: (dataPoints: DataPoint[]) => void;
-  inputMode: StatisticalDataInputMode;
-  onInputModeChange: (mode: StatisticalDataInputMode) => void;
+  inputMode: StatisticalDataInputMode | StatisticalDataInputConfig;
+  onInputModeChange: (mode: any) => void;
   userMode: 'student' | 'research' | 'teacher';
   maxDataPoints?: number;
   enableBatchProcessing?: boolean;
@@ -107,16 +108,16 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
     if (!csvData.trim()) return;
 
     const lines = csvData.trim().split('\n');
-    const hasHeaders = inputMode.hasHeaders && lines.length > 1;
+    const hasHeaders = (inputMode as any).hasHeaders && lines.length > 1;
     const dataLines = hasHeaders ? lines.slice(1) : lines;
     
     const newPoints: DataPoint[] = [];
     
     dataLines.forEach((line, rowIndex) => {
-      const values = line.split(inputMode.delimiter || ',').map(v => v.trim());
+      const values = line.split(((inputMode as any).delimiter || ',')).map(v => v.trim());
       
-      if (inputMode.columnMapping) {
-        const { value: valueCol, label: labelCol } = inputMode.columnMapping;
+      if ((inputMode as any).columnMapping) {
+        const { value: valueCol, label: labelCol } = (inputMode as any).columnMapping;
         
         if (valueCol < values.length) {
           const value = parseFloat(values[valueCol]);
@@ -316,7 +317,7 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
           <button
             onClick={() => onInputModeChange({ type: 'manual' })}
             className={`px-4 py-2 rounded-lg border transition-colors ${
-              inputMode.type === 'manual'
+              (inputMode as any).type === 'manual'
                 ? 'bg-blue-50 border-blue-200 text-blue-700'
                 : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
             }`}
@@ -326,7 +327,7 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
           <button
             onClick={() => onInputModeChange({ type: 'csv', delimiter: ',', hasHeaders: false })}
             className={`px-4 py-2 rounded-lg border transition-colors ${
-              inputMode.type === 'csv'
+              (inputMode as any).type === 'csv'
                 ? 'bg-blue-50 border-blue-200 text-blue-700'
                 : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
             }`}
@@ -336,7 +337,7 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
           <button
             onClick={() => onInputModeChange({ type: 'json' })}
             className={`px-4 py-2 rounded-lg border transition-colors ${
-              inputMode.type === 'json'
+              (inputMode as any).type === 'json'
                 ? 'bg-blue-50 border-blue-200 text-blue-700'
                 : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
             }`}
@@ -361,7 +362,7 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
       </div>
 
       {/* Manual Entry */}
-      {inputMode.type === 'manual' && (
+      {(inputMode as any).type === 'manual' && (
         <div className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
             <div>
@@ -406,7 +407,7 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
       )}
 
       {/* CSV Input */}
-      {inputMode.type === 'csv' && (
+      {(inputMode as any).type === 'csv' && (
         <div className="mb-6">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -426,8 +427,8 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
                 Delimiter
               </label>
               <select
-                value={inputMode.delimiter || ','}
-                onChange={(e) => onInputModeChange({ ...inputMode, delimiter: e.target.value })}
+                value={(inputMode as any).delimiter || ','}
+                onChange={(e) => onInputModeChange({ ...(inputMode as any), delimiter: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 <option value=",">Comma (,)</option>
@@ -438,8 +439,8 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
             <div className="flex items-center">
               <input
                 type="checkbox"
-                checked={inputMode.hasHeaders || false}
-                onChange={(e) => onInputModeChange({ ...inputMode, hasHeaders: e.target.checked })}
+                checked={(inputMode as any).hasHeaders || false}
+                onChange={(e) => onInputModeChange({ ...(inputMode as any), hasHeaders: e.target.checked })}
                 className="mr-2"
               />
               <label className="text-sm text-gray-700">First row contains headers</label>
@@ -458,7 +459,7 @@ const StatisticalDataInput: React.FC<StatisticalDataInputProps> = ({
       )}
 
       {/* JSON Input */}
-      {inputMode.type === 'json' && (
+      {(inputMode as any).type === 'json' && (
         <div className="mb-6">
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-2">

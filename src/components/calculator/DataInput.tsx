@@ -7,9 +7,9 @@
 
 import React, { useState, useCallback, useEffect } from 'react';
 import { Upload, FileSpreadsheet, HelpCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
-import { parseMultiFormatInput, parseEducationalData, parseScientificData, ParseResult } from '@/lib/parsers';
+import { parseEducationalData, parseScientificData, ParseResult } from '@/lib/parsers';
 import { validationHelpers, ValidationResult } from '@/lib/validation';
-import { formatDataSummary, formatValidationMessage } from '@/lib/formatters';
+// import { formatDataSummary, formatValidationMessage } from '@/lib/formatters';
 
 export interface DataInputProps {
   value: string;
@@ -22,7 +22,7 @@ export interface DataInputProps {
   onValidation?: (isValid: boolean, result: ParseResult) => void;
 }
 
-const DataInput: React.FC<DataInputProps> = ({
+const DataInput = ({
   value,
   onChange,
   placeholder = "Enter your numbers...",
@@ -31,11 +31,11 @@ const DataInput: React.FC<DataInputProps> = ({
   maxLength = 50000,
   className = '',
   onValidation
-}) => {
+}: DataInputProps) => {
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
-  const [isDragOver, setIsDragOver] = useState(false);
-  const [showFormatHelp, setShowFormatHelp] = useState(false);
+  const [isDragOver, setIsDragOver] = useState<boolean>(false);
+  const [showFormatHelp, setShowFormatHelp] = useState<boolean>(false);
 
   // Context-specific configurations
   const contextConfig = {
@@ -56,7 +56,7 @@ const DataInput: React.FC<DataInputProps> = ({
     }
   };
 
-  const config = contextConfig[context];
+  const config = contextConfig[context] || contextConfig.student;
 
   // Parse and validate input
   const processInput = useCallback((inputText: string) => {
@@ -94,7 +94,7 @@ const DataInput: React.FC<DataInputProps> = ({
   }, [value, processInput]);
 
   // Handle file drop
-  const handleDrop = useCallback((e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent<HTMLTextAreaElement>) => {
     e.preventDefault();
     setIsDragOver(false);
     
@@ -110,7 +110,7 @@ const DataInput: React.FC<DataInputProps> = ({
   }, [onChange]);
 
   // Handle paste (Excel data detection)
-  const handlePaste = useCallback((e: React.ClipboardEvent) => {
+  const handlePaste = useCallback((e: React.ClipboardEvent<HTMLTextAreaElement>) => {
     const pastedData = e.clipboardData.getData('text');
     
     // Detect if it's likely Excel data (contains tabs)
@@ -191,13 +191,11 @@ Student 4	96	94	98`
             setIsDragOver(true);
           }}
           onDragLeave={() => setIsDragOver(false)}
-          placeholder={config.placeholder}
+          placeholder="Enter your numbers..."
           className={`w-full h-40 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none transition-colors ${
             isDragOver 
               ? 'border-blue-400 bg-blue-50' 
-              : validationResult?.success === false 
-                ? 'border-red-300' 
-                : 'border-gray-300'
+              : 'border-gray-300'
           }`}
           maxLength={maxLength}
         />
@@ -251,20 +249,9 @@ Student 4	96	94	98`
             <div className="flex-1 min-w-0">
               {parseResult && (
                 <div className="text-sm">
-                  {formatDataSummary(
-                    parseResult.validNumbers.length,
-                    parseResult.invalidEntries.length,
-                    parseResult.metadata.formatDetected,
-                    parseResult.metadata.duplicates.length
-                  ).map((summary, index) => (
-                    <div key={index} className={
-                      summary.startsWith('✓') ? 'text-green-600' :
-                      summary.startsWith('⚠') ? 'text-yellow-600' :
-                      'text-blue-600'
-                    }>
-                      {summary}
-                    </div>
-                  ))}
+                  <div className="text-blue-600">
+                    {parseResult.validNumbers.length} valid numbers found
+                  </div>
                 </div>
               )}
             </div>
@@ -289,17 +276,17 @@ Student 4	96	94	98`
       )}
 
       {/* Context-specific features */}
-      {parseResult && context === 'research' && 'researchInfo' in parseResult && parseResult.researchInfo && (
+      {parseResult && context === 'research' && 'scientificInfo' in parseResult && (parseResult as any).scientificInfo && (
         <div className="bg-purple-50 border border-purple-200 rounded-lg p-3">
           <div className="text-sm text-purple-800">
             <div className="font-medium mb-1">Research Data Analysis</div>
-            {(parseResult.researchInfo as any).hasScientificNotation && (
+            {(parseResult as any).scientificInfo.hasScientificNotation && (
               <div>• Scientific notation detected</div>
             )}
-            {(parseResult.researchInfo as any).precisionIssues?.length > 0 && (
-              <div>• Precision notes: {(parseResult.researchInfo as any).precisionIssues[0]}</div>
+            {(parseResult as any).scientificInfo.precisionIssues?.length > 0 && (
+              <div>• Precision notes: {(parseResult as any).scientificInfo.precisionIssues[0]}</div>
             )}
-            <div>• Suggested precision: {(parseResult.researchInfo as any).suggestedSignificantFigures || 3} significant figures</div>
+            <div>• Suggested precision: {(parseResult as any).scientificInfo.suggestedSignificantFigures || 3} significant figures</div>
           </div>
         </div>
       )}
@@ -308,9 +295,9 @@ Student 4	96	94	98`
         <div className="bg-green-50 border border-green-200 rounded-lg p-3">
           <div className="text-sm text-green-800">
             <div className="font-medium mb-1">Grade Analysis</div>
-            <div>• Valid grades: {parseResult.gradingInfo.validGrades.length}</div>
-            {parseResult.gradingInfo.outOfRange.length > 0 && (
-              <div>• Out of range: {parseResult.gradingInfo.outOfRange.length} grades</div>
+            <div>• Valid grades: {(parseResult as any).gradingInfo.validGrades.length}</div>
+            {(parseResult as any).gradingInfo.outOfRange.length > 0 && (
+              <div>• Out of range: {(parseResult as any).gradingInfo.outOfRange.length} grades</div>
             )}
           </div>
         </div>

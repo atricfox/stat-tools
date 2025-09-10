@@ -1,0 +1,87 @@
+// 环境感知的 Sentry 包装器
+type SentryMethod = 'captureException' | 'captureMessage' | 'addBreadcrumb';
+
+class EnvironmentAwareSentry {
+  private static instance: EnvironmentAwareSentry;
+  private sentry: any = null;
+  private isClient = typeof window !== 'undefined';
+  private isInitialized = false;
+
+  static getInstance(): EnvironmentAwareSentry {
+    if (!EnvironmentAwareSentry.instance) {
+      EnvironmentAwareSentry.instance = new EnvironmentAwareSentry();
+    }
+    return EnvironmentAwareSentry.instance;
+  }
+
+  async initialize() {
+    if (this.isInitialized) return;
+
+    try {
+      if (this.isClient) {
+        // 客户端初始化
+        const { init, captureException, captureMessage, addBreadcrumb } = await import('@sentry/nextjs');
+        
+        init({
+          dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
+          enabled: process.env.NODE_ENV === 'production',
+          environment: process.env.NEXT_PUBLIC_ENVIRONMENT || 'development',
+          tracesSampleRate: 0.1,
+          replaysSessionSampleRate: 0.1,
+        });
+
+        this.sentry = { captureException, captureMessage, addBreadcrumb };
+      } else {
+        // 服务端初始化
+        const { init, captureException, captureMessage, addBreadcrumb } = await import('@sentry/node');
+        
+        init({
+          dsn: process.env.SENTRY_DSN,
+          enabled: process.env.NODE_ENV === 'production',
+          environment: process.env.NODE_ENV || 'development',
+          tracesSampleRate: 0.2,
+        });
+
+        this.sentry = { captureException, captureMessage, addBreadcrumb };
+      }
+      
+      this.isInitialized = true;
+    } catch (error) {
+      console.warn('Failed to initialize Sentry:', error);
+      // 创建 fallback 方法
+      this.sentry = {
+        captureException: (error: Error) => console.error('Fallback Error:', error),
+        captureMessage: (message: string) => console.log('Fallback Message:', message),
+        addBreadcrumb: (breadcrumb: any) => console.log('Fallback Breadcrumb:', breadcrumb),
+      };
+    }
+  }
+
+  async captureException(error: Error, context?: any) {
+    if (!this.isInitialized) await this.initialize();
+    return this.sentry?.captureException(error, context);
+  }
+
+  async captureMessage(message: string, level?: any) {
+    if (!this.isInitialized) await this.initialize();
+    return this.sentry?.captureMessage(message, level);
+  }
+
+  async addBreadcrumb(breadcrumb: any) {
+    if (!this.isInitialized) await this.initialize();
+    return this.sentry?.addBreadcrumb(breadcrumb);
+  }
+}
+
+// 导出单例实例
+export const smartSentry = EnvironmentAwareSentry.getInstance();
+
+// 便捷的导出方法
+export const captureException = (error: Error, context?: any) => 
+  smartSentry.captureException(error, context);
+
+export const captureMessage = (message: string, level?: any) => 
+  smartSentry.captureMessage(message, level);
+
+export const addBreadcrumb = (breadcrumb: any) => 
+  smartSentry.addBreadcrumb(breadcrumb);

@@ -10,7 +10,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { 
   BarChart3, 
   Box, 
-  Scatter, 
   TrendingUp, 
   Settings,
   Download,

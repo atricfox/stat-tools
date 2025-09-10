@@ -1,5 +1,5 @@
 export async function GET() {
-  const requestId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2,8)}`)
+  const requestId = `${Date.now()}-${Math.random().toString(36).slice(2,8)}`
   return new Response('ok', {
     status: 200,
     headers: {

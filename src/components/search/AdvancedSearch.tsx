@@ -443,7 +443,7 @@ export const AdvancedSearch: React.FC<AdvancedSearchProps> = ({
 
     // 发送搜索建议点击事件
     if (typeof window !== 'undefined') {
-      window.gtag?.('event', 'search_suggestion_click', {
+      (window as any).gtag?.('event', 'search_suggestion_click', {
         event_category: 'Search',
         event_label: suggestion.text,
         custom_parameters: {

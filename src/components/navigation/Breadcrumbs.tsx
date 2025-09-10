@@ -111,7 +111,7 @@ const Breadcrumbs: React.FC<BreadcrumbsProps> = ({
               <span className="text-gray-500 px-2">...</span>
             ) : item.href && !item.current ? (
               <Link
-                href={item.href}
+                href={item.href as any}
                 className="flex items-center px-2 py-1 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
               >
                 {item.icon && <item.icon className="h-4 w-4 mr-1" />}

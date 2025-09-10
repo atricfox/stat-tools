@@ -15,6 +15,7 @@ import {
   GPACalculatorState,
   ValidationResult,
   ValidationError,
+  ValidationWarning,
   GPACalculationError
 } from '@/types/gpa';
 
@@ -197,7 +198,7 @@ export function validateCourse(course: Course, system: GradePointSystem): Valida
  */
 export function validateCourses(courses: Course[], system: GradePointSystem): ValidationResult {
   const allErrors: ValidationError[] = [];
-  const allWarnings: ValidationError[] = [];
+  const allWarnings: ValidationWarning[] = [];
 
   if (!courses || courses.length === 0) {
     allErrors.push({
@@ -230,8 +231,7 @@ export function validateCourses(courses: Course[], system: GradePointSystem): Va
       allWarnings.push({
         ...warning,
         field: `course[${index}].${warning.field}`,
-        message: `Course ${index + 1}: ${warning.message}`,
-        suggestion: warning.suggestion
+        message: `Course ${index + 1}: ${warning.message}`
       });
     });
   });

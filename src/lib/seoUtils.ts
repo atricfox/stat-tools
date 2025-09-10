@@ -414,9 +414,4 @@ export class PerformanceOptimizer {
   }
 }
 
-export {
-  StructuredDataValidator,
-  URLOptimizer,
-  KeywordAnalyzer,
-  PerformanceOptimizer
-};
+// Classes are already exported inline above

@@ -150,9 +150,7 @@ export const useStandardDeviationCalculation = (): UseStandardDeviationCalculati
       return { valid: false, errors };
     }
     
-    if (points.length < 2) {
-      errors.push('At least two data points are required for meaningful standard deviation calculation');
-    }
+    // Single data point is valid for population standard deviation (result = 0)
     
     const validPoints = points.filter(point => !point.excluded);
     if (validPoints.length === 0) {
@@ -192,11 +190,10 @@ export const useStandardDeviationCalculation = (): UseStandardDeviationCalculati
       const values = validPoints.map(point => point.value);
       const sortedValues = [...values].sort((a, b) => a - b);
       
-      // Outlier detection
+      // Outlier detection - always detect outliers for reporting
       const outlierMethod = options.outlierMethod || 'iqr';
       const outlierThreshold = options.outlierThreshold || 1.5;
-      const outlierValues = options.excludeOutliers ? 
-        detectOutliers(values, outlierMethod, outlierThreshold) : [];
+      const outlierValues = detectOutliers(values, outlierMethod, outlierThreshold);
       
       const cleanValues = options.excludeOutliers ? 
         values.filter(value => !outlierValues.includes(value)) : values;

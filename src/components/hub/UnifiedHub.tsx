@@ -81,7 +81,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, viewMode, onToolClick }) => {
     
     // 发送工具点击事件到分析系统
     if (typeof window !== 'undefined') {
-      window.gtag?.('event', 'tool_click', {
+      (window as any).gtag?.('event', 'tool_click', {
         event_category: 'Hub Navigation',
         event_label: tool.id,
         custom_parameters: {
@@ -99,7 +99,7 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, viewMode, onToolClick }) => {
     : "p-6 bg-white dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700 hover:border-blue-300 dark:hover:border-blue-600 hover:shadow-lg hover:transform hover:scale-[1.02] transition-all duration-200";
 
   return (
-    <Link href={tool.url} className="block group" onClick={handleClick}>
+    <Link href={tool.url as any} className="block group" onClick={handleClick}>
       <div className={cardStyles}>
         {viewMode === 'list' ? (
           // List View Layout

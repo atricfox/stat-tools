@@ -366,6 +366,7 @@ export function parseScientificData(input: string): ParseResult & {
     hasScientificNotation: boolean;
     significantFigures: number[];
     precisionIssues: string[];
+    suggestedSignificantFigures?: number;
   };
 } {
   const baseResult = parseMultiFormatInput(input);
@@ -390,13 +391,20 @@ export function parseScientificData(input: string): ParseResult & {
       precisionIssues.push(`Number ${index + 1} has high precision (${str.split('.')[1].length} decimal places)`);
     }
   });
+
+  // Suggest appropriate significant figures based on data
+  const maxSigFigs = Math.max(...significantFigures, 0);
+  const avgSigFigs = significantFigures.length > 0 ? 
+    significantFigures.reduce((sum, sf) => sum + sf, 0) / significantFigures.length : 0;
+  const suggestedSignificantFigures = Math.max(Math.ceil(avgSigFigs), maxSigFigs, 3);
   
   return {
     ...baseResult,
     scientificInfo: {
       hasScientificNotation,
       significantFigures,
-      precisionIssues
+      precisionIssues,
+      suggestedSignificantFigures
     }
   };
 }

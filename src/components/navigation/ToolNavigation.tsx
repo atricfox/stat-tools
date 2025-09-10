@@ -282,7 +282,7 @@ const ToolNavigation: React.FC<ToolNavigationProps> = ({
             {getRelatedTools().map((tool) => (
               <Link
                 key={tool.id}
-                href={tool.comingSoon ? '#' : tool.href}
+                href={(tool.comingSoon ? '#' : tool.href) as any}
                 className={`p-2 rounded-lg transition-colors text-center ${
                   tool.comingSoon
                     ? 'bg-gray-200 text-gray-500 cursor-not-allowed'
@@ -311,13 +311,8 @@ interface ToolCardProps {
 }
 
 const ToolCard: React.FC<ToolCardProps> = ({ tool, isActive, showDescription }) => {
-  const CardWrapper = tool.comingSoon ? 'div' : Link;
-  const cardProps = tool.comingSoon 
-    ? { className: 'cursor-not-allowed' }
-    : { href: tool.href };
-
-  return (
-    <CardWrapper {...cardProps}>
+  return tool.comingSoon ? (
+    <div className="cursor-not-allowed">
       <div className={`p-3 rounded-lg border transition-all duration-200 ${
         tool.comingSoon
           ? 'border-gray-200 bg-gray-50 opacity-60'
@@ -338,10 +333,10 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, isActive, showDescription }) 
           </div>
           <div className="flex items-center gap-1">
             {tool.popular && (
-              <Star className="h-3 w-3 text-yellow-500" title="Popular" />
+              <Star className="h-3 w-3 text-yellow-500" aria-hidden="true" />
             )}
             {tool.comingSoon && (
-              <Clock className="h-3 w-3 text-gray-400" title="Coming Soon" />
+              <Clock className="h-3 w-3 text-gray-400" aria-hidden="true" />
             )}
           </div>
         </div>
@@ -366,7 +361,39 @@ const ToolCard: React.FC<ToolCardProps> = ({ tool, isActive, showDescription }) 
           )}
         </div>
       </div>
-    </CardWrapper>
+    </div>
+  ) : (
+    <Link href={tool.href as any}>
+      <div className={`p-3 rounded-lg border transition-all duration-200 ${
+        isActive
+          ? 'border-blue-300 bg-blue-50 shadow-sm'
+          : 'border-gray-200 hover:border-gray-300 hover:shadow-sm hover:bg-gray-50'
+      }`}>
+        <div className="flex items-start justify-between mb-2">
+          <div className="flex items-center">
+            <tool.icon className={`h-4 w-4 mr-2 ${
+              isActive ? 'text-blue-600' : 'text-gray-600'
+            }`} />
+            <h5 className={`text-sm font-medium ${
+              isActive ? 'text-blue-900' : 'text-gray-900'
+            }`}>
+              {tool.name}
+            </h5>
+          </div>
+          <div className="flex items-center gap-1">
+            {tool.popular && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-yellow-100 text-yellow-800">Popular</span>
+            )}
+            {isActive && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-800">Current</span>
+            )}
+          </div>
+        </div>
+        {showDescription && tool.description && (
+          <p className="text-xs text-gray-600 line-clamp-2">{tool.description}</p>
+        )}
+      </div>
+    </Link>
   );
 };
 

@@ -61,8 +61,8 @@ export interface StandardDeviationResult {
   }>;
 }
 
-export interface StatisticalDataInputMode {
-  type: 'manual' | 'csv' | 'paste' | 'json';
+export interface StatisticalDataInputConfig {
+  type: StatisticalDataInputMode;
   delimiter?: string;
   hasHeaders?: boolean;
   columnMapping?: {
@@ -74,7 +74,7 @@ export interface StatisticalDataInputMode {
 
 export interface StandardDeviationCalculatorState {
   dataPoints: DataPoint[];
-  inputMode: StatisticalDataInputMode;
+  inputMode: StatisticalDataInputConfig;
   calculationType: 'sample' | 'population' | 'both';
   precision: number;
   userMode: 'student' | 'research' | 'teacher';
@@ -162,7 +162,7 @@ export interface UseStandardDeviationCalculation {
   result: StandardDeviationResult | null;
   isCalculating: boolean;
   error: string | null;
-  calculate: (dataPoints: DataPoint[], options: Partial<StandardDeviationCalculatorState>) => void;
+  calculate: (dataPoints: DataPoint[], options: Partial<StandardDeviationCalculatorState>) => Promise<void>;
   reset: () => void;
   addDataPoint: (point: DataPoint) => void;
   removeDataPoint: (id: string) => void;

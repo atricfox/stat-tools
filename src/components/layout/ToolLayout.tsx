@@ -57,7 +57,7 @@ const ToolLayout: React.FC<ToolLayoutProps> = ({
               <React.Fragment key={item.href}>
                 {index === 0 ? (
                   <Link 
-                    href={item.href}
+                    href={item.href as any}
                     className="flex items-center hover:text-blue-500 transition-colors duration-200"
                   >
                     <Home className="h-4 w-4 mr-1" />
@@ -72,7 +72,7 @@ const ToolLayout: React.FC<ToolLayoutProps> = ({
                       </span>
                     ) : (
                       <Link 
-                        href={item.href}
+                        href={item.href as any}
                         className="hover:text-blue-500 transition-colors duration-200"
                       >
                         {item.label}

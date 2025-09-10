@@ -16,17 +16,17 @@ export default function MeanCalculatorClient() {
   const [userMode, setUserMode] = useState<UserMode>('student');
   const [input, setInput] = useState('');
   const [precision, setPrecision] = useState(2);
-  const [ignoreOutliers, setIgnoreOutliers] = useState(false);
-  const [confidenceLevel, setConfidenceLevel] = useState(95);
+  // const [ignoreOutliers, setIgnoreOutliers] = useState(false); // unused
+  // const [confidenceLevel, setConfidenceLevel] = useState(95); // unused
   const [showSteps, setShowSteps] = useState(false);
   const [showHelp, setShowHelp] = useState(false);
 
   // Use the custom hook for calculations
-  const { result, calculateMean, clearResults, loadExample } = useMeanCalculation(
+  const { result, calculateMean, clearResults } = useMeanCalculation(
     userMode,
     precision,
-    ignoreOutliers,
-    confidenceLevel
+    false, // ignoreOutliers
+    95     // confidenceLevel
   );
 
   // SEO structured data
@@ -43,11 +43,11 @@ export default function MeanCalculatorClient() {
     clearResults();
   };
 
-  const handleLoadExample = () => {
-    const example = loadExample();
-    setInput(example);
-    calculateMean(example);
-  };
+  // const handleLoadExample = () => {
+  //   const example = loadExample();
+  //   setInput(example);
+  //   calculateMean(example);
+  // }; // unused
 
   const handleCopyResults = (text: string) => {
     navigator.clipboard.writeText(text);

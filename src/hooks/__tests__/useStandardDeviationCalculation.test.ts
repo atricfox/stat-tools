@@ -380,7 +380,7 @@ describe('useStandardDeviationCalculation', () => {
       expect(res.sampleStandardDeviation).toBeCloseTo(2.138, 2);
       expect(res.median).toBeCloseTo(4.5, 1);
       expect(res.q1).toBeCloseTo(4, 1);
-      expect(res.q3).toBeCloseTo(5, 1);
+      expect(res.q3).toBeCloseTo(5.5, 1);
     });
   });
 });

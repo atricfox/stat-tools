@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { MetadataManager } from '@/components/seo/MetadataManager';
-import { StructuredDataProvider, useStructuredData } from '@/components/seo/StructuredDataProvider';
+// import { StructuredDataProvider, useStructuredData } from '@/components/seo/StructuredDataProvider'; // unused in this file
 
 // Generate metadata for this page
 const metadataManager = MetadataManager.getInstance();

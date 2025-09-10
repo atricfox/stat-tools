@@ -3,7 +3,7 @@
  * Implements smart component loading with loading states and error boundaries
  */
 
-import { lazy, ComponentType } from 'react';
+import { lazy, ComponentType, LazyExoticComponent } from 'react';
 
 export interface LazyComponentOptions {
   fallback?: ComponentType;
@@ -13,7 +13,7 @@ export interface LazyComponentOptions {
 }
 
 export interface LazyLoadResult<T> {
-  Component: ComponentType<T>;
+  Component: LazyExoticComponent<ComponentType<T>>;
   prefetch: () => Promise<void>;
   preload: () => Promise<{ default: ComponentType<T> }>;
 }

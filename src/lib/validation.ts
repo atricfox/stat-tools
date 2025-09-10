@@ -61,22 +61,41 @@ export function isValidNumber(value: string): boolean {
   const trimmed = value.trim();
   if (!trimmed) return false;
   
+  // Check for invalid patterns first
+  if (trimmed === '+' || trimmed === '-') return false;
+  if (/\d+\.\d+\.\d+/.test(trimmed)) return false; // Multiple decimal points like "1.2.3"
+  
   const num = parseFloat(trimmed);
   return !isNaN(num) && isFinite(num);
 }
 
 export function sanitizeInput(input: string): string {
-  return input
-    .trim()
-    .replace(/[;|]/g, ',') // Replace semicolons and pipes with commas
-    .replace(/\s+/g, ', ') // Replace multiple spaces with comma-space
-    .replace(/,+/g, ',') // Collapse multiple commas
-    .replace(/^,|,$/g, ''); // Remove leading/trailing commas
+  // Handle the simplest cases first
+  let result = input.trim();
+  
+  // Replace alternative separators with commas
+  result = result.replace(/[;|]/g, ',');
+  
+  // If it's space-separated (no commas), convert spaces to commas
+  if (!/,/.test(result)) {
+    result = result.replace(/\s+/g, ', ');
+  } else {
+    // For comma-separated, just normalize spacing
+    result = result.replace(/\s*,\s*/g, ', ');
+  }
+  
+  // Clean up any leading/trailing commas
+  result = result.replace(/^,\s*|,\s*$/g, '');
+  
+  return result;
 }
 
 export function parseNumberString(value: string): number | null {
   const trimmed = value.trim();
   if (!trimmed) return null;
+  
+  // Use isValidNumber for consistent validation
+  if (!isValidNumber(trimmed)) return null;
   
   const num = parseFloat(trimmed);
   if (isNaN(num) || !isFinite(num)) return null;
@@ -190,7 +209,7 @@ export const validationHelpers = {
     
     // Check for very small dataset
     if (numbers.length >= 2 && numbers.length < 3) {
-      warnings.push('Small dataset - results may not be meaningful');
+      warnings.push('small dataset - results may not be meaningful');
       suggestions.push('Consider collecting more data points for reliable results');
     }
     
@@ -204,13 +223,15 @@ export const validationHelpers = {
       }
     }
     
-    // Check for extreme outliers (more than 3 standard deviations)
-    if (numbers.length > 4) {
+    // Check for extreme outliers (more than 2 standard deviations for smaller datasets)
+    if (numbers.length >= 4) {
       const mean = numbers.reduce((sum, num) => sum + num, 0) / numbers.length;
       const variance = numbers.reduce((sum, num) => sum + Math.pow(num - mean, 2), 0) / numbers.length;
       const stdDev = Math.sqrt(variance);
       
-      const extremeOutliers = numbers.filter(num => Math.abs(num - mean) > 3 * stdDev);
+      // Use lower threshold for smaller datasets, more lenient threshold
+      const threshold = numbers.length > 10 ? 2.5 : 1.5;
+      const extremeOutliers = numbers.filter(num => Math.abs(num - mean) > threshold * stdDev);
       if (extremeOutliers.length > 0) {
         warnings.push(`${extremeOutliers.length} extreme outlier${extremeOutliers.length > 1 ? 's' : ''} detected`);
         suggestions.push('Review outlying values for potential data entry errors');

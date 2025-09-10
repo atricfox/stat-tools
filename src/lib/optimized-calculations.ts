@@ -81,7 +81,7 @@ export class OptimizedCalculationService {
     
     const useCache = options.useCache !== false;
     
-    let result: MeanCalculationResult;
+    let result: MeanCalculationResult | undefined;
     let cacheHit = false;
     
     if (useCache) {
@@ -117,6 +117,11 @@ export class OptimizedCalculationService {
     // Update metrics
     this.updateMetrics(computationTime, cacheHit);
     
+    // Check if result was computed
+    if (!result) {
+      throw new Error('Failed to compute calculation result');
+    }
+    
     // Determine optimization level and quality
     const optimizationLevel = this.determineOptimizationLevel(cleanData.length, options.precision || 2);
     const quality = this.assessResultQuality(result, cleanData);
@@ -150,7 +155,7 @@ export class OptimizedCalculationService {
     }
     
     const useCache = options.useCache !== false;
-    let result: HighPrecisionResult;
+    let result: HighPrecisionResult | undefined;
     let cacheHit = false;
     
     if (useCache) {
@@ -190,6 +195,11 @@ export class OptimizedCalculationService {
     const computationTime = endTime - startTime;
     
     this.updateMetrics(computationTime, cacheHit);
+    
+    // Check if result was computed
+    if (!result) {
+      throw new Error('Failed to compute high-precision calculation result');
+    }
     
     return {
       ...result,

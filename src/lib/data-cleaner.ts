@@ -211,21 +211,22 @@ export class DataCleaner {
     const types: Record<string, number> = {};
     
     sample.forEach(value => {
-      let type = typeof value;
+      let vtype: string = typeof value;
       
       if (value === null || value === undefined) {
-        type = 'null';
-      } else if (type === 'string') {
-        if (value.trim() === '') {
-          type = 'empty';
-        } else if (!isNaN(parseFloat(value))) {
-          type = 'numeric_string';
-        } else if (value.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)) {
-          type = 'date';
+        vtype = 'null';
+      } else if (vtype === 'string') {
+        const strVal = String(value);
+        if (strVal.trim() === '') {
+          vtype = 'empty';
+        } else if (!isNaN(parseFloat(strVal))) {
+          vtype = 'numeric_string';
+        } else if (strVal.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)) {
+          vtype = 'date';
         }
       }
       
-      types[type] = (types[type] || 0) + 1;
+      types[vtype] = (types[vtype] || 0) + 1;
     });
     
     return types;

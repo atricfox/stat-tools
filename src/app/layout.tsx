@@ -1,8 +1,14 @@
+// Global polyfill for SSR compatibility - must be first
+if (typeof global !== 'undefined' && typeof (global as any).self === 'undefined') {
+  (global as any).self = global;
+}
+
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Script from 'next/script'
 import { headers } from 'next/headers'
+// Sentry 相关组件已移除
 
 const inter = Inter({
   subsets: ['latin'],

@@ -27,7 +27,7 @@ import {
   Info,
   Target
 } from 'lucide-react';
-import AdvancedExcelParser, { 
+import type { 
   ParsedExcelData, 
   TeacherDataFormat, 
   ExcelSheet,
@@ -112,6 +112,9 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
         throw new Error(`File too large. Maximum size is ${maxFileSize / 1024 / 1024}MB`);
       }
 
+      // Dynamically import the parser to avoid SSR issues
+      const { default: AdvancedExcelParser } = await import('@/lib/excel-advanced-parser');
+
       // Parse the file
       const parsed = await AdvancedExcelParser.parseFile(file, parseOptions);
       setParsedData(parsed);
@@ -135,7 +138,7 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
     }
   };
 
-  const handleExtractData = (extractionType: 'simple' | 'grades' | 'batch') => {
+  const handleExtractData = async (extractionType: 'simple' | 'grades' | 'batch') => {
     if (!parsedData || !parsedData.selectedSheet) return;
 
     try {
@@ -154,6 +157,9 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
             setError('Please select at least one column to extract grades from');
             return;
           }
+          
+          // Dynamically import the parser
+          const { default: AdvancedExcelParser } = await import('@/lib/excel-advanced-parser');
           
           const gradeResult = AdvancedExcelParser.extractGrades(
             parsedData.selectedSheet,
@@ -178,7 +184,10 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
             return;
           }
 
-          const batchResult = AdvancedExcelParser.batchProcessGradebook(
+          // Dynamically import the parser
+          const { default: AdvancedExcelParserBatch } = await import('@/lib/excel-advanced-parser');
+
+          const batchResult = AdvancedExcelParserBatch.batchProcessGradebook(
             parsedData.selectedSheet,
             selectedColumns,
             {
@@ -212,17 +221,17 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
       <div className="text-sm text-blue-800 space-y-1">
         <div className="flex justify-between">
           <span>Sheets:</span>
-          <span>{parsedData?.metadata.totalSheets}</span>
+          <span>{parsedData?.sheets.length}</span>
         </div>
         <div className="flex justify-between">
           <span>Total Rows:</span>
-          <span>{parsedData?.metadata.totalRows.toLocaleString()}</span>
+          <span>{parsedData?.selectedSheet?.rowCount?.toLocaleString() || 0}</span>
         </div>
         <div className="flex justify-between">
           <span>Parse Time:</span>
           <span>{parsedData?.metadata.parseTime.toFixed(0)}ms</span>
         </div>
-        {parsedData?.metadata.warnings.length > 0 && (
+        {parsedData?.metadata.warnings && parsedData.metadata.warnings.length > 0 && (
           <div className="mt-2">
             <span className="font-medium">Warnings:</span>
             <ul className="list-disc list-inside mt-1">
@@ -241,7 +250,7 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
 
     const getFormatIcon = () => {
       switch (teacherFormat.type) {
-        case 'grades': return <BarChart3 className="h-5 w-5 text-green-600" />;
+        case 'gradebook': return <BarChart3 className="h-5 w-5 text-green-600" />;
         case 'attendance': return <Calendar className="h-5 w-5 text-blue-600" />;
         case 'scores': return <TrendingUp className="h-5 w-5 text-purple-600" />;
         default: return <Table className="h-5 w-5 text-gray-600" />;
@@ -250,7 +259,7 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
 
     const getFormatColor = () => {
       switch (teacherFormat.type) {
-        case 'grades': return 'green';
+        case 'gradebook': return 'green';
         case 'attendance': return 'blue';
         case 'scores': return 'purple';
         default: return 'gray';
@@ -281,11 +290,11 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
           </div>
 
           <div>
-            <span className={`text-${color}-700 font-medium text-sm`}>Suggestions:</span>
+            <span className={`text-${color}-700 font-medium text-sm`}>Recommendations:</span>
             <div className={`mt-1 text-xs text-${color}-800 space-y-1`}>
-              <div>• Use column {teacherFormat.suggestions.columnToUse + 1} for primary data</div>
-              <div>• Data range: {teacherFormat.suggestions.dataRange}</div>
-              <div>• Expected format: {teacherFormat.suggestions.expectedFormat}</div>
+              <div>• Data starts at row {teacherFormat.structure.dataStartRow + 1}</div>
+              <div>• Found {teacherFormat.structure.dataColumns.length} data column(s)</div>
+              <div>• Data type: {teacherFormat.metadata.dataType}</div>
             </div>
           </div>
 
@@ -531,10 +540,12 @@ const TeacherFileUpload: React.FC<TeacherFileUploadProps> = ({
               </label>
               <select
                 value={selectedSheet}
-                onChange={(e) => {
+                onChange={async (e) => {
                   setSelectedSheet(e.target.value);
                   const sheet = parsedData.sheets.find(s => s.name === e.target.value);
                   if (sheet) {
+                    // Dynamically import the parser
+                    const { default: AdvancedExcelParser } = await import('@/lib/excel-advanced-parser');
                     const format = AdvancedExcelParser.analyzeTeacherData(sheet);
                     setTeacherFormat(format);
                     setSelectedColumns(format.structure.dataColumns);

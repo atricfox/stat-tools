@@ -44,10 +44,20 @@ export function useMeanCalculator({
       return { validNumbers: [], invalidEntries: [], isValid: false };
     }
 
-    const { validNumbers, invalidEntries } = parseNumberInput(input);
-    const isValid = validNumbers.length > 0;
+    try {
+      const parseResult = parseNumberInput(input);
+      if (!parseResult || typeof parseResult !== 'object') {
+        return { validNumbers: [], invalidEntries: [input], isValid: false };
+      }
+      
+      const { validNumbers, invalidEntries } = parseResult;
+      const isValid = validNumbers.length > 0;
 
-    return { validNumbers, invalidEntries, isValid };
+      return { validNumbers, invalidEntries, isValid };
+    } catch (error) {
+      console.error('Parse error in useMeanCalculator:', error);
+      return { validNumbers: [], invalidEntries: [input], isValid: false };
+    }
   }, [input]);
 
   // Get data quality warnings and suggestions
@@ -55,7 +65,13 @@ export function useMeanCalculator({
     if (!validateInput || !parsedData.isValid) {
       return { warnings: [], suggestions: [] };
     }
-    return validationHelpers.detectDataIssues(input);
+    try {
+      const result = validationHelpers.detectDataIssues(input);
+      return result || { warnings: [], suggestions: [] };
+    } catch (error) {
+      console.error('Validation error in useMeanCalculator:', error);
+      return { warnings: [], suggestions: [] };
+    }
   }, [input, parsedData.isValid, validateInput]);
 
   // Calculate mean
@@ -191,10 +207,10 @@ export function useMeanCalculator({
           count: result.count,
           precision: precisionValue
         },
-        validNumbers: result.validNumbers,
-        invalidEntries: result.invalidEntries,
+        validNumbers: parsedData.validNumbers,
+        invalidEntries: parsedData.invalidEntries,
         timestamp: new Date().toISOString()
       };
-    }, [input, result, precisionValue])
+    }, [input, result, precisionValue, parsedData])
   };
 }

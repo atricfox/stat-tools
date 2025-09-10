@@ -326,7 +326,13 @@ export class PerformanceOptimizer {
     url: string;
     userAgent: string;
     metrics: Partial<PerformanceMetrics>;
-    analysis: ReturnType<typeof this.analyzePerformance>;
+    analysis: {
+      metrics: Partial<PerformanceMetrics>;
+      score: number;
+      rating: 'good' | 'needs-improvement' | 'poor';
+      optimizations: PerformanceOptimization[];
+      coreWebVitalsStatus: Record<string, 'good' | 'needs-improvement' | 'poor'>;
+    };
   } {
     const metrics = this.getCurrentMetrics();
     const analysis = this.analyzePerformance(metrics);

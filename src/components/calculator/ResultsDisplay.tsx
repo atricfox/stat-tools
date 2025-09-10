@@ -61,7 +61,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   // Calculate additional statistics for advanced display
   const additionalStats = showAdvancedStats ? {
     median: (() => {
-      const sorted = [...result.validNumbers].sort((a, b) => a - b);
+      const sorted = [...results.validNumbers].sort((a, b) => a - b);
       const mid = Math.floor(sorted.length / 2);
       return sorted.length % 2 === 0 
         ? (sorted[mid - 1] + sorted[mid]) / 2 
@@ -69,7 +69,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     })(),
     mode: (() => {
       const freq: { [key: number]: number } = {};
-      result.validNumbers.forEach(num => {
+      (results.validNumbers as number[]).forEach((num: number) => {
         freq[num] = (freq[num] || 0) + 1;
       });
       const maxFreq = Math.max(...Object.values(freq));
@@ -79,14 +79,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         .map(Number);
     })(),
     stdDev: (() => {
-      const mean = result.mean;
-      const variance = result.validNumbers.reduce((sum, num) => 
+      const mean = results.mean;
+      const variance = (results.validNumbers as number[]).reduce((sum: number, num: number) => 
         sum + Math.pow(num - mean, 2), 0
-      ) / result.validNumbers.length;
+      ) / (results.validNumbers as number[]).length;
       return Math.sqrt(variance);
     })(),
     quartiles: (() => {
-      const sorted = [...result.validNumbers].sort((a, b) => a - b);
+      const sorted = [...results.validNumbers].sort((a, b) => a - b);
       const q1Index = Math.floor(sorted.length * 0.25);
       const q3Index = Math.floor(sorted.length * 0.75);
       return {
@@ -97,7 +97,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
   } : null;
 
   const copyResult = async () => {
-    const text = formatForExport(result.mean, 'mean', result.validNumbers, precision);
+    const text = formatForExport(results.mean, 'mean', results.validNumbers, precision);
     try {
       await navigator.clipboard.writeText(text);
       setCopiedResult(true);
@@ -111,7 +111,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
     try {
       const url = createShareableURL(
         window.location.origin + window.location.pathname,
-        result.validNumbers,
+        results.validNumbers,
         precision,
         'mean'
       );
@@ -131,13 +131,13 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       case 'json':
         content = JSON.stringify({
           result: {
-            mean: result.mean,
-            count: result.count,
-            sum: result.sum,
+            mean: results.mean,
+            count: results.count,
+            sum: results.sum,
             precision
           },
-          data: result.validNumbers,
-          invalidEntries: result.invalidEntries,
+          data: results.validNumbers,
+          invalidEntries: results.invalidEntries,
           statistics: additionalStats,
           timestamp: new Date().toISOString()
         }, null, 2);
@@ -147,17 +147,17 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       
       case 'csv':
         const csvHeaders = 'Index,Value\n';
-        const csvData = result.validNumbers
-          .map((num, index) => `${index + 1},${num}`)
+        const csvData = (results.validNumbers as number[])
+          .map((num: number, index: number) => `${index + 1},${num}`)
           .join('\n');
-        const csvSummary = `\n\nSummary\nMean,${result.mean}\nCount,${result.count}\nSum,${result.sum}`;
+        const csvSummary = `\n\nSummary\nMean,${results.mean}\nCount,${results.count}\nSum,${results.sum}`;
         content = csvHeaders + csvData + csvSummary;
         mimeType = 'text/csv';
         filename += '.csv';
         break;
       
       default:
-        content = formatForExport(result.mean, 'mean', result.validNumbers, precision);
+        content = formatForExport(results.mean, 'mean', results.validNumbers, precision);
         filename += '.txt';
     }
 
@@ -176,8 +176,8 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-xl font-semibold text-gray-900">
-            {context === 'student' ? 'Your Grade Average' : 
-             context === 'research' ? 'Statistical Results' : 
+            {userContext === 'student' ? 'Your Grade Average' : 
+             userContext === 'research' ? 'Statistical Results' : 
              'Class Statistics'}
           </h2>
           <div className="flex items-center gap-2">
@@ -194,22 +194,22 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         {/* Primary Result */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
           <ResultCard
-            value={formatNumber(result.mean, { precision })}
+            value={formatNumber(results.mean, { precision })}
             label="Mean (Average)"
             highlighted={true}
             size="large"
-            description={context === 'student' ? 'Your overall average' : 
-                        context === 'research' ? 'Arithmetic mean' : 
+            description={userContext === 'student' ? 'Your overall average' : 
+                        userContext === 'research' ? 'Arithmetic mean' : 
                         'Class average'}
           />
           <ResultCard
-            value={result.count}
+            value={results.count}
             label="Sample Size"
             size="medium"
             description="Total numbers"
           />
           <ResultCard
-            value={formatNumber(result.sum, { precision })}
+            value={formatNumber(results.sum, { precision })}
             label="Sum"
             size="medium"
             description="Total sum"
@@ -247,11 +247,11 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         )}
 
         {/* Data Quality Indicators */}
-        {(result.warnings && result.warnings.length > 0) && (
+        {(results.warnings && results.warnings.length > 0) && (
           <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-6">
             <h4 className="font-medium text-yellow-800 mb-2">Data Quality Notes</h4>
             <ul className="text-sm text-yellow-700 space-y-1">
-              {result.warnings.map((warning, index) => (
+              {(results.warnings as string[]).map((warning: string, index: number) => (
                 <li key={index}>• {warning}</li>
               ))}
             </ul>
@@ -259,14 +259,14 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
         )}
 
         {/* Invalid Entries Warning */}
-        {result.invalidEntries && result.invalidEntries.length > 0 && (
+        {results.invalidEntries && results.invalidEntries.length > 0 && (
           <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
             <h4 className="font-medium text-orange-800 mb-2">
-              Ignored {result.invalidEntries.length} Invalid Entr{result.invalidEntries.length > 1 ? 'ies' : 'y'}
+              Ignored {results.invalidEntries.length} Invalid Entr{results.invalidEntries.length > 1 ? 'ies' : 'y'}
             </h4>
             <div className="text-sm text-orange-700">
-              {result.invalidEntries.slice(0, 5).join(', ')}
-              {result.invalidEntries.length > 5 && ` (+${result.invalidEntries.length - 5} more)`}
+              {results.invalidEntries.slice(0, 5).join(', ')}
+              {results.invalidEntries.length > 5 && ` (+${results.invalidEntries.length - 5} more)`}
             </div>
           </div>
         )}
@@ -309,7 +309,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             </button>
           </div>
 
-          {context !== 'student' && (
+          {userContext !== 'student' && (
             <button
               onClick={shareResult}
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
@@ -336,15 +336,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Minimum:</span>
-                  <span className="font-mono">{formatNumber(Math.min(...result.validNumbers), { precision })}</span>
+                  <span className="font-mono">{formatNumber(Math.min(...results.validNumbers), { precision })}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Maximum:</span>
-                  <span className="font-mono">{formatNumber(Math.max(...result.validNumbers), { precision })}</span>
+                  <span className="font-mono">{formatNumber(Math.max(...results.validNumbers), { precision })}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-gray-600">Range:</span>
-                  <span className="font-mono">{formatNumber(Math.max(...result.validNumbers) - Math.min(...result.validNumbers), { precision })}</span>
+                  <span className="font-mono">{formatNumber(Math.max(...results.validNumbers) - Math.min(...results.validNumbers), { precision })}</span>
                 </div>
                 {additionalStats && (
                   <>
@@ -354,7 +354,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">Coefficient of Variation:</span>
-                      <span className="font-mono">{formatNumber((additionalStats.stdDev / result.mean) * 100, { precision: 1 })}%</span>
+                      <span className="font-mono">{formatNumber((additionalStats.stdDev / results.mean) * 100, { precision: 1 })}%</span>
                     </div>
                   </>
                 )}
@@ -364,30 +364,30 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <div>
               <h4 className="font-medium text-gray-900 mb-3">Context Insights</h4>
               <div className="text-sm text-gray-600 space-y-2">
-                {context === 'student' && (
+                {userContext === 'student' && (
                   <>
                     <p>• This represents your overall performance average</p>
                     <p>• Consider the range to see consistency in your work</p>
-                    {result.mean >= 90 && <p>• Excellent performance! Keep it up! 🎉</p>}
-                    {result.mean >= 80 && result.mean < 90 && <p>• Good work! Room for improvement 📈</p>}
-                    {result.mean < 80 && <p>• Consider reviewing material for better results 📚</p>}
+                    {results.mean >= 90 && <p>• Excellent performance! Keep it up! 🎉</p>}
+                    {results.mean >= 80 && results.mean < 90 && <p>• Good work! Room for improvement 📈</p>}
+                    {results.mean < 80 && <p>• Consider reviewing material for better results 📚</p>}
                   </>
                 )}
-                {context === 'research' && (
+                {userContext === 'research' && (
                   <>
-                    <p>• Sample size: {result.count} measurements</p>
+                    <p>• Sample size: {results.count} measurements</p>
                     <p>• Data precision appears appropriate for analysis</p>
-                    {additionalStats && additionalStats.stdDev / result.mean < 0.1 && 
+                    {additionalStats && additionalStats.stdDev / results.mean < 0.1 && 
                       <p>• Low variability indicates consistent measurements ✓</p>
                     }
                   </>
                 )}
-                {context === 'teacher' && (
+                {userContext === 'teacher' && (
                   <>
                     <p>• Class average provides baseline performance metric</p>
                     <p>• Use range to identify students needing extra support</p>
-                    {result.mean >= 85 && <p>• Class performing well overall! 👏</p>}
-                    {result.count >= 20 && <p>• Good sample size for reliable statistics</p>}
+                    {results.mean >= 85 && <p>• Class performing well overall! 👏</p>}
+                    {results.count >= 20 && <p>• Good sample size for reliable statistics</p>}
                   </>
                 )}
               </div>
@@ -400,9 +400,9 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
             <div className="relative bg-gray-100 rounded-lg p-4 h-16">
               {/* Simple dot plot */}
               <div className="relative h-8 flex items-center">
-                {result.validNumbers.slice(0, 50).map((num, index) => {
-                  const min = Math.min(...result.validNumbers);
-                  const max = Math.max(...result.validNumbers);
+                {(results.validNumbers as number[]).slice(0, 50).map((num: number, index: number) => {
+                  const min = Math.min(...results.validNumbers);
+                  const max = Math.max(...results.validNumbers);
                   const position = max === min ? 50 : ((num - min) / (max - min)) * 100;
                   return (
                     <div
@@ -417,15 +417,15 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
                 <div
                   className="absolute w-0.5 h-8 bg-red-500"
                   style={{ 
-                    left: `${Math.max(0, Math.min(100, ((result.mean - Math.min(...result.validNumbers)) / (Math.max(...result.validNumbers) - Math.min(...result.validNumbers))) * 100))}%` 
+                    left: `${Math.max(0, Math.min(100, ((results.mean - Math.min(...results.validNumbers)) / (Math.max(...results.validNumbers) - Math.min(...results.validNumbers))) * 100))}%` 
                   }}
-                  title={`Mean: ${result.mean}`}
+                  title={`Mean: ${results.mean}`}
                 />
               </div>
               <div className="flex justify-between text-xs text-gray-500 mt-2">
-                <span>{formatNumber(Math.min(...result.validNumbers), { precision })}</span>
-                <span className="text-red-600 font-medium">Mean: {formatNumber(result.mean, { precision })}</span>
-                <span>{formatNumber(Math.max(...result.validNumbers), { precision })}</span>
+                <span>{formatNumber(Math.min(...results.validNumbers), { precision })}</span>
+                <span className="text-red-600 font-medium">Mean: {formatNumber(results.mean, { precision })}</span>
+                <span>{formatNumber(Math.max(...results.validNumbers), { precision })}</span>
               </div>
             </div>
           </div>
@@ -434,7 +434,7 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
 
       {/* Calculation Steps */}
       <CalculationSteps
-        steps={formatCalculationSteps(result.validNumbers, 'mean', result.mean, precision)}
+        steps={formatCalculationSteps(results.validNumbers, 'mean', results.mean, precision)}
         title="Step-by-Step Calculation"
         explanation={
           <div>
@@ -445,12 +445,12 @@ const ResultsDisplay: React.FC<ResultsDisplayProps> = ({
               The arithmetic mean (average) is calculated by adding all the numbers together 
               and dividing by the count of numbers. It represents the central tendency of your 
               data set and is widely used in {
-                context === 'student' ? 'academic grading' :
-                context === 'research' ? 'statistical analysis' :
+                userContext === 'student' ? 'academic grading' :
+                userContext === 'research' ? 'statistical analysis' :
                 'educational assessment'
               }.
             </p>
-            {context === 'research' && (
+            {userContext === 'research' && (
               <p className="mt-2">
                 <em>Note: Consider using median for skewed distributions or when outliers are present.</em>
               </p>

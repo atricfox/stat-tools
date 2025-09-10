@@ -1,5 +1,6 @@
 export function createRequestContext(init?: { requestId?: string; path?: string }) {
-  const requestId = init?.requestId || (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`)
+  const generateId = () => `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  const requestId = init?.requestId || generateId()
   const path = init?.path || ''
   const startedAt = Date.now()
 
