@@ -1,8 +1,3 @@
-// Global polyfill for SSR compatibility - must be first
-if (typeof global !== 'undefined' && typeof (global as any).self === 'undefined') {
-  (global as any).self = global;
-}
-
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'

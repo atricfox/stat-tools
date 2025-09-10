@@ -18,22 +18,12 @@ const nextConfig = {
   poweredByHeader: false,
   generateBuildId: () => 'build',
   
+  // Force Node.js runtime to avoid edge-runtime issues
+  serverExternalPackages: ['@edge-runtime/cookies'],
+  
+  
   // Enhanced webpack configuration for code splitting
   webpack: (config, { dev, isServer }) => {
-    // Add global polyfills for SSR compatibility
-    if (isServer) {
-      const originalEntry = config.entry;
-      config.entry = async () => {
-        const entries = await originalEntry();
-        
-        if (entries['main.js'] && !entries['main.js'].includes('./src/polyfills.js')) {
-          entries['main.js'].unshift('./src/polyfills.js');
-        }
-        
-        return entries;
-      };
-    }
-
     // Fix Node.js polyfills
     config.resolve.fallback = {
       ...config.resolve.fallback,
@@ -48,6 +38,17 @@ const nextConfig = {
       os: false,
       url: false,
     };
+
+    // Fix edge-runtime compatibility by providing polyfills
+    if (isServer) {
+      const webpack = require('webpack');
+      config.plugins = config.plugins || [];
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          'self': 'globalThis',
+        })
+      );
+    }
     // Production optimizations
     if (!dev) {
       // Split chunks configuration
