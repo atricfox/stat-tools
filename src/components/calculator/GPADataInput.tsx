@@ -20,8 +20,6 @@ import {
   AlertCircle,
   CheckCircle,
   BookOpen,
-  Trash2,
-  Copy,
   RotateCcw
 } from 'lucide-react';
 import { Course, GradePointSystem } from '@/types/gpa';
@@ -110,17 +108,41 @@ export default function GPADataInput({
   }, [courses.length, maxCourses, onAddCourse]);
 
   const handleAddSampleCourse = useCallback(() => {
-    const sampleCourses = [
-      { name: 'Calculus I', credits: 4, grade: 'A', semester: 'Fall 2023' },
-      { name: 'English Composition', credits: 3, grade: 'A-', semester: 'Fall 2023' },
-      { name: 'General Chemistry', credits: 4, grade: 'B+', semester: 'Fall 2023' },
-      { name: 'World History', credits: 3, grade: 'B', semester: 'Spring 2024' },
-      { name: 'Statistics', credits: 3, grade: 'A-', semester: 'Spring 2024' }
-    ];
+    // Use grading system-specific sample data
+    let sampleCourses = [];
+    
+    if (gradeSystem.id === 'gpa-4.5') {
+      // Germany grading system
+      sampleCourses = [
+        { name: 'Mathematik I', credits: 5, grade: '1.0', semester: 'WS 2023' },
+        { name: 'Physik', credits: 4, grade: '1.3', semester: 'WS 2023' },
+        { name: 'Informatik', credits: 6, grade: '1.7', semester: 'WS 2023' },
+        { name: 'Chemie', credits: 4, grade: '2.0', semester: 'SS 2024' },
+        { name: 'Statistik', credits: 3, grade: '2.3', semester: 'SS 2024' }
+      ];
+    } else if (gradeSystem.id === 'gpa-4.3') {
+      // Canada grading system
+      sampleCourses = [
+        { name: 'Mathematics', credits: 3, grade: 'A+', semester: 'Fall 2023' },
+        { name: 'Biology', credits: 4, grade: 'A', semester: 'Fall 2023' },
+        { name: 'Literature', credits: 3, grade: 'A-', semester: 'Fall 2023' },
+        { name: 'Physics', credits: 4, grade: 'B+', semester: 'Spring 2024' },
+        { name: 'Statistics', credits: 3, grade: 'B', semester: 'Spring 2024' }
+      ];
+    } else {
+      // US 4.0 grading system (default)
+      sampleCourses = [
+        { name: 'Calculus I', credits: 4, grade: 'A', semester: 'Fall 2023' },
+        { name: 'English Composition', credits: 3, grade: 'A-', semester: 'Fall 2023' },
+        { name: 'General Chemistry', credits: 4, grade: 'B+', semester: 'Fall 2023' },
+        { name: 'World History', credits: 3, grade: 'B', semester: 'Spring 2024' },
+        { name: 'Statistics', credits: 3, grade: 'A-', semester: 'Spring 2024' }
+      ];
+    }
 
     const coursesToAdd = sampleCourses.slice(0, Math.min(5, maxCourses - courses.length));
     coursesToAdd.forEach(course => onAddCourse(course));
-  }, [courses.length, maxCourses, onAddCourse]);
+  }, [courses.length, maxCourses, onAddCourse, gradeSystem.id]);
 
   const parseTranscriptText = useCallback((text: string) => {
     const errors: string[] = [];
@@ -539,6 +561,16 @@ export default function GPADataInput({
                 >
                   Load Sample Data
                 </button>
+                {courses.length > 0 && (
+                  <button
+                    onClick={onClearAll}
+                    className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    title="Clear all courses"
+                  >
+                    <RotateCcw className="h-4 w-4 inline mr-1" />
+                    Clear
+                  </button>
+                )}
                 <button
                   onClick={handleAddNewCourse}
                   disabled={courses.length >= maxCourses}
@@ -573,22 +605,13 @@ export default function GPADataInput({
           <span className="text-sm font-medium text-gray-700">
             Courses ({courses.length}/{maxCourses})
           </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => exportCourses('csv')}
-              className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-            >
-              <Download className="w-3 h-3 inline mr-1" />
-              Export
-            </button>
-            <button
-              onClick={onClearAll}
-              className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
-            >
-              <Trash2 className="w-3 h-3 inline mr-1" />
-              Clear All
-            </button>
-          </div>
+          <button
+            onClick={() => exportCourses('csv')}
+            className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+          >
+            <Download className="w-3 h-3 inline mr-1" />
+            Export
+          </button>
         </div>
         
         {courses.map((course) => (
@@ -598,14 +621,14 @@ export default function GPADataInput({
               placeholder="Course name"
               value={course.name}
               onChange={(e) => onUpdateCourse(course.id, { name: e.target.value })}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="number"
               placeholder="Credits"
               value={course.credits}
               onChange={(e) => onUpdateCourse(course.id, { credits: parseFloat(e.target.value) || 0 })}
-              className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-16 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               min="0.5"
               max="10"
               step="0.5"
@@ -613,7 +636,7 @@ export default function GPADataInput({
             <select
               value={course.grade}
               onChange={(e) => onUpdateCourse(course.id, { grade: e.target.value })}
-              className="w-24 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-20 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="">Grade</option>
               {availableGrades.map(grade => (
@@ -625,7 +648,7 @@ export default function GPADataInput({
               placeholder="Semester"
               value={course.semester || ''}
               onChange={(e) => onUpdateCourse(course.id, { semester: e.target.value })}
-              className="w-28 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-24 px-2 py-1.5 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               onClick={() => onRemoveCourse(course.id)}

@@ -4,10 +4,11 @@
  * Implements US-019: Final exam score prediction for students
  */
 
-import React, { useState } from 'react';
-import { HelpCircle, RefreshCw, ChevronDown } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { HelpCircle, RefreshCw, ChevronDown, Copy, Share2, Download } from 'lucide-react';
 import useFinalGradeCalculation from '@/hooks/useFinalGradeCalculation';
 import CalculationSteps, { CalculationStep } from '@/components/calculator/CalculationSteps';
+import HelpSection from '@/components/calculator/HelpSection';
 import GradeDataInput from './shared/GradeDataInput';
 import WeightSlider from './shared/WeightSlider';
 import FinalGradeResultDisplay from './shared/FinalGradeResultDisplay';
@@ -45,7 +46,7 @@ export default function FinalGradeCalculator({
     initialGrades: [],
     initialFinalWeight: 40,
     initialTargetGrade: 85,
-    autoCalculate: false
+    autoCalculate: true
   });
 
   // Grade management functions for the new input component
@@ -75,11 +76,124 @@ export default function FinalGradeCalculator({
   // UI State for showing steps and help
   const [showSteps, setShowSteps] = useState(false);
   const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const downloadMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close download menu when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (downloadMenuRef.current && !downloadMenuRef.current.contains(event.target as Node)) {
+        setShowDownloadMenu(false);
+      }
+    };
+
+    if (showDownloadMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showDownloadMenu]);
 
   // Notify parent component about result changes
   React.useEffect(() => {
     onResultChange?.(result !== null);
   }, [result, onResultChange]);
+
+  // Action functions for copy, share, download
+  const copyResult = () => {
+    if (!result) return;
+    const text = `Final Grade Prediction Results
+Required Final Score: ${result.isAchievable ? `${result.requiredScore.toFixed(1)}%` : 'Not Achievable'}
+Current Weighted Score: ${result.currentWeightedScore.toFixed(1)}%
+${!result.isAchievable ? `Maximum Possible Grade: ${result.maxPossibleGrade.toFixed(1)}%` : ''}
+Difficulty Level: ${result.difficultyLevel}
+Recommendation: ${result.recommendation}`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      // Optional: Show success feedback
+    });
+  };
+
+  const shareResult = async () => {
+    if (!result) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Final Grade Prediction',
+          text: `I need ${result.isAchievable ? `${result.requiredScore.toFixed(1)}%` : 'an impossible score'} on my final exam to achieve my target grade.`,
+          url: window.location.href
+        });
+      } catch (error: any) {
+        // Handle share cancellation gracefully
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing results:', error);
+          copyResult(); // Fallback to copy on error
+        }
+        // AbortError means user canceled the share, which is normal behavior
+      }
+    } else {
+      copyResult(); // Fallback to copy
+    }
+  };
+
+  const downloadData = (format: 'csv' | 'json' | 'txt') => {
+    if (!result) return;
+    let content = '';
+    let filename = '';
+    let mimeType = '';
+
+    const data = {
+      requiredScore: result.requiredScore,
+      isAchievable: result.isAchievable,
+      currentWeightedScore: result.currentWeightedScore,
+      maxPossibleGrade: result.maxPossibleGrade,
+      difficultyLevel: result.difficultyLevel,
+      recommendation: result.recommendation,
+      timestamp: new Date().toISOString()
+    };
+
+    if (format === 'csv') {
+      content = `Field,Value
+Required Final Score,${result.isAchievable ? `${result.requiredScore.toFixed(1)}%` : 'Not Achievable'}
+Current Weighted Score,${result.currentWeightedScore.toFixed(1)}%
+Maximum Possible Grade,${result.maxPossibleGrade.toFixed(1)}%
+Difficulty Level,${result.difficultyLevel}
+Is Achievable,${result.isAchievable}
+Recommendation,"${result.recommendation}"
+Generated,${new Date().toLocaleString()}`;
+      filename = 'final_grade_prediction.csv';
+      mimeType = 'text/csv';
+    } else if (format === 'json') {
+      content = JSON.stringify(data, null, 2);
+      filename = 'final_grade_prediction.json';
+      mimeType = 'application/json';
+    } else { // txt
+      content = `Final Grade Prediction Results
+Generated: ${new Date().toLocaleString()}
+
+Required Final Score: ${result.isAchievable ? `${result.requiredScore.toFixed(1)}%` : 'Not Achievable'}
+Current Weighted Score: ${result.currentWeightedScore.toFixed(1)}%
+Maximum Possible Grade: ${result.maxPossibleGrade.toFixed(1)}%
+Difficulty Level: ${result.difficultyLevel}
+Is Achievable: ${result.isAchievable}
+
+Recommendation: ${result.recommendation}`;
+      filename = 'final_grade_prediction.txt';
+      mimeType = 'text/plain';
+    }
+
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setShowDownloadMenu(false);
+  };
 
   // Convert calculation steps to CalculationSteps format
   const getCalculationSteps = (): CalculationStep[] => {
@@ -102,6 +216,27 @@ export default function FinalGradeCalculator({
       {/* Input Section */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
         <div className="space-y-6">
+          
+          {/* Grading Scale Selection - Moved to top */}
+          <div>
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Grading Scale</h3>
+            <div className="flex flex-wrap gap-2">
+              {(['percentage', '4.0', '5.0'] as GradingScale[]).map((scale) => (
+                <button
+                  key={scale}
+                  onClick={() => setGradingScale(scale)}
+                  className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    gradingScale === scale
+                      ? 'bg-blue-600 text-white'
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  {scale === 'percentage' ? 'Percentage' : 
+                   scale === '4.0' ? '4.0 Scale' : '5.0 Scale'}
+                </button>
+              ))}
+            </div>
+          </div>
           
           {/* Current Grades Input */}
           <div>
@@ -151,29 +286,6 @@ export default function FinalGradeCalculator({
               </div>
             </div>
 
-            {/* Grading Scale Selection */}
-            <div className="mt-6">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Grading Scale
-              </label>
-              <div className="flex flex-wrap gap-2">
-                {(['percentage', '4.0', '5.0'] as GradingScale[]).map((scale) => (
-                  <button
-                    key={scale}
-                    onClick={() => setGradingScale(scale)}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      gradingScale === scale
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {scale === 'percentage' ? 'Percentage' : 
-                     scale === '4.0' ? '4.0 Scale' : '5.0 Scale'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
             {/* Validation Errors */}
             {!isValid && validationErrors.length > 0 && (
               <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-md">
@@ -194,30 +306,7 @@ export default function FinalGradeCalculator({
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-2 justify-center pt-2">
-              {grades.length > 0 && (
-                <button
-                  onClick={calculate}
-                  disabled={!canCalculate || isCalculating}
-                  className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                    canCalculate && !isCalculating
-                      ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {isCalculating ? 'Calculating...' : 'Calculate Required Score'}
-                </button>
-              )}
-              
-              <button
-                onClick={reset}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                title="Reset all data"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
-            </div>
+            {/* Action Buttons - Remove Calculate button, move Clear to GradeDataInput */}
           </div>
         </div>
       </div>
@@ -225,10 +314,61 @@ export default function FinalGradeCalculator({
       {/* Results Section */}
       {result && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Final Grade Prediction</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Final Grade Prediction</h2>
+            
+            {/* Action Buttons */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={copyResult}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                title="Copy results"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+              <button
+                onClick={shareResult}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                title="Share results"
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
+              <div className="relative" ref={downloadMenuRef}>
+                <button 
+                  onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  title="Download results"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+                {showDownloadMenu && (
+                  <div className="absolute right-0 top-10 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-16">
+                    <button
+                      onClick={() => downloadData('csv')}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg"
+                    >
+                      CSV
+                    </button>
+                    <button
+                      onClick={() => downloadData('json')}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      JSON
+                    </button>
+                    <button
+                      onClick={() => downloadData('txt')}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg"
+                    >
+                      TXT
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
           
           {/* Current Status Summary */}
-          <div className="bg-blue-50 rounded-lg p-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4 mb-6 text-center">
             <h4 className="text-sm font-medium text-blue-900 mb-2">Current Status</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
               <div>
@@ -259,31 +399,34 @@ export default function FinalGradeCalculator({
         </div>
       )}
 
-      {/* Calculation Steps */}
-      {showSteps && result && (
-        <CalculationSteps
-          steps={getCalculationSteps()}
-          context="student"
-          showFormulas={true}
-          showExplanations={true}
-          interactive={true}
-          className="shadow-sm"
-        />
-      )}
-
-      {/* Calculation Steps Button - Only when results available */}
+      {/* Calculation Steps Section - Only when results available */}
       {result && (
-        <div className="flex justify-center">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
           <button
             onClick={() => setShowSteps(!showSteps)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              showSteps 
-                ? 'bg-blue-100 text-blue-700' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 -m-2 rounded-lg transition-colors"
           >
-            {showSteps ? 'Hide' : 'Show'} Calculation Steps
+            <h3 className="text-lg font-semibold text-gray-900">
+              <HelpCircle className="w-5 h-5 inline mr-2" />
+              Calculation Steps
+            </h3>
+            <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
+              showSteps ? 'rotate-180' : ''
+            }`} />
           </button>
+          
+          {showSteps && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <CalculationSteps
+                steps={getCalculationSteps()}
+                context="student"
+                showFormulas={true}
+                showExplanations={true}
+                interactive={true}
+                className="shadow-sm"
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -304,46 +447,11 @@ export default function FinalGradeCalculator({
         
         {showHelp && (
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="space-y-4">
-              <div>
-              <h4 className="font-medium text-gray-900 mb-2">What is Final Grade Prediction?</h4>
-              <p className="text-gray-700">
-                This calculator helps you determine the minimum score needed on your final exam 
-                to achieve your desired overall grade in a course based on your current performance.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">How to Use This Calculator</h4>
-              <ul className="list-disc list-inside text-gray-700 space-y-1">
-                <li>Enter your current assignment and exam scores with their weights</li>
-                <li>Set the weight percentage for your final exam</li>
-                <li>Choose your target overall grade for the course</li>
-                <li>The calculator will show the required final exam score</li>
-                <li>View detailed calculation steps and feasibility analysis</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Understanding Results</h4>
-              <ul className="text-gray-700 space-y-1">
-                <li><strong>Green:</strong> Target is easily achievable</li>
-                <li><strong>Yellow:</strong> Target requires moderate effort</li>
-                <li><strong>Orange:</strong> Target is challenging but possible</li>
-                <li><strong>Red:</strong> Target may not be achievable</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Tips for Success</h4>
-              <ul className="text-gray-700 space-y-1">
-                <li>Keep your current grades updated as you receive new scores</li>
-                <li>Plan your study time based on the required final score</li>
-                <li>Consider extra credit opportunities if available</li>
-                <li>Speak with your instructor if targets seem unrealistic</li>
-              </ul>
-            </div>
-            </div>
+            <HelpSection
+              userMode="student"
+              calculatorType="final-grade"
+              className="shadow-sm"
+            />
           </div>
         )}
       </div>

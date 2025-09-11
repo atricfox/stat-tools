@@ -12,14 +12,14 @@ import HelpSection from '@/components/calculator/HelpSection';
 import { useWeightedMeanCalculation } from '@/hooks/useWeightedMeanCalculation';
 import { useWeightedURLState } from '@/lib/weighted-url-state-manager';
 import { WeightedPair, InputMode } from '@/types/weightedMean';
-import ShareCalculation from '@/components/calculator/ShareCalculation';
+import { formatForCalculationSteps } from '@/lib/formatters/numberFormatter';
 
 export default function WeightedMeanCalculator() {
   const [userMode, setUserMode] = useState<UserMode>('student');
   const [precision, setPrecision] = useState(2);
   const [inputMode, setInputMode] = useState<InputMode>('pairs');
-  const [showSteps, setShowSteps] = useState(false);
   const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
+  const [showSteps, setShowSteps] = useState(false);
 
   // Use the weighted mean calculation hook
   const {
@@ -46,6 +46,32 @@ export default function WeightedMeanCalculator() {
   } = useWeightedURLState();
 
   const toolCategory = userMode === 'teacher' ? 'gpa' : userMode === 'research' ? 'analysis' : 'statistics';
+
+  // Convert result steps to CalculationStep format for the CalculationSteps component
+  const getCalculationSteps = (): CalculationStep[] => {
+    if (!result || !result.steps) return [];
+    
+    return result.steps.map((step, index) => ({
+      id: `step-${index}`,
+      title: `Step ${index + 1}`,
+      description: step,
+      formula: index === 0 ? 'Data Validation' : 
+               index === 1 ? 'Weight Calculation' : 
+               index === 2 ? 'Σ(value × weight)' :
+               index === 3 ? 'Σ(weights)' :
+               index === result.steps.length - 1 ? 'Weighted Mean = Σ(value × weight) / Σ(weights)' : '',
+      calculation: step,
+      result: index === result.steps.length - 1 ? formatForCalculationSteps(result.weightedMean, userMode, precision) : '',
+      explanation: index === result.steps.length - 1 
+        ? `The weighted mean gives more importance to values with higher weights.` 
+        : index === 0 
+        ? 'Validating and processing input value-weight pairs.'
+        : index === 1
+        ? 'Calculating the total weighted values and weights.'
+        : 'Processing statistical calculations step by step.',
+      difficulty: userMode === 'student' ? 'basic' : userMode === 'research' ? 'advanced' : 'intermediate'
+    }));
+  };
 
   const handleDataChange = (pairs: WeightedPair[]) => {
     // Auto-calculate when data changes
@@ -82,53 +108,30 @@ export default function WeightedMeanCalculator() {
     URL.revokeObjectURL(url);
   };
 
-  // Convert result to CalculationStep format for the CalculationSteps component
-  const getCalculationSteps = (): CalculationStep[] => {
-    if (!result) return [];
+  const handleShareResults = (data: any) => {
+    const shareableState = createShareableUrl(data, { includeQR: true });
+    const shareUrl = shareableState?.url || window.location.href;
     
-    return [
-      {
-        id: 'step-1',
-        title: 'Step 1',
-        description: `Collected ${result.validPairs} valid value:weight pairs`,
-        formula: 'Data Validation',
-        calculation: `Found ${result.validPairs} pairs, excluded ${result.excludedPairs} invalid entries`,
-        result: `${result.validPairs} pairs`,
-        explanation: 'Validated input data and filtered out invalid entries.',
-        difficulty: userMode === 'student' ? 'basic' : userMode === 'research' ? 'advanced' : 'intermediate'
-      },
-      {
-        id: 'step-2',
-        title: 'Step 2',
-        description: 'Calculate weighted sum',
-        formula: 'Σ(value × weight)',
-        calculation: `Total weighted sum = ${result.totalWeightedValue}`,
-        result: `${result.totalWeightedValue}`,
-        explanation: 'Sum of all values multiplied by their respective weights.',
-        difficulty: userMode === 'student' ? 'basic' : userMode === 'research' ? 'advanced' : 'intermediate'
-      },
-      {
-        id: 'step-3',
-        title: 'Step 3',
-        description: 'Calculate total weights',
-        formula: 'Σ(weight)',
-        calculation: `Total weights = ${result.totalWeights}`,
-        result: `${result.totalWeights}`,
-        explanation: 'Sum of all individual weights.',
-        difficulty: userMode === 'student' ? 'basic' : userMode === 'research' ? 'advanced' : 'intermediate'
-      },
-      {
-        id: 'step-4',
-        title: 'Step 4',
-        description: 'Calculate weighted mean',
-        formula: 'Weighted Mean = Σ(value × weight) ÷ Σ(weight)',
-        calculation: `${result.totalWeightedValue} ÷ ${result.totalWeights} = ${result.weightedMean}`,
-        result: `${result.weightedMean}`,
-        explanation: 'The weighted mean represents the central tendency considering the importance (weight) of each value.',
-        difficulty: userMode === 'student' ? 'basic' : userMode === 'research' ? 'advanced' : 'intermediate'
-      }
-    ];
+    if (navigator.share) {
+      navigator.share({
+        title: 'Weighted Mean Calculator Results',
+        text: `Weighted Mean: ${data.weightedMean.toFixed(precision)}`,
+        url: shareUrl
+      }).catch((error) => {
+        // Ignore AbortError (user canceled share)
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+          // Fallback: copy to clipboard
+          navigator.clipboard.writeText(shareUrl);
+        }
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(shareUrl);
+      // You could add a toast notification here
+    }
   };
+
 
 
   return (
@@ -174,20 +177,41 @@ export default function WeightedMeanCalculator() {
           precision={precision}
           onCopy={handleCopyResults}
           onDownload={handleDownloadResults}
+          onShare={handleShareResults}
           className="shadow-sm"
         />
 
-        {/* Calculation Steps */}
-        {showSteps && result && (
-          <CalculationSteps
-            steps={getCalculationSteps()}
-            context={userMode}
-            showFormulas={true}
-            showExplanations={userMode === 'student'}
-            interactive={true}
-            className="shadow-sm"
-          />
+        {/* Calculation Steps Section - Only when results available */}
+        {result && (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+            <button
+              onClick={() => setShowSteps(!showSteps)}
+              className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 -m-2 rounded-lg transition-colors"
+            >
+              <h3 className="text-lg font-semibold text-gray-900">
+                <HelpCircle className="w-5 h-5 inline mr-2" />
+                Calculation Steps
+              </h3>
+              <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
+                showSteps ? 'rotate-180' : ''
+              }`} />
+            </button>
+            
+            {showSteps && (
+              <div className="mt-4 pt-4 border-t border-gray-200">
+                <CalculationSteps
+                  steps={getCalculationSteps()}
+                  context={userMode}
+                  showFormulas={userMode !== 'student'}
+                  showExplanations={true}
+                  interactive={true}
+                  className="shadow-sm"
+                />
+              </div>
+            )}
+          </div>
         )}
+
 
         {/* Help Section - Clickable Header for expand/collapse */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
@@ -274,43 +298,6 @@ export default function WeightedMeanCalculator() {
           </div>
         </div>
 
-        {/* Control Buttons - Help Always Available for SEO */}
-        <div className="flex flex-wrap gap-4">
-          <button
-            onClick={() => setShowHelp(!showHelp)}
-            className={`flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
-              showHelp 
-                ? 'bg-blue-100 text-blue-700' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-          >
-            <HelpCircle className="h-4 w-4 mr-2" />
-            {showHelp ? 'Hide' : 'Show'} Help
-          </button>
-          
-          {/* Calculation Steps Button - Only when results available */}
-          {result && (
-            <button
-              onClick={() => setShowSteps(!showSteps)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                showSteps 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {showSteps ? 'Hide' : 'Show'} Calculation Steps
-            </button>
-          )}
-          
-          {/* Share Calculation - Only when results available */}
-          {result && (
-            <ShareCalculation
-              onCreateShare={(options) => createShareableUrl(result, options)}
-              onGenerateQR={generateQRCode}
-              result={result}
-            />
-          )}
-        </div>
 
       </div>
     </CalculatorLayout>

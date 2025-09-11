@@ -10,7 +10,6 @@ import {
   BookOpen, 
   ChevronRight, 
   ChevronDown, 
-  Copy, 
   Eye, 
   EyeOff,
   Calculator,
@@ -83,7 +82,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
   };
 
   const copyStep = (step: CalculationStep) => {
-    const text = `${step.title}\n${step.formula}\n${step.calculation} = ${step.result}`;
+    const text = `${step.title}\n${step.formula}\n${step.calculation}${step.result ? `\n${step.result}` : ''}`;
     navigator.clipboard.writeText(text);
   };
 
@@ -137,8 +136,7 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
         <div className="flex items-center justify-between">
           <div className="flex items-center">
             <BookOpen className="h-5 w-5 text-blue-600 mr-2" />
-            <h3 className="text-lg font-semibold text-gray-900">Calculation Steps</h3>
-            <span className="ml-2 text-sm text-gray-500">({steps.length} steps)</span>
+            <span className="text-sm text-gray-500">{steps.length} steps</span>
           </div>
 
           <div className="flex items-center space-x-2">
@@ -248,7 +246,10 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                       className="p-1 text-gray-400 hover:text-gray-600 hover:bg-gray-200 rounded"
                       title="Copy Step"
                     >
-                      <Copy className="h-4 w-4" />
+                      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                        <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                        <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                      </svg>
                     </button>
                     
                     {interactive && (
@@ -286,7 +287,9 @@ const CalculationSteps: React.FC<CalculationStepsProps> = ({
                     </div>
                     <div className="font-mono text-sm">
                       <div className="text-gray-700">{step.calculation}</div>
-                      <div className="text-blue-900 font-medium mt-1">= {step.result}</div>
+                      {step.result && (
+                        <div className="text-blue-900 font-medium mt-1">{step.result}</div>
+                      )}
                     </div>
                   </div>
 

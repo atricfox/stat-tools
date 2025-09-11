@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   HelpCircle,
   BarChart3,
@@ -12,6 +12,7 @@ import PrecisionControl from '@/components/calculator/PrecisionControl';
 import GradePointSystemSelector from '@/components/calculator/GradePointSystemSelector';
 import GPADataInput from '@/components/calculator/GPADataInput';
 import CalculationSteps, { CalculationStep } from '@/components/calculator/CalculationSteps';
+import HelpSection from '@/components/calculator/HelpSection';
 import { useGPACalculation } from '@/hooks/useGPACalculation';
 import { DEFAULT_GRADE_SYSTEMS } from '@/lib/gpaCalculation';
 import { GradePointSystem } from '@/types/gpa';
@@ -40,10 +41,12 @@ export default function GPACalculatorClient() {
 
   // UI State
   const [precision, setPrecision] = useState(2);
-  const [showSteps, setShowSteps] = useState(false);
   const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
   const [showVisualization, setShowVisualization] = useState(false);
+  const [showSteps, setShowSteps] = useState(false);
   const [showIncompatibilityWarning, setShowIncompatibilityWarning] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const downloadMenuRef = useRef<HTMLDivElement>(null);
 
   // GPA specific state
   const [gradeSystem, setGradeSystem] = useState<GradePointSystem>(DEFAULT_GRADE_SYSTEMS['gpa-4.0']);
@@ -104,7 +107,25 @@ export default function GPACalculatorClient() {
 
   // Auto-calculate when courses or precision changes
   useEffect(() => {
-    if (courses.length > 0 && !showIncompatibilityWarning) {
+    // Don't auto-calculate if incompatibility warning is showing
+    if (showIncompatibilityWarning) {
+      return;
+    }
+    
+    if (courses.length > 0) {
+      // Check if all courses are compatible with current grading system
+      const hasIncompatibleGrades = courses.some(course => {
+        if (!course.grade) return false;
+        return !gradeSystem.mappings.some(mapping => 
+          mapping.letterGrade === course.grade
+        );
+      });
+      
+      // Don't calculate if there are incompatible grades
+      if (hasIncompatibleGrades) {
+        return;
+      }
+      
       // Only calculate if all courses have required fields
       const hasValidCourses = courses.every(course => 
         course.name?.trim() && 
@@ -117,6 +138,93 @@ export default function GPACalculatorClient() {
       }
     }
   }, [courses, precision, calculateWithCurrentCourses, gradeSystem, showIncompatibilityWarning]);
+
+  // Close download menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (downloadMenuRef.current && !downloadMenuRef.current.contains(event.target as Node)) {
+        setShowDownloadMenu(false);
+      }
+    };
+
+    if (showDownloadMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showDownloadMenu]);
+
+  // Handle copy results
+  const handleCopyResults = () => {
+    if (!result) return;
+    const text = `GPA: ${result.gpa.toFixed(precision)}\nTotal Credits: ${result.totalCredits}\nAcademic Standing: ${result.academicStanding.level}\nGrading System: ${gradeSystem.name}`;
+    navigator.clipboard.writeText(text);
+  };
+
+  // Handle share results
+  const handleShareResults = () => {
+    if (!result) return;
+    const shareText = `GPA: ${result.gpa.toFixed(precision)}, Total Credits: ${result.totalCredits}, Academic Standing: ${result.academicStanding.level}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'GPA Calculator Results',
+        text: shareText,
+        url: window.location.href
+      }).catch((error) => {
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+          navigator.clipboard.writeText(`${shareText}\n${window.location.href}`);
+        }
+      });
+    } else {
+      navigator.clipboard.writeText(`${shareText}\n${window.location.href}`);
+    }
+  };
+
+  // Handle download results
+  const handleDownloadResults = (format: 'csv' | 'json') => {
+    if (!result) return;
+    
+    let content = '';
+    const fileName = `gpa-results.${format}`;
+    
+    if (format === 'json') {
+      content = JSON.stringify({
+        gpa: result.gpa,
+        totalCredits: result.totalCredits,
+        academicStanding: result.academicStanding,
+        system: gradeSystem.name,
+        courses: result.courses.map(cr => ({
+          name: cr.course.name,
+          credits: cr.course.credits,
+          grade: cr.course.grade,
+          gradePoints: cr.gradePoints,
+          qualityPoints: cr.qualityPoints
+        })),
+        statistics: result.statistics,
+        timestamp: result.timestamp
+      }, null, 2);
+    } else {
+      content = 'Course Name,Credits,Grade,Grade Points,Quality Points\n';
+      content += result.courses.map(cr => 
+        `"${cr.course.name}",${cr.course.credits},"${cr.course.grade}",${cr.gradePoints},${cr.qualityPoints}`
+      ).join('\n');
+      content += `\n\nGPA:,${result.gpa.toFixed(precision)}\n`;
+      content += `Total Credits:,${result.totalCredits}\n`;
+      content += `Academic Standing:,${result.academicStanding.level}\n`;
+      content += `Grading System:,${gradeSystem.name}`;
+    }
+
+    const blob = new Blob([content], { type: format === 'json' ? 'application/json' : 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <>
@@ -207,9 +315,16 @@ export default function GPACalculatorClient() {
                 onPrecisionChange={setPrecision}
               />
 
-              {/* Action Buttons */}
-              <div className="flex gap-2 justify-center pt-2">
-                {result && (
+              {/* Action Buttons - Clear button moved to GPADataInput */}
+            </div>
+          </div>
+
+          {/* Results Section */}
+          {result && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">GPA Results</h2>
+                <div className="flex items-center space-x-2">
                   <button
                     onClick={() => setShowVisualization(!showVisualization)}
                     className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
@@ -221,23 +336,60 @@ export default function GPACalculatorClient() {
                     <BarChart3 className="w-4 h-4 inline mr-1" />
                     Charts
                   </button>
-                )}
-                
-                <button
-                  onClick={clearAll}
-                  className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                  title="Clear all courses"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                </button>
+                  <button
+                    onClick={() => handleCopyResults()}
+                    className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                    title="Copy results"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4">
+                      <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
+                      <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => handleShareResults()}
+                    className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                    title="Share results"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z" />
+                    </svg>
+                  </button>
+                  <div className="relative" ref={downloadMenuRef}>
+                    <button
+                      onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                      className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                      title="Download results"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="h-4 w-4">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                      </svg>
+                    </button>
+                    {showDownloadMenu && (
+                      <div className="absolute right-0 top-10 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-24">
+                        <button
+                          onClick={() => {
+                            handleDownloadResults('csv');
+                            setShowDownloadMenu(false);
+                          }}
+                          className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg"
+                        >
+                          CSV
+                        </button>
+                        <button
+                          onClick={() => {
+                            handleDownloadResults('json');
+                            setShowDownloadMenu(false);
+                          }}
+                          className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg"
+                        >
+                          JSON
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
-
-          {/* Results Section */}
-          {result && (
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4">GPA Results</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div className="text-center p-4 bg-blue-50 rounded-lg">
@@ -300,8 +452,8 @@ export default function GPACalculatorClient() {
                     <div>
                       <h4 className="font-medium text-gray-900 mb-3">GPA Performance</h4>
                       <div className="relative">
-                        <div className="w-48 h-24 mx-auto mb-4">
-                          <svg viewBox="0 0 200 100" className="w-full h-full">
+                        <div className="w-48 h-32 mx-auto mb-4">
+                          <svg viewBox="0 0 200 110" className="w-full h-full overflow-visible">
                             <path
                               d="M 20 80 A 80 80 0 0 1 180 80"
                               fill="none"
@@ -374,33 +526,37 @@ export default function GPACalculatorClient() {
             </div>
           )}
 
-          {/* Calculation Steps */}
-          {showSteps && result && (
-            <CalculationSteps
-              steps={getCalculationSteps()}
-              context="student"
-              showFormulas={true}
-              showExplanations={true}
-              interactive={true}
-              className="shadow-sm"
-            />
-          )}
-
-          {/* Calculation Steps Button - Only when results available */}
+          {/* Calculation Steps Section - Only when results available */}
           {result && (
-            <div className="flex justify-center">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
               <button
                 onClick={() => setShowSteps(!showSteps)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  showSteps 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                }`}
+                className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 -m-2 rounded-lg transition-colors"
               >
-                {showSteps ? 'Hide' : 'Show'} Calculation Steps
+                <h3 className="text-lg font-semibold text-gray-900">
+                  <HelpCircle className="w-5 h-5 inline mr-2" />
+                  Calculation Steps
+                </h3>
+                <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
+                  showSteps ? 'rotate-180' : ''
+                }`} />
               </button>
+              
+              {showSteps && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <CalculationSteps
+                    steps={getCalculationSteps()}
+                    context="student"
+                    showFormulas={true}
+                    showExplanations={true}
+                    interactive={true}
+                    className="shadow-sm"
+                  />
+                </div>
+              )}
             </div>
           )}
+
 
           {/* Help Section - Clickable Header for expand/collapse */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
@@ -419,35 +575,11 @@ export default function GPACalculatorClient() {
             
             {showHelp && (
               <div className="mt-4 pt-4 border-t border-gray-200">
-                <div className="space-y-4">
-                  <div>
-                  <h4 className="font-medium text-gray-900 mb-2">What is GPA?</h4>
-                  <p className="text-gray-700">
-                    Grade Point Average (GPA) is a standardized way to measure academic performance. 
-                    It&apos;s calculated by dividing total grade points by total credit hours.
-                  </p>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">How to Use This Calculator</h4>
-                  <ul className="list-disc list-inside text-gray-700 space-y-1">
-                    <li>Select your grading system (4.0, 4.3, or 4.5 scale)</li>
-                    <li>Add courses using manual entry, transcript paste, or file upload</li>
-                    <li>Your GPA will be calculated automatically</li>
-                    <li>View detailed calculation steps and academic performance insights</li>
-                    <li>Export your results or save custom grading systems</li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h4 className="font-medium text-gray-900 mb-2">Grading Systems</h4>
-                  <ul className="text-gray-700 space-y-1">
-                    <li><strong>4.0 Scale:</strong> Standard US system (A=4.0, B=3.0, etc.)</li>
-                    <li><strong>4.3 Scale:</strong> Canadian system (A+=4.3, A=4.0, etc.)</li>
-                    <li><strong>4.5 Scale:</strong> German system with different grade mappings</li>
-                  </ul>
-                </div>
-                </div>
+                <HelpSection
+                  userMode="student"
+                  calculatorType="gpa"
+                  className="shadow-sm"
+                />
               </div>
             )}
           </div>

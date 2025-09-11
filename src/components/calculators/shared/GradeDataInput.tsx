@@ -553,6 +553,16 @@ export default function GradeDataInput({
                 >
                   Load Sample Data
                 </button>
+                {grades.length > 0 && (
+                  <button
+                    onClick={onClearAll}
+                    className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    title="Clear all grades"
+                  >
+                    <RotateCcw className="h-4 w-4 inline mr-1" />
+                    Clear
+                  </button>
+                )}
                 <button
                   onClick={handleAddNewGrade}
                   disabled={grades.length >= maxGrades}
@@ -587,39 +597,30 @@ export default function GradeDataInput({
           <span className="text-sm font-medium text-gray-700">
             Grade Items ({grades.length}/{maxGrades})
           </span>
-          <div className="flex gap-2">
-            <button
-              onClick={() => exportGrades('csv')}
-              className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
-            >
-              <Download className="w-3 h-3 inline mr-1" />
-              Export
-            </button>
-            <button
-              onClick={onClearAll}
-              className="px-3 py-1 text-xs bg-red-100 text-red-700 rounded hover:bg-red-200 transition-colors"
-            >
-              <Trash2 className="w-3 h-3 inline mr-1" />
-              Clear All
-            </button>
-          </div>
+          <button
+            onClick={() => exportGrades('csv')}
+            className="px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors"
+          >
+            <Download className="w-3 h-3 inline mr-1" />
+            Export
+          </button>
         </div>
         
         {grades.map((grade) => (
-          <div key={grade.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+          <div key={grade.id} className="flex items-center space-x-2 p-2 bg-gray-50 rounded-lg">
             <input
               type="text"
               placeholder="Grade item name"
               value={grade.name}
               onChange={(e) => onUpdateGrade(grade.id, { name: e.target.value })}
-              className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="flex-1 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="number"
               placeholder="Score"
               value={grade.score}
               onChange={(e) => onUpdateGrade(grade.id, { score: parseFloat(e.target.value) || 0 })}
-              className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               min="0"
               max="100"
               step="0.1"
@@ -629,7 +630,7 @@ export default function GradeDataInput({
               placeholder="Weight %"
               value={grade.weight}
               onChange={(e) => onUpdateGrade(grade.id, { weight: parseFloat(e.target.value) || 0 })}
-              className="w-20 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-16 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               min="0"
               max="100"
               step="0.1"
@@ -637,7 +638,7 @@ export default function GradeDataInput({
             <select
               value={grade.category}
               onChange={(e) => onUpdateGrade(grade.id, { category: e.target.value as GradeItem['category'] })}
-              className="w-28 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-24 px-2 py-1 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <option value="assignment">Assignment</option>
               <option value="exam">Exam</option>

@@ -323,6 +323,84 @@ export class StructuredDataTemplates {
     };
   }
 
+  // Percent Error Calculator的HowTo Schema
+  static getPercentErrorCalculatorHowTo(): HowToSchema {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'HowTo',
+      name: 'How to Calculate Percent Error Between Theoretical and Experimental Values',
+      description: 'Step-by-step guide to calculate percentage error between theoretical and experimental values using our online calculator.',
+      totalTime: 'PT3M',
+      tool: ['Percent Error Calculator', 'Error Analysis Calculator'],
+      supply: ['Theoretical value', 'Experimental value'],
+      step: [
+        {
+          '@type': 'HowToStep',
+          name: 'Enter theoretical value',
+          text: 'Input the expected or theoretical value that serves as your reference point.',
+          url: `${this.SITE_URL}/calculator/percent-error#theoretical`
+        },
+        {
+          '@type': 'HowToStep',
+          name: 'Enter experimental value',
+          text: 'Input the measured or experimental value from your test or observation.',
+          url: `${this.SITE_URL}/calculator/percent-error#experimental`
+        },
+        {
+          '@type': 'HowToStep',
+          name: 'Set precision',
+          text: 'Choose the number of decimal places for your percent error result.',
+          url: `${this.SITE_URL}/calculator/percent-error#precision`
+        },
+        {
+          '@type': 'HowToStep',
+          name: 'Calculate and analyze',
+          text: 'Get your percent error result with detailed calculation steps and accuracy assessment.',
+          url: `${this.SITE_URL}/calculator/percent-error#results`
+        }
+      ]
+    };
+  }
+
+  // Range Calculator的HowTo Schema
+  static getRangeCalculatorHowTo(): HowToSchema {
+    return {
+      '@context': 'https://schema.org',
+      '@type': 'HowTo',
+      name: 'How to Calculate Data Range and Statistical Spread',
+      description: 'Learn how to calculate data range, minimum, maximum, and distribution analysis using our statistical calculator.',
+      totalTime: 'PT4M',
+      tool: ['Range Calculator', 'Statistical Analysis Tool'],
+      supply: ['Data set', 'Numbers to analyze'],
+      step: [
+        {
+          '@type': 'HowToStep',
+          name: 'Input your data',
+          text: 'Enter your numbers separated by commas, spaces, or line breaks for range analysis.',
+          url: `${this.SITE_URL}/calculator/range#input`
+        },
+        {
+          '@type': 'HowToStep',
+          name: 'Choose analysis level',
+          text: 'Select student, teacher, or research mode for different levels of statistical analysis.',
+          url: `${this.SITE_URL}/calculator/range#mode`
+        },
+        {
+          '@type': 'HowToStep',
+          name: 'Set precision',
+          text: 'Configure decimal places for your range and statistical results.',
+          url: `${this.SITE_URL}/calculator/range#precision`
+        },
+        {
+          '@type': 'HowToStep',
+          name: 'Analyze results',
+          text: 'View range, quartiles, outliers, and comprehensive distribution analysis.',
+          url: `${this.SITE_URL}/calculator/range#analysis`
+        }
+      ]
+    };
+  }
+
   // 通用FAQ Schema
   static getCalculatorFAQ(): FAQSchema {
     return {
@@ -502,6 +580,36 @@ export function useStructuredData(toolId?: string) {
             { name: 'Home', url: '/' },
             { name: 'Calculators', url: '/calculator' },
             { name: 'GPA Calculator' }
+          ])
+        };
+
+      case 'percent-error':
+        return {
+          ...baseConfig,
+          howTo: StructuredDataTemplates.getPercentErrorCalculatorHowTo(),
+          softwareApplication: StructuredDataTemplates.getSoftwareApplicationSchema(
+            'Percent Error Calculator',
+            '/calculator/percent-error'
+          ),
+          breadcrumb: StructuredDataTemplates.getBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Calculators', url: '/calculator' },
+            { name: 'Percent Error Calculator' }
+          ])
+        };
+
+      case 'range':
+        return {
+          ...baseConfig,
+          howTo: StructuredDataTemplates.getRangeCalculatorHowTo(),
+          softwareApplication: StructuredDataTemplates.getSoftwareApplicationSchema(
+            'Range Calculator',
+            '/calculator/range'
+          ),
+          breadcrumb: StructuredDataTemplates.getBreadcrumbSchema([
+            { name: 'Home', url: '/' },
+            { name: 'Calculators', url: '/calculator' },
+            { name: 'Range Calculator' }
           ])
         };
 

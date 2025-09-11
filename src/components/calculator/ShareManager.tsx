@@ -113,6 +113,11 @@ const ShareManager: React.FC<ShareManagerProps> = ({
           navigator.share({
             title: text,
             url: url
+          }).catch((error: any) => {
+            // Handle share cancellation gracefully
+            if (error.name !== 'AbortError') {
+              console.error('Error sharing:', error);
+            }
           });
         }
         break;

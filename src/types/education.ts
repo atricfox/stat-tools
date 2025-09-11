@@ -121,6 +121,16 @@ export interface CumulativeGPAResult {
     targetSystem: string;
     conversionApplied: Record<string, number>;
   };
+  calculationSteps: {
+    id: string;
+    title: string;
+    description: string;
+    formula: string;
+    calculation: string;
+    result: string;
+    explanation: string;
+    difficulty: 'basic' | 'intermediate' | 'advanced';
+  }[];
 }
 
 // What-if analysis types

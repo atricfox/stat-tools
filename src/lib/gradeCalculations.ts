@@ -452,6 +452,89 @@ export function calculateCumulativeGPA(
     improvementSuggestions.push('Challenge yourself with more advanced courses');
   }
 
+  // Group courses by semester for better step visualization
+  const semesterGroups = convertedCourses.reduce((groups, course) => {
+    const semester = course.semester || 'Unassigned';
+    if (!groups[semester]) {
+      groups[semester] = [];
+    }
+    groups[semester].push(course);
+    return groups;
+  }, {} as Record<string, typeof convertedCourses>);
+
+  const semesterCount = Object.keys(semesterGroups).length;
+
+  // Generate detailed calculation steps
+  const calculationSteps = [
+    {
+      id: 'step-1',
+      title: 'Grade System Conversion',
+      description: sourceGradingSystem !== targetGradingSystem 
+        ? `Convert all grades from ${sourceGradingSystem} to ${targetGradingSystem} system`
+        : `All grades are already in ${targetGradingSystem} system`,
+      formula: sourceGradingSystem !== targetGradingSystem 
+        ? `Grade conversion: ${sourceGradingSystem} → ${targetGradingSystem}`
+        : 'No conversion needed',
+      calculation: sourceGradingSystem !== targetGradingSystem 
+        ? convertedCourses.slice(0, 5).map(course => 
+            `${course.name}: ${course.grade} → ${course.gradePoints.toFixed(2)} points`
+          ).join(', ') + (convertedCourses.length > 5 ? `... and ${convertedCourses.length - 5} more courses` : '')
+        : `All ${convertedCourses.length} courses use ${targetGradingSystem} system`,
+      result: `${convertedCourses.length} courses processed`,
+      explanation: sourceGradingSystem !== targetGradingSystem 
+        ? 'Each grade is converted to the target grading system for consistent calculation.'
+        : 'All grades are already in the same grading system.',
+      difficulty: 'basic' as const
+    },
+    {
+      id: 'step-2',
+      title: 'Calculate Quality Points by Semester',
+      description: 'Calculate quality points (Grade Points × Credits) for each course',
+      formula: 'Quality Points = Grade Points × Credit Hours',
+      calculation: Object.entries(semesterGroups).map(([semester, courses]) => {
+        const semesterQualityPoints = courses.reduce((sum, course) => 
+          sum + (course.gradePoints * course.credits), 0);
+        return `${semester}: ${semesterQualityPoints.toFixed(2)} quality points (${courses.length} courses)`;
+      }).join('; '),
+      result: `Total Quality Points: ${totalGradePoints.toFixed(2)}`,
+      explanation: 'Quality points represent the weighted contribution of each course based on credit hours.',
+      difficulty: 'intermediate' as const
+    },
+    {
+      id: 'step-3',
+      title: 'Sum Total Credits Across All Semesters',
+      description: 'Add up all credit hours from all semesters',
+      formula: 'Total Credits = Sum of all course credit hours',
+      calculation: Object.entries(semesterGroups).map(([semester, courses]) => {
+        const semesterCredits = courses.reduce((sum, course) => sum + course.credits, 0);
+        return `${semester}: ${semesterCredits} credits`;
+      }).join(' + ') + ` = ${totalCredits}`,
+      result: `${totalCredits} total credits across ${semesterCount} semesters`,
+      explanation: 'Total credits represent the complete academic workload across all semesters.',
+      difficulty: 'basic' as const
+    },
+    {
+      id: 'step-4',
+      title: 'Calculate Cumulative GPA',
+      description: 'Divide total quality points by total credits to get cumulative GPA',
+      formula: 'Cumulative GPA = Total Quality Points ÷ Total Credits',
+      calculation: `${totalGradePoints.toFixed(2)} ÷ ${totalCredits} = ${cumulativeGPA.toFixed(4)}`,
+      result: `Cumulative GPA: ${cumulativeGPA.toFixed(2)}`,
+      explanation: 'The cumulative GPA represents your overall academic performance across all semesters.',
+      difficulty: 'basic' as const
+    },
+    {
+      id: 'step-5',
+      title: 'Competitive Analysis',
+      description: 'Analyze GPA competitiveness for graduate school applications',
+      formula: 'Competitiveness based on GPA ranges and percentiles',
+      calculation: `GPA ${cumulativeGPA.toFixed(2)} → ${competitiveLevel} level (${percentile}th percentile)`,
+      result: `${competitiveLevel.charAt(0).toUpperCase() + competitiveLevel.slice(1)} competitiveness`,
+      explanation: `Your GPA places you in the ${percentile}th percentile, indicating ${competitiveLevel} competitiveness for graduate programs.`,
+      difficulty: 'advanced' as const
+    }
+  ];
+
   return {
     cumulativeGPA: Math.round(cumulativeGPA * 100) / 100,
     totalCredits,
@@ -469,7 +552,8 @@ export function calculateCumulativeGPA(
       conversionApplied: sourceGradingSystem !== targetGradingSystem 
         ? { 'conversion_applied': 1 } 
         : { 'no_conversion': 1 }
-    }
+    },
+    calculationSteps
   };
 }
 

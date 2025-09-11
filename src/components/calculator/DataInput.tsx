@@ -6,7 +6,7 @@
 'use client'
 
 import React, { useState, useCallback, useEffect } from 'react';
-import { Upload, FileSpreadsheet, HelpCircle, AlertTriangle, CheckCircle, Info } from 'lucide-react';
+import { Upload, FileSpreadsheet, HelpCircle, AlertTriangle, CheckCircle, Info, RotateCcw } from 'lucide-react';
 import { parseEducationalData, parseScientificData, ParseResult } from '@/lib/parsers';
 import { validationHelpers, ValidationResult } from '@/lib/validation';
 // import { formatDataSummary, formatValidationMessage } from '@/lib/formatters';
@@ -20,6 +20,7 @@ export interface DataInputProps {
   maxLength?: number;
   className?: string;
   onValidation?: (isValid: boolean, result: ParseResult) => void;
+  onClear?: () => void;
 }
 
 const DataInput = ({
@@ -30,7 +31,8 @@ const DataInput = ({
   context = 'student',
   maxLength = 50000,
   className = '',
-  onValidation
+  onValidation,
+  onClear
 }: DataInputProps) => {
   const [parseResult, setParseResult] = useState<ParseResult | null>(null);
   const [validationResult, setValidationResult] = useState<ValidationResult | null>(null);
@@ -224,6 +226,16 @@ Student 4	96	94	98`
         >
           Load Example
         </button>
+        {onClear && (
+          <button
+            onClick={onClear}
+            className="flex items-center px-3 py-1.5 text-sm bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 transition-colors"
+            title="Clear all data"
+          >
+            <RotateCcw className="h-3 w-3 mr-1" />
+            Clear
+          </button>
+        )}
         {context === 'teacher' && (
           <div className="flex items-center px-3 py-1.5 text-sm text-gray-600 bg-gray-50 rounded-md">
             <FileSpreadsheet className="h-4 w-4 mr-1" />

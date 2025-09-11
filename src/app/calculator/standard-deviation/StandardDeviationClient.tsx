@@ -1,180 +1,147 @@
 'use client';
 
-import React, { useState, useCallback, useEffect } from 'react';
-import { 
-  Share2,
-  HelpCircle,
-  BarChart3,
-  RefreshCw,
-  ChevronDown
-} from 'lucide-react';
+import React, { useState, useCallback } from 'react';
+import { RotateCcw, HelpCircle, ChevronDown } from 'lucide-react';
 import CalculatorLayout from '@/components/layout/CalculatorLayout';
+import UserModeSelector, { UserMode } from '@/components/calculator/UserModeSelector';
+import DataInput from '@/components/calculator/DataInput';
 import PrecisionControl from '@/components/calculator/PrecisionControl';
-import UserModeSelector from '@/components/calculator/UserModeSelector';
-import StatisticalDataInput from '@/components/calculator/StatisticalDataInput';
-import StandardDeviationResults from '@/components/calculator/StandardDeviationResults';
-import StatisticalVisualization from '@/components/calculator/StatisticalVisualization';
+import StatisticalResults from '@/components/calculator/StatisticalResults';
+import CalculationSteps, { CalculationStep } from '@/components/calculator/CalculationSteps';
 import HelpSection from '@/components/calculator/HelpSection';
-import CalculationSteps from '@/components/calculator/CalculationSteps';
 
 import { useStandardDeviationCalculation } from '@/hooks/useStandardDeviationCalculation';
-import { useBatchProcessing } from '@/hooks/useBatchProcessing';
-
-import { 
-  DataPoint,
-  StatisticalDataInputConfig,
-  StandardDeviationCalculatorState,
-  StatisticalVisualizationConfig,
-  BatchProcessingOptions
-} from '@/types/standardDeviation';
 
 import { StructuredDataProvider, useStructuredData } from '@/components/seo/StructuredDataProvider';
+import { formatForCalculationSteps } from '@/lib/formatters/numberFormatter';
 
 export default function StandardDeviationClient() {
-  // Core calculation state
-  const { 
-    result, 
-    isCalculating, 
-    error, 
-    calculate, 
-    reset: resetCalculation,
-    // validateData - commented out unused
-  } = useStandardDeviationCalculation();
+  const [userMode, setUserMode] = useState<UserMode>('student');
+  const [input, setInput] = useState('');
+  const [precision, setPrecision] = useState(2);
+  const [calculationType, setCalculationType] = useState<'sample' | 'population'>('sample');
+  const [showSteps, setShowSteps] = useState(false);
+  const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
 
-  // Batch processing - commented out unused
-  // const {
-  //   isProcessing: isBatchProcessing,
-  //   progress: batchProgress,
-  //   results: batchResults,
-  //   errors: batchErrors,
-  //   processFile,
-  //   downloadResults: downloadBatchResults,
-  //   reset: resetBatchProcessing
-  // } = useBatchProcessing();
+  // Use the custom hook for calculations
+  const { result, calculate, reset: resetCalculation } = useStandardDeviationCalculation();
 
   // SEO structured data
   const { getToolConfig } = useStructuredData('standard-deviation');
   const structuredDataConfig = getToolConfig('standard-deviation');
 
-  // UI State
-  const [dataPoints, setDataPoints] = useState<DataPoint[]>([]);
-  const [precision, setPrecision] = useState(2);
-  const [userMode, setUserMode] = useState<'student' | 'research' | 'teacher'>('student');
-  const [showSteps, setShowSteps] = useState(false);
-  const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
-  const [showVisualization, setShowVisualization] = useState(false);
-  // const [showSettings, setShowSettings] = useState(false); // unused
-  const [showShare, setShowShare] = useState(false);
-
-  // Standard Deviation specific state
-  const [calculationType, setCalculationType] = useState<'sample' | 'population'>('sample');
-  const [inputMode, setInputMode] = useState<'manual' | 'csv' | 'excel' | 'paste'>('manual');
-  const [outlierDetectionEnabled, setOutlierDetectionEnabled] = useState(false);
-
-  // Calculate on data changes
-  useEffect(() => {
-    if (dataPoints.length >= 2) {
-      const validDataPoints = dataPoints.filter(dp => !isNaN(dp.value));
-      if (validDataPoints.length >= 2) {
-        calculate(validDataPoints, { 
+  const handleInputChange = (value: string) => {
+    setInput(value);
+    if (value.trim()) {
+      // Parse input similar to Mean Calculator
+      const numbers = value.split(/[,\s\n]+/).map(s => parseFloat(s.trim())).filter(n => !isNaN(n));
+      if (numbers.length >= 2) {
+        // Convert to DataPoint format for the hook
+        const dataPoints = numbers.map((num, index) => ({
+          id: index.toString(),
+          value: num,
+          label: `Value ${index + 1}`
+        }));
+        calculate(dataPoints, { 
           calculationType: calculationType as 'sample' | 'population',
           precision
         });
       }
+    } else {
+      resetCalculation();
     }
-  }, [dataPoints, calculationType, precision, outlierDetectionEnabled, calculate]);
+  };
 
-  // Handle data input changes
-  const handleDataChange = useCallback((newDataPoints: DataPoint[]) => {
-    setDataPoints(newDataPoints);
-  }, []);
-
-  const handleAddDataPoint = useCallback((value: number, label?: string) => {
-    const newPoint: DataPoint = {
-      id: Date.now().toString(),
-      value,
-      label: label || `Value ${dataPoints.length + 1}`
-    };
-    setDataPoints(prev => [...prev, newPoint]);
-  }, [dataPoints.length]);
-
-  const handleRemoveDataPoint = useCallback((id: string) => {
-    setDataPoints(prev => prev.filter(dp => dp.id !== id));
-  }, []);
-
-  const handleClearAll = useCallback(() => {
-    setDataPoints([]);
+  const handleClearAll = () => {
+    setInput('');
     resetCalculation();
-  }, [resetCalculation]);
-
-  const handleLoadExample = useCallback(() => {
-    const exampleData: DataPoint[] = [
-      { id: '1', value: 2, label: 'Value 1' },
-      { id: '2', value: 4, label: 'Value 2' },
-      { id: '3', value: 4, label: 'Value 3' },
-      { id: '4', value: 4, label: 'Value 4' },
-      { id: '5', value: 5, label: 'Value 5' },
-      { id: '6', value: 5, label: 'Value 6' },
-      { id: '7', value: 7, label: 'Value 7' },
-      { id: '8', value: 9, label: 'Value 8' }
-    ];
-    setDataPoints(exampleData);
-  }, []);
-
-  // Generate shareable state
-  const generateShareableState = () => {
-    return null; // Would return shareable state
   };
 
-  // Generate QR code
-  const generateQRCode = () => {
-    return 'data:image/svg+xml;base64,mock-qr-code';
-  };
-
-  // Convert result steps to CalculationSteps format
-  const getCalculationSteps = () => {
+  // Convert result steps to CalculationStep format for the CalculationSteps component
+  const getCalculationSteps = (): CalculationStep[] => {
     if (!result || !result.steps) return [];
-    return result.steps.map((step, index) => {
-      const totalSteps = result.steps.length;
-      const stepIndex = index;
-      
-      return {
-        id: `step-${index}`,
-        title: `Step ${index + 1}`,
-        description: step,
-        formula: getStepFormula(stepIndex, totalSteps),
-        calculation: step,
-        result: '',
-        explanation: getStepExplanation(stepIndex, totalSteps),
-        difficulty: userMode === 'student' ? 'basic' as const : 
-                   userMode === 'research' ? 'advanced' as const : 
-                   'intermediate' as const
-      };
-    });
-  };
-
-  const getStepFormula = (stepIndex: number, totalSteps: number): string => {
-    const formulas = [
-      'x̄ = Σx / n',
-      'Σ(x - x̄)²',
-      calculationType === 'sample' ? 's² = Σ(x - x̄)² / (n-1)' : 'σ² = Σ(x - x̄)² / n',
-      calculationType === 'sample' ? 's = √(s²)' : 'σ = √(σ²)'
-    ];
-    return formulas[Math.min(stepIndex, formulas.length - 1)] || '';
-  };
-
-  const getStepExplanation = (stepIndex: number, totalSteps: number): string => {
-    const explanations = [
-      'Calculate the mean (average) of all data points.',
-      'Find the squared differences from the mean for each data point.',
-      'Calculate the variance by averaging the squared differences.',
-      'Take the square root of the variance to get the standard deviation.'
-    ];
     
-    return stepIndex === totalSteps - 1 
-      ? 'The standard deviation measures how spread out the data points are from the mean.'
-      : 'This step helps us understand the variability in our data.';
+    return result.steps.map((step, index) => ({
+      id: `step-${index}`,
+      title: `Step ${index + 1}`,
+      description: step,
+      formula: index === 0 ? 'Data Collection' : 
+               index === 1 ? 'x̄ = Σx / n' : 
+               index === 2 ? 'Deviations from Mean' :
+               index === 3 ? '(x - x̄)²' :
+               index === 4 ? 'Σ(x - x̄)²' :
+               index === 5 ? calculationType === 'sample' ? 's² = Σ(x - x̄)² / (n-1)' : 'σ² = Σ(x - x̄)² / n' :
+               index === 6 ? calculationType === 'sample' ? 's = √(s²)' : 'σ = √(σ²)' : '',
+      calculation: step,
+      result: index === result.steps.length - 1 ? formatForCalculationSteps(result.standardDeviation || 0, userMode, precision) : '',
+      explanation: index === result.steps.length - 1 
+        ? `The ${calculationType} standard deviation measures how spread out your data points are from the mean.` 
+        : index === 0 
+        ? 'Count the number of data points in the dataset.'
+        : index === 1
+        ? 'Calculate the arithmetic mean of all data points.'
+        : index === 2
+        ? 'Find how much each data point differs from the mean.'
+        : 'Processing statistical calculations step by step.',
+      difficulty: userMode === 'student' ? 'basic' : userMode === 'research' ? 'advanced' : 'intermediate'
+    }));
   };
+
+  const handleCopyResults = (text: string) => {
+    navigator.clipboard.writeText(text);
+  };
+
+  const handleExportResults = (format: 'json' | 'csv' | 'txt') => {
+    if (!result) return;
+    
+    let content = '';
+    const fileName = `standard-deviation-results.${format}`;
+    
+    switch (format) {
+      case 'json':
+        content = JSON.stringify(result, null, 2);
+        break;
+      case 'csv':
+        content = `data,${result.validNumbers?.join(',') || ''}\nstandardDeviation,${result.standardDeviation}`;
+        break;
+      case 'txt':
+        content = `Standard Deviation: ${result.standardDeviation}\nData: ${result.validNumbers?.join(', ') || ''}`;
+        break;
+    }
+
+    const blob = new Blob([content], { type: format === 'json' ? 'application/json' : 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const handleShareResults = (data: any) => {
+    const stdDev = data.calculationType === 'population' ? data.populationStandardDeviation : data.sampleStandardDeviation;
+    const shareText = `Standard Deviation: ${stdDev.toFixed(precision)}, Mean: ${data.mean.toFixed(precision)}, Sample Size: ${data.count}`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: 'Standard Deviation Calculator Results',
+        text: shareText,
+        url: window.location.href
+      }).catch((error) => {
+        // Ignore AbortError (user canceled share)
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing:', error);
+          // Fallback: copy to clipboard
+          navigator.clipboard.writeText(`${shareText}\n${window.location.href}`);
+        }
+      });
+    } else {
+      // Fallback: copy to clipboard
+      navigator.clipboard.writeText(`${shareText}\n${window.location.href}`);
+    }
+  };
+
+  const toolCategory = userMode === 'teacher' ? 'gpa' : userMode === 'research' ? 'analysis' : 'statistics';
 
   return (
     <>
@@ -183,231 +150,113 @@ export default function StandardDeviationClient() {
       
       <CalculatorLayout
         title="Standard Deviation Calculator"
-        description="Calculate sample and population standard deviation with comprehensive statistical analysis. Includes outlier detection, visualization, and batch processing for large datasets."
+        description="Calculate sample and population standard deviation with step-by-step explanations for different use cases."
         breadcrumbs={[
           { label: 'Calculators', href: '/calculator' },
           { label: 'Standard Deviation Calculator' }
         ]}
         currentTool="standard-deviation"
-        toolCategory="statistics"
+        toolCategory={toolCategory}
       >
-        {/* User Mode Selector */}
-        <UserModeSelector 
-          userMode={userMode}
-          onModeChange={setUserMode}
-        />
-        
-        {/* Main Content */}
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 lg:gap-8">
-          {/* Left Column - Input & Controls */}
-          <div className="xl:col-span-2 space-y-6">
-            
-            {/* Data Input Section */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
-              <StatisticalDataInput
-                dataPoints={dataPoints}
-                onDataPointsChange={handleDataChange}
-                inputMode={inputMode}
-                onInputModeChange={setInputMode}
-                userMode={userMode}
-                isProcessing={isCalculating}
-                processingProgress={0}
-                onBatchProcess={() => {}}
-                enableBatchProcessing={userMode !== 'student'}
+        <div className="space-y-6">
+          {/* User Mode Selector */}
+          <UserModeSelector 
+            userMode={userMode}
+            onModeChange={setUserMode}
+          />
+
+          {/* Input Section */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+            <div className="space-y-6">
+              <DataInput
+                value={input}
+                onChange={handleInputChange}
+                context={userMode}
+                placeholder="Enter numbers separated by commas, spaces, or line breaks..."
+                label="Data Values"
+                onClear={handleClearAll}
               />
-            </div>
 
-            {/* Settings Panel */}
-            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
-              <div className="space-y-6">
-                <div className="flex flex-wrap gap-4">
-                  <div className="flex-1 min-w-0">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Calculation Type
-                    </label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <button
-                        onClick={() => setCalculationType('sample')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          calculationType === 'sample'
-                            ? 'bg-blue-100 text-blue-700 border-2 border-blue-200'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent'
-                        }`}
-                      >
-                        Sample (s)
-                      </button>
-                      <button
-                        onClick={() => setCalculationType('population')}
-                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-                          calculationType === 'population'
-                            ? 'bg-blue-100 text-blue-700 border-2 border-blue-200'
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent'
-                        }`}
-                      >
-                        Population (σ)
-                      </button>
-                    </div>
-                  </div>
-
-                  <div className="flex-1 min-w-0">
-                    <PrecisionControl
-                      precision={precision}
-                      onPrecisionChange={setPrecision}
-                    />
-                  </div>
-                </div>
-
-                {/* Advanced Options for Research/Teacher mode */}
-                {userMode !== 'student' && (
-                  <div className="pt-4 border-t border-gray-200">
-                    <div className="flex items-center justify-between">
-                      <label className="flex items-center">
-                        <input
-                          type="checkbox"
-                          checked={outlierDetectionEnabled}
-                          onChange={(e) => setOutlierDetectionEnabled(e.target.checked)}
-                          className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                        />
-                        <span className="ml-2 text-sm text-gray-700">Enable outlier detection</span>
-                      </label>
-                    </div>
-                  </div>
-                )}
-
-                {/* Action Buttons */}
-                <div className="flex gap-2 justify-center pt-2">
-                  {result && (
-                    <>
-                      <button
-                        onClick={() => setShowVisualization(!showVisualization)}
-                        className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
-                          showVisualization 
-                            ? 'bg-green-100 text-green-700' 
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        <BarChart3 className="w-4 h-4 inline mr-1" />
-                        Charts
-                      </button>
-                      
-                      <button
-                        onClick={() => setShowShare(!showShare)}
-                        className={`px-4 py-2 rounded-lg transition-colors text-sm font-medium ${
-                          showShare 
-                            ? 'bg-purple-100 text-purple-700' 
-                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                        }`}
-                      >
-                        <Share2 className="w-4 h-4 inline mr-1" />
-                        Share
-                      </button>
-                    </>
-                  )}
-
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Calculation Type
+                </label>
+                <div className="grid grid-cols-2 gap-2">
                   <button
-                    onClick={handleClearAll}
-                    className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                    title="Clear all data"
+                    onClick={() => setCalculationType('sample')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      calculationType === 'sample'
+                        ? 'bg-blue-100 text-blue-700 border-2 border-blue-200'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent'
+                    }`}
                   >
-                    <RefreshCw className="h-4 w-4" />
+                    Sample (s)
+                  </button>
+                  <button
+                    onClick={() => setCalculationType('population')}
+                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                      calculationType === 'population'
+                        ? 'bg-blue-100 text-blue-700 border-2 border-blue-200'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200 border-2 border-transparent'
+                    }`}
+                  >
+                    Population (σ)
                   </button>
                 </div>
               </div>
-            </div>
-          </div>
 
-          {/* Right Column - Results */}
-          <div className="space-y-6">
-            {/* Results */}
-            {result && (
-              <StandardDeviationResults
-                result={result}
+              <PrecisionControl
                 precision={precision}
-                userMode={userMode}
-                showAdvancedStats={userMode !== 'student'}
-                showDistributionAnalysis={userMode === 'research'}
+                onPrecisionChange={setPrecision}
               />
-            )}
-
-            {/* Visualization */}
-            {showVisualization && result && (
-              <StatisticalVisualization
-                result={result}
-                config={{
-                  showMean: true,
-                  showMedian: userMode !== 'student',
-                  showStandardDeviation: true,
-                  showOutliers: outlierDetectionEnabled,
-                  showNormalCurve: userMode !== 'student',
-                  chartType: 'histogram'
-                }}
-                onConfigChange={(newConfig) => {
-                  // Handle config changes if needed
-                }}
-                userMode={userMode}
-              />
-            )}
-
-            {/* Error Display */}
-            {error && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                <div className="flex items-center text-red-800">
-                  <span className="font-medium">Calculation Error:</span>
-                </div>
-                <p className="text-sm text-red-700 mt-1">{error}</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Share Modal - TODO: Implement proper sharing */}
-        {showShare && result && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-            <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4">
-              <h3 className="text-lg font-semibold mb-4">Share Calculation</h3>
-              <p className="text-gray-600 mb-4">Sharing functionality will be implemented in a future update.</p>
-              <button
-                onClick={() => setShowShare(false)}
-                className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-              >
-                Close
-              </button>
             </div>
           </div>
-        )}
 
-        {/* Calculation Steps */}
-        {showSteps && result && (
-          <div className="mt-8">
-            <CalculationSteps
-              steps={getCalculationSteps()}
-              context={userMode}
-              showFormulas={userMode !== 'student'}
-              showExplanations={true}
-              interactive={userMode === 'student'}
-              className="shadow-sm"
+          {/* Results Section */}
+          {result && (
+            <StatisticalResults
+              result={result}
+              userMode={userMode}
+              precision={precision}
+              onCopy={handleCopyResults}
+              onDownload={(data, format) => handleExportResults(format as 'csv' | 'json' | 'txt')}
+              onShare={handleShareResults}
             />
-          </div>
-        )}
+          )}
 
-        {/* Calculation Steps Button - Only when results available */}
-        {result && (
-          <div className="flex justify-center mt-6">
-            <button
-              onClick={() => setShowSteps(!showSteps)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                showSteps 
-                  ? 'bg-blue-100 text-blue-700' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              {showSteps ? 'Hide' : 'Show'} Calculation Steps
-            </button>
-          </div>
-        )}
+          {/* Calculation Steps Section - Only when results available */}
+          {result && (
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
+              <button
+                onClick={() => setShowSteps(!showSteps)}
+                className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 -m-2 rounded-lg transition-colors"
+              >
+                <h3 className="text-lg font-semibold text-gray-900">
+                  <HelpCircle className="w-5 h-5 inline mr-2" />
+                  Calculation Steps
+                </h3>
+                <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
+                  showSteps ? 'rotate-180' : ''
+                }`} />
+              </button>
+              
+              {showSteps && (
+                <div className="mt-4 pt-4 border-t border-gray-200">
+                  <CalculationSteps
+                    steps={getCalculationSteps()}
+                    context={userMode}
+                    showFormulas={userMode !== 'student'}
+                    showExplanations={true}
+                    interactive={true}
+                    className="shadow-sm"
+                  />
+                </div>
+              )}
+            </div>
+          )}
 
-        {/* Help Section - Clickable Header for expand/collapse */}
-        <div className="mt-8">
+
+          {/* Help Section - Clickable Header for expand/collapse */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
             <button
               onClick={() => setShowHelp(!showHelp)}

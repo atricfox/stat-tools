@@ -30,7 +30,7 @@ export const DEFAULT_GRADE_SYSTEMS: Record<string, GradePointSystem> = {
     country: 'United States',
     description: 'Standard US university grading system',
     isOfficial: true,
-    source: 'https://www.usnews.com/education/best-colleges/articles/how-to-convert-gpa-to-4-0-scale',
+    source: 'https://en.wikipedia.org/wiki/Academic_grading_in_the_United_States',
     mappings: [
       { letterGrade: 'A+', numericMin: 97, numericMax: 100, gradePoints: 4.0, percentageMin: 97, percentageMax: 100, description: 'Exceptional' },
       { letterGrade: 'A', numericMin: 93, numericMax: 96, gradePoints: 4.0, percentageMin: 93, percentageMax: 96, description: 'Excellent' },
@@ -54,7 +54,7 @@ export const DEFAULT_GRADE_SYSTEMS: Record<string, GradePointSystem> = {
     country: 'Canada',
     description: 'Standard Canadian university grading system',
     isOfficial: true,
-    source: 'https://www.canada.ca/en/immigration-refugees-citizenship/corporate/publications-manuals/operational-bulletins-manuals/temporary-residents/students/assessing-documents.html',
+    source: 'https://en.wikipedia.org/wiki/Academic_grading_in_Canada',
     mappings: [
       { letterGrade: 'A+', numericMin: 95, numericMax: 100, gradePoints: 4.3, percentageMin: 95, percentageMax: 100, description: 'Outstanding' },
       { letterGrade: 'A', numericMin: 90, numericMax: 94, gradePoints: 4.0, percentageMin: 90, percentageMax: 94, description: 'Excellent' },
@@ -78,7 +78,7 @@ export const DEFAULT_GRADE_SYSTEMS: Record<string, GradePointSystem> = {
     country: 'Germany',
     description: 'German university grading system',
     isOfficial: true,
-    source: 'https://www.daad.de/en/study-and-research-in-germany/plan-your-studies/grades/',
+    source: 'https://en.wikipedia.org/wiki/Academic_grading_in_Germany',
     mappings: [
       { letterGrade: '1.0', numericMin: 95, numericMax: 100, gradePoints: 4.5, percentageMin: 95, percentageMax: 100, description: 'Sehr gut (Very Good)' },
       { letterGrade: '1.3', numericMin: 90, numericMax: 94, gradePoints: 4.2, percentageMin: 90, percentageMax: 94, description: 'Sehr gut (Very Good)' },

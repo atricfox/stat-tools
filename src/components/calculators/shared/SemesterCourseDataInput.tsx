@@ -393,7 +393,7 @@ export default function SemesterCourseDataInput({
           min="0"
           max="100"
           step="0.1"
-          className="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 border-gray-300"
+          className="w-full px-2 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 border-gray-300"
           placeholder="85"
         />
       );
@@ -402,7 +402,7 @@ export default function SemesterCourseDataInput({
         <select
           value={course.grade as string}
           onChange={(e) => onUpdateCourse(course.id, { grade: e.target.value })}
-          className="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 border-gray-300"
+          className="w-full px-2 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 border-gray-300"
         >
           {availableGrades.map(grade => (
             <option key={grade} value={grade}>{grade}</option>
@@ -620,6 +620,16 @@ export default function SemesterCourseDataInput({
                 >
                   Load Sample Data
                 </button>
+                {courses.length > 0 && (
+                  <button
+                    onClick={onClearAll}
+                    className="px-3 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    title="Clear all courses"
+                  >
+                    <RotateCcw className="h-4 w-4 inline mr-1" />
+                    Clear
+                  </button>
+                )}
                 <button
                   onClick={handleAddNewCourse}
                   disabled={courses.length >= maxCourses}
@@ -681,7 +691,7 @@ export default function SemesterCourseDataInput({
                 placeholder="Course name"
                 value={course.name}
                 onChange={(e) => onUpdateCourse(course.id, { name: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-2 py-1 text-xs border border-gray-300 rounded-md focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
             </div>
 
@@ -697,7 +707,7 @@ export default function SemesterCourseDataInput({
                 placeholder="Credits"
                 value={course.credits}
                 onChange={(e) => onUpdateCourse(course.id, { credits: parseFloat(e.target.value) || 0 })}
-                className="w-full px-2 py-1 text-sm border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 border-gray-300"
+                className="w-full px-2 py-1 text-xs border rounded focus:outline-none focus:ring-1 focus:ring-blue-500 border-gray-300"
                 min="0.5"
                 max="10"
                 step="0.5"

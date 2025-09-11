@@ -4,10 +4,11 @@
  * Implements US-018: Cumulative GPA calculation for graduate school applications
  */
 
-import React, { useState } from 'react';
-import { HelpCircle, RefreshCw, ChevronDown } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { HelpCircle, RefreshCw, ChevronDown, Copy, Share2, Download } from 'lucide-react';
 import useCumulativeGPACalculation from '@/hooks/useCumulativeGPACalculation';
 import CalculationSteps, { CalculationStep } from '@/components/calculator/CalculationSteps';
+import HelpSection from '@/components/calculator/HelpSection';
 import CumulativeGPACourseDataInput from './shared/CumulativeGPACourseDataInput';
 import ResultDisplay from './shared/ResultDisplay';
 import type { Course, GradingScale } from '@/types/education';
@@ -64,8 +65,26 @@ export default function CumulativeGPACalculator({
   };
 
   // UI State for showing steps and help
-  const [showSteps, setShowSteps] = useState(false);
   const [showHelp, setShowHelp] = useState(true); // Default expanded for SEO
+  const [showSteps, setShowSteps] = useState(false);
+  const [showDownloadMenu, setShowDownloadMenu] = useState(false);
+  const downloadMenuRef = useRef<HTMLDivElement>(null);
+
+  // Close download menu when clicking outside
+  React.useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (downloadMenuRef.current && !downloadMenuRef.current.contains(event.target as Node)) {
+        setShowDownloadMenu(false);
+      }
+    };
+
+    if (showDownloadMenu) {
+      document.addEventListener('mousedown', handleClickOutside);
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+  }, [showDownloadMenu]);
 
   // Notify parent component about result changes
   React.useEffect(() => {
@@ -86,6 +105,102 @@ export default function CumulativeGPACalculator({
       explanation: step.explanation,
       difficulty: step.difficulty as 'basic' | 'intermediate' | 'advanced'
     }));
+  };
+
+  // Action functions for copy, share, download
+  const copyResult = () => {
+    if (!result) return;
+    const text = `Cumulative GPA Results
+Cumulative GPA: ${result.cumulativeGPA.toFixed(2)}
+Total Semesters: ${semesterCount}
+Total Courses: ${courseCount}
+Total Credits: ${totalCredits}
+Source System: ${sourceGradingSystem}
+Target System: ${targetGradingSystem}`;
+    
+    navigator.clipboard.writeText(text).then(() => {
+      // Optional: Show success feedback
+    });
+  };
+
+  const shareResult = async () => {
+    if (!result) return;
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: 'Cumulative GPA Results',
+          text: `My cumulative GPA is ${result.cumulativeGPA.toFixed(2)} across ${semesterCount} semesters with ${courseCount} courses and ${totalCredits} credits.`,
+          url: window.location.href
+        });
+      } catch (error: any) {
+        // Handle share cancellation gracefully
+        if (error.name !== 'AbortError') {
+          console.error('Error sharing results:', error);
+          copyResult(); // Fallback to copy on error
+        }
+        // AbortError means user canceled the share, which is normal behavior
+      }
+    } else {
+      copyResult(); // Fallback to copy
+    }
+  };
+
+  const downloadData = (format: 'csv' | 'json' | 'txt') => {
+    if (!result) return;
+    let content = '';
+    let filename = '';
+    let mimeType = '';
+
+    const data = {
+      cumulativeGPA: result.cumulativeGPA,
+      totalSemesters: semesterCount,
+      totalCourses: courseCount,
+      totalCredits: totalCredits,
+      sourceGradingSystem: sourceGradingSystem,
+      targetGradingSystem: targetGradingSystem,
+      courses: courses,
+      timestamp: new Date().toISOString()
+    };
+
+    if (format === 'csv') {
+      content = `Course Name,Grade,Credits,Semester,Included\n`;
+      content += courses.map(course => 
+        `"${course.name}","${course.grade}",${course.credits},"${course.semester}",${course.isIncluded ? 'Yes' : 'No'}`
+      ).join('\n');
+      content += `\n\nCumulative GPA,${result.cumulativeGPA.toFixed(2)}\nTotal Semesters,${semesterCount}\nTotal Courses,${courseCount}\nTotal Credits,${totalCredits}\nSource System,${sourceGradingSystem}\nTarget System,${targetGradingSystem}`;
+      filename = 'cumulative_gpa_results.csv';
+      mimeType = 'text/csv';
+    } else if (format === 'json') {
+      content = JSON.stringify(data, null, 2);
+      filename = 'cumulative_gpa_results.json';
+      mimeType = 'application/json';
+    } else { // txt
+      content = `Cumulative GPA Results
+Generated: ${new Date().toLocaleString()}
+
+Cumulative GPA: ${result.cumulativeGPA.toFixed(2)}
+Total Semesters: ${semesterCount}
+Total Courses: ${courseCount}
+Total Credits: ${totalCredits}
+Source System: ${sourceGradingSystem}
+Target System: ${targetGradingSystem}
+
+Course Details:
+${courses.map(course => `${course.name}: ${course.grade} (${course.credits} credits, ${course.semester})`).join('\n')}`;
+      filename = 'cumulative_gpa_results.txt';
+      mimeType = 'text/plain';
+    }
+
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    setShowDownloadMenu(false);
   };
 
 
@@ -202,28 +317,7 @@ export default function CumulativeGPACalculator({
               </div>
             )}
 
-            {/* Action Buttons */}
-            <div className="flex gap-2 justify-center pt-2">
-              <button
-                onClick={calculate}
-                disabled={!canCalculate || isCalculating}
-                className={`px-6 py-3 rounded-lg font-medium transition-colors ${
-                  canCalculate && !isCalculating
-                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                }`}
-              >
-                {isCalculating ? 'Calculating...' : 'Calculate'}
-              </button>
-              
-              <button
-                onClick={reset}
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-                title="Reset all data"
-              >
-                <RefreshCw className="h-4 w-4" />
-              </button>
-            </div>
+            {/* Action Buttons - Calculate button removed, Reset moved to input component */}
           </div>
         </div>
       </div>
@@ -231,25 +325,76 @@ export default function CumulativeGPACalculator({
       {/* Results Section */}
       {result && (
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Cumulative GPA Results</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">Cumulative GPA Results</h2>
+            
+            {/* Action Buttons */}
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={copyResult}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                title="Copy results"
+              >
+                <Copy className="h-4 w-4" />
+              </button>
+              <button
+                onClick={shareResult}
+                className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                title="Share results"
+              >
+                <Share2 className="h-4 w-4" />
+              </button>
+              <div className="relative" ref={downloadMenuRef}>
+                <button 
+                  onClick={() => setShowDownloadMenu(!showDownloadMenu)}
+                  className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                  title="Download results"
+                >
+                  <Download className="h-4 w-4" />
+                </button>
+                {showDownloadMenu && (
+                  <div className="absolute right-0 top-10 bg-white border border-gray-200 rounded-lg shadow-lg z-10 min-w-16">
+                    <button
+                      onClick={() => downloadData('csv')}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-t-lg"
+                    >
+                      CSV
+                    </button>
+                    <button
+                      onClick={() => downloadData('json')}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      JSON
+                    </button>
+                    <button
+                      onClick={() => downloadData('txt')}
+                      className="block w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-gray-50 rounded-b-lg"
+                    >
+                      TXT
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
           
           {/* Current Status Summary */}
-          <div className="bg-blue-50 rounded-lg p-4 mb-6">
+          <div className="bg-blue-50 rounded-lg p-4 mb-6 text-center">
             <h4 className="text-sm font-medium text-blue-900 mb-2">Academic Summary</h4>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-              <div>
+              <div className="text-center">
                 <div className="font-medium text-blue-700">{semesterCount}</div>
                 <div className="text-blue-600">Semesters</div>
               </div>
-              <div>
+              <div className="text-center">
                 <div className="font-medium text-blue-700">{courseCount}</div>
                 <div className="text-blue-600">Total Courses</div>
               </div>
-              <div>
+              <div className="text-center">
                 <div className="font-medium text-blue-700">{totalCredits}</div>
                 <div className="text-blue-600">Total Credits</div>
               </div>
-              <div>
+              <div className="text-center">
                 <div className="font-medium text-blue-700">
                   {result ? result.cumulativeGPA.toFixed(2) : '--'}
                 </div>
@@ -259,11 +404,13 @@ export default function CumulativeGPACalculator({
           </div>
 
           {/* Results Display */}
-          <ResultDisplay
-            result={result}
-            type="cumulative-gpa"
-            showDetails={true}
-          />
+          <div className="text-center">
+            <ResultDisplay
+              result={result}
+              type="cumulative-gpa"
+              showDetails={true}
+            />
+          </div>
 
           <div className="bg-gray-50 rounded-lg p-4 mt-6">
             <h3 className="font-medium text-gray-900 mb-2">Graduate School Tips</h3>
@@ -278,31 +425,34 @@ export default function CumulativeGPACalculator({
         </div>
       )}
 
-      {/* Calculation Steps */}
-      {showSteps && result && (
-        <CalculationSteps
-          steps={getCalculationSteps()}
-          context="student"
-          showFormulas={true}
-          showExplanations={true}
-          interactive={true}
-          className="shadow-sm"
-        />
-      )}
-
-      {/* Calculation Steps Button - Only when results available */}
+      {/* Calculation Steps Section - Only when results available */}
       {result && (
-        <div className="flex justify-center">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
           <button
             onClick={() => setShowSteps(!showSteps)}
-            className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-              showSteps 
-                ? 'bg-blue-100 text-blue-700' 
-                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
+            className="w-full flex items-center justify-between text-left hover:bg-gray-50 p-2 -m-2 rounded-lg transition-colors"
           >
-            {showSteps ? 'Hide' : 'Show'} Calculation Steps
+            <h3 className="text-lg font-semibold text-gray-900">
+              <HelpCircle className="w-5 h-5 inline mr-2" />
+              Calculation Steps
+            </h3>
+            <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
+              showSteps ? 'rotate-180' : ''
+            }`} />
           </button>
+          
+          {showSteps && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <CalculationSteps
+                steps={getCalculationSteps()}
+                context="student"
+                showFormulas={true}
+                showExplanations={true}
+                interactive={true}
+                className="shadow-sm"
+              />
+            </div>
+          )}
         </div>
       )}
 
@@ -323,57 +473,11 @@ export default function CumulativeGPACalculator({
         
         {showHelp && (
           <div className="mt-4 pt-4 border-t border-gray-200">
-            <div className="space-y-4">
-              <div>
-              <h4 className="font-medium text-gray-900 mb-2">What is Cumulative GPA?</h4>
-              <p className="text-gray-700">
-                Cumulative GPA is your overall Grade Point Average across all semesters and courses. 
-                It's calculated by dividing total grade points by total credit hours for all courses taken.
-              </p>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">How to Use This Calculator</h4>
-              <ul className="list-disc list-inside text-gray-700 space-y-1">
-                <li>Select input and target grading systems (4.0, 5.0, or percentage)</li>
-                <li>Add courses organized by semester with grades and credit hours</li>
-                <li>Use checkboxes to include/exclude courses from GPA calculation</li>
-                <li>View cumulative GPA with detailed academic analysis</li>
-                <li>Get graduate school competitiveness assessment</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Grading System Conversions</h4>
-              <ul className="text-gray-700 space-y-1">
-                <li><strong>4.0 Scale:</strong> A=4.0, B=3.0, C=2.0, D=1.0, F=0.0</li>
-                <li><strong>5.0 Scale:</strong> A=5.0, B=4.0, C=3.0, D=2.0, F=0.0</li>
-                <li><strong>Percentage:</strong> 90-100%=A, 80-89%=B, 70-79%=C, etc.</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Graduate School Applications</h4>
-              <ul className="text-gray-700 space-y-1">
-                <li>Most graduate programs require minimum 3.0 GPA</li>
-                <li>Competitive programs typically expect 3.5+ GPA</li>
-                <li>Top-tier schools often require 3.7+ GPA</li>
-                <li>Consider major GPA vs. overall GPA for specialized programs</li>
-                <li>Upward grade trends can offset lower early grades</li>
-              </ul>
-            </div>
-            
-            <div>
-              <h4 className="font-medium text-gray-900 mb-2">Tips for GPA Improvement</h4>
-              <ul className="text-gray-700 space-y-1">
-                <li>Focus on high-credit courses for maximum impact</li>
-                <li>Consider retaking courses with very low grades</li>
-                <li>Take additional courses in areas of strength</li>
-                <li>Seek academic support services early</li>
-                <li>Plan course loads carefully to maintain quality</li>
-              </ul>
-            </div>
-            </div>
+            <HelpSection
+              userMode="student"
+              calculatorType="cumulative-gpa"
+              className="shadow-sm"
+            />
           </div>
         )}
       </div>

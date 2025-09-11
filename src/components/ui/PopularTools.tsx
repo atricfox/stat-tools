@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calculator, Award, BarChart3, TrendingUp, Flame, ArrowRight } from 'lucide-react';
+import { Calculator, Award, BarChart3, TrendingUp, Flame, ArrowRight, Target, Ruler, Percent } from 'lucide-react';
 
 const PopularTools = () => {
   const popularTools = [
@@ -12,6 +12,22 @@ const PopularTools = () => {
       trend: '+12%'
     },
     {
+      name: 'Median Calculator',
+      description: 'Calculate median (middle value) with quartiles analysis',
+      icon: Target,
+      path: '/calculator/median',
+      usage: '12.8K',
+      trend: '+25%'
+    },
+    {
+      name: 'Unweighted GPA Calculator',
+      description: 'Calculate simple GPA without credit hour weighting',
+      icon: Award,
+      path: '/calculator/gpa',
+      usage: '11.4K',
+      trend: '+20%'
+    },
+    {
       name: 'Weighted GPA Calculator',
       description: 'Calculate GPA with credit hour weighting',
       icon: Award,
@@ -20,10 +36,26 @@ const PopularTools = () => {
       trend: '+18%'
     },
     {
+      name: 'Range Calculator',
+      description: 'Calculate data range and spread analysis',
+      icon: Ruler,
+      path: '/calculator/range',
+      usage: '7.2K',
+      trend: '+14%'
+    },
+    {
+      name: 'Percent Error Calculator',
+      description: 'Calculate percentage error and accuracy',
+      icon: Percent,
+      path: '/calculator/percent-error',
+      usage: '6.8K',
+      trend: '+16%'
+    },
+    {
       name: 'Standard Deviation',
       description: 'Sample and population standard deviation',
       icon: BarChart3,
-      path: '/tool/standard-deviation',
+      path: '/calculator/standard-deviation',
       usage: '6.3K',
       trend: '+8%'
     },

@@ -1,5 +1,5 @@
 import React from 'react'
-import { Calculator, BarChart3, TrendingUp, ArrowRight, GraduationCap } from 'lucide-react'
+import { Calculator, BarChart3, TrendingUp, ArrowRight, GraduationCap, Target, Ruler, Percent } from 'lucide-react'
 
 const FeaturedTools = () => {
   const tools = [
@@ -9,6 +9,14 @@ const FeaturedTools = () => {
       href: '/calculator/mean',
       description: 'Calculate arithmetic mean with step-by-step explanation',
       icon: Calculator,
+      popular: true
+    },
+    {
+      name: 'Median Calculator',
+      slug: 'median',
+      href: '/calculator/median',
+      description: 'Calculate median (middle value) with quartiles and outlier detection',
+      icon: Target,
       popular: true
     },
     {
@@ -45,8 +53,24 @@ const FeaturedTools = () => {
       name: 'GPA Calculator',
       slug: 'gpa',
       href: '/calculator/gpa',
-      description: 'Calculate Grade Point Average with multiple grading systems (4.0/4.3/4.5)',
+      description: 'Calculate unweighted Grade Point Average with multiple grading systems (4.0/4.3/4.5)',
       icon: GraduationCap,
+      popular: true
+    },
+    {
+      name: 'Range Calculator',
+      slug: 'range',
+      href: '/calculator/range',
+      description: 'Calculate data range, minimum, maximum, and spread analysis',
+      icon: Ruler,
+      popular: true
+    },
+    {
+      name: 'Percent Error Calculator',
+      slug: 'percent-error',
+      href: '/calculator/percent-error',
+      description: 'Calculate percentage error between theoretical and experimental values',
+      icon: Percent,
       popular: true
     },
     {

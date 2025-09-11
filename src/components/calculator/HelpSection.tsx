@@ -17,7 +17,7 @@ import { UserMode } from './UserModeSelector';
 
 interface HelpSectionProps {
   userMode: UserMode;
-  calculatorType?: 'mean' | 'weighted-mean' | 'standard-deviation';
+  calculatorType?: 'mean' | 'weighted-mean' | 'standard-deviation' | 'final-grade' | 'semester-grade' | 'cumulative-gpa' | 'gpa' | 'percent-error' | 'range';
   className?: string;
 }
 
@@ -101,99 +101,282 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
           title: 'What is Weighted Mean?',
           content: 'The weighted mean is an average where some values contribute more than others. Each value is multiplied by its weight, then all results are summed and divided by the total weight.',
           examples: [
-            'Grades: Math(90, 3 credits), English(85, 4 credits)',
-            'Weighted Mean = (90×3 + 85×4) ÷ (3+4) = 87.14'
+            'Data: Math(90, 3 credits), English(85, 4 credits) → Weighted Mean = 87.14',
+            'Grades: 90×3 + 85×4 = 610, Total weights: 3+4 = 7, Result: 610÷7 = 87.14'
           ]
         },
         {
-          id: 'input-formats-weighted',
+          id: 'input-formats',
           title: 'Supported Input Formats',
-          content: 'Enter value-weight pairs using different formats. The calculator supports multiple input methods for flexibility.',
+          content: 'You can enter value-weight pairs separated by commas, spaces, or new lines. The calculator automatically handles different formats.',
           examples: [
             'Pairs format: 85:3, 90:4, 78:2',
             'Colon format: 85:3\n90:4\n78:2',
-            'Comma format: 85,3\n90,4\n78,2'
-          ]
-        },
-        {
-          id: 'when-to-use',
-          title: 'When to Use Weighted Mean',
-          content: 'Use weighted mean when different data points have varying levels of importance or frequency.',
-          examples: [
-            'GPA calculation (courses with different credit hours)',
-            'Portfolio returns (investments of different sizes)',
-            'Survey results (responses from different demographics)'
+            'Tab separated: 85\t3\n90\t4\n78\t2'
           ]
         }
       ],
       formulas: [
         {
-          id: 'weighted-mean-formula',
+          id: 'basic-formula',
           title: 'Weighted Mean Formula',
           content: 'Weighted Mean = Σ(value × weight) ÷ Σ(weight)',
-          examples: [
-            'Σ(vᵢ × wᵢ) ÷ Σ(wᵢ)',
-            'Where vᵢ = value, wᵢ = weight'
-          ]
-        },
-        {
-          id: 'step-by-step',
-          title: 'Calculation Steps',
-          content: 'The weighted mean calculation follows these steps:',
-          examples: [
-            'Step 1: Multiply each value by its weight',
-            'Step 2: Sum all weighted values',
-            'Step 3: Sum all weights',
-            'Step 4: Divide weighted sum by total weight'
-          ]
+          examples: ['Σ(vᵢ × wᵢ) ÷ Σ(wᵢ) where vᵢ = value, wᵢ = weight']
         }
       ],
       examples: [
         {
-          id: 'gpa-example',
-          title: 'GPA Calculation Example',
-          content: 'Calculate GPA for: Math A(4.0, 3 credits), English B+(3.3, 4 credits), Science A-(3.7, 3 credits)',
+          id: 'simple-example',
+          title: 'Simple Example',
+          content: 'Calculate weighted mean of: Math(90, 3 credits), English(85, 4 credits), Science(88, 2 credits)',
           examples: [
-            'Step 1: Calculate weighted values',
-            '  Math: 4.0 × 3 = 12.0',
-            '  English: 3.3 × 4 = 13.2',
-            '  Science: 3.7 × 3 = 11.1',
-            'Step 2: Sum weighted values = 12.0 + 13.2 + 11.1 = 36.3',
-            'Step 3: Sum weights = 3 + 4 + 3 = 10',
-            'Step 4: GPA = 36.3 ÷ 10 = 3.63'
-          ]
-        },
-        {
-          id: 'investment-example',
-          title: 'Investment Portfolio Example',
-          content: 'Calculate portfolio return: Stock A(8%, $1000), Stock B(12%, $2000), Stock C(5%, $500)',
-          examples: [
-            'Weighted values: 8%×$1000 + 12%×$2000 + 5%×$500',
-            '= $80 + $240 + $25 = $345',
-            'Total investment: $1000 + $2000 + $500 = $3500',
-            'Portfolio return: $345 ÷ $3500 = 9.86%'
+            'Step 1: Multiply values by weights → 90×3, 85×4, 88×2',
+            'Step 2: Calculate weighted values → 270 + 340 + 176 = 786',
+            'Step 3: Sum weights → 3 + 4 + 2 = 9',
+            'Step 4: Divide weighted sum by total weight → 786 ÷ 9 = 87.33',
+            'Answer: The weighted mean is 87.33'
           ]
         }
       ],
       troubleshooting: [
         {
-          id: 'zero-weights',
-          title: 'Zero or Negative Weights',
-          content: 'Weights should be positive numbers. Zero weights are ignored, and negative weights may cause errors.',
+          id: 'invalid-data',
+          title: 'Invalid Data Entries',
+          content: 'The calculator will ignore non-numeric entries and show you which entries were excluded.',
           tips: [
-            'Ensure all weights are positive numbers',
-            'Zero weights will be excluded from calculation',
-            'Check that weight format matches your input method'
+            'Check for typos in your numbers',
+            'Ensure each value has a corresponding weight',
+            'Use consistent formatting for value-weight pairs'
+          ]
+        }
+      ]
+    };
+
+    // Content for Final Grade Calculator
+    const finalGradeContent = {
+      basics: [
+        {
+          id: 'what-is-final-grade-prediction',
+          title: 'What is Final Grade Prediction?',
+          content: 'Final Grade Prediction helps you determine the minimum score needed on your final exam to achieve your desired overall grade in a course. It calculates the required final exam score based on your current performance and the weight of the final exam in your course.',
+          examples: [
+            'Current grade: 85%, Final exam weight: 30%, Target: 90% → Required final score: 101.7%',
+            'Current grade: 78%, Final exam weight: 40%, Target: 85% → Required final score: 95.5%'
           ]
         },
         {
-          id: 'mismatched-pairs',
-          title: 'Mismatched Value-Weight Pairs',
-          content: 'Each value must have a corresponding weight. Unmatched entries will be excluded.',
+          id: 'input-methods',
+          title: 'Input Methods',
+          content: 'You can add your current grades using multiple convenient methods to ensure accuracy.',
+          examples: [
+            'Manual Entry: Add grades one by one with names, scores, and weights',
+            'Gradebook Paste: Copy-paste from your online gradebook',
+            'Spreadsheet Import: Import from Excel or Google Sheets',
+            'CSV Upload: Upload a CSV file with your grade data'
+          ]
+        }
+      ],
+      formulas: [
+        {
+          id: 'final-grade-formula',
+          title: 'Final Grade Calculation Formula',
+          content: 'Final Grade = (Current Weighted Score × Current Weight) + (Final Exam Score × Final Weight)',
+          examples: [
+            'Required Final Score = (Target Grade - Current Weighted Score × Current Weight) / Final Weight',
+            'If result > 100%, the target grade may not be achievable'
+          ]
+        }
+      ],
+      examples: [
+        {
+          id: 'detailed-example',
+          title: 'Step-by-Step Example',
+          content: 'Calculate required final exam score with multiple assignments',
+          examples: [
+            'Assignments: Homework (90%, 20%), Midterm (85%, 25%), Quiz (88%, 15%)',
+            'Current weighted score: 90×0.20 + 85×0.25 + 88×0.15 = 18 + 21.25 + 13.2 = 52.45%',
+            'Current weight used: 20% + 25% + 15% = 60%',
+            'Final exam weight: 40%, Target grade: 87%',
+            'Required final score: (87 - 52.45) / 0.40 = 86.375%',
+            'Answer: You need at least 86.4% on your final exam'
+          ]
+        }
+      ],
+      troubleshooting: [
+        {
+          id: 'impossible-grades',
+          title: 'When Target Grades Are Impossible',
+          content: 'If the required final exam score exceeds 100%, your target grade may not be achievable with the current grading structure.',
           tips: [
-            'Count your values and weights - they should match',
-            'Use consistent formatting for all pairs',
-            'Check for missing colons, commas, or spaces'
+            'Consider adjusting your target grade to a more realistic level',
+            'Check if there are extra credit opportunities available',
+            'Verify that you entered all assignments and their weights correctly',
+            'Speak with your instructor about grade improvement options'
+          ]
+        },
+        {
+          id: 'weight-validation',
+          title: 'Weight Validation Issues',
+          content: 'Make sure all assignment weights and the final exam weight add up correctly for accurate predictions.',
+          tips: [
+            'Total weights should equal 100% (all assignments + final exam)',
+            'Check your syllabus for the correct final exam weight',
+            'Ensure individual assignment weights match your syllabus',
+            'Account for dropped lowest grades or bonus points if applicable'
+          ]
+        }
+      ]
+    };
+
+    // Content for Semester Grade Calculator
+    const semesterGradeContent = {
+      basics: [
+        {
+          id: 'what-is-semester-gpa',
+          title: 'What is Semester GPA?',
+          content: 'Semester GPA is the Grade Point Average for courses taken during a single academic term. It calculates your performance for just that semester, distinct from cumulative GPA which includes all terms.',
+          examples: [
+            'Fall 2024: Math (A, 3 cr), English (B+, 4 cr), History (A-, 2 cr) → Semester GPA: 3.67',
+            'Spring 2024: 5 courses, 15 credits, various grades → Calculate weighted average'
+          ]
+        },
+        {
+          id: 'input-methods',
+          title: 'Multiple Input Methods',
+          content: 'Add your semester courses using the method most convenient for you.',
+          examples: [
+            'Manual Entry: Add each course with name, grade, and credits',
+            'Paste Transcript: Copy-paste directly from your academic transcript',
+            'Spreadsheet Import: Import from Excel or Google Sheets',
+            'CSV Upload: Upload a formatted CSV file with course data'
+          ]
+        }
+      ],
+      formulas: [
+        {
+          id: 'semester-gpa-formula',
+          title: 'Semester GPA Formula',
+          content: 'Semester GPA = Σ(Grade Points × Credits) ÷ Σ(Credits)',
+          examples: [
+            'Grade Points vary by system: A=4.0, B=3.0, C=2.0, etc.',
+            'Each course contributes: Grade Points × Credit Hours',
+            'Total divided by total credit hours for semester'
+          ]
+        }
+      ],
+      examples: [
+        {
+          id: 'semester-example',
+          title: 'Complete Semester Example',
+          content: 'Calculate semester GPA for a typical course load',
+          examples: [
+            'Course 1: Calculus I (A, 4.0 points, 4 credits) → 4.0 × 4 = 16 quality points',
+            'Course 2: English 101 (B+, 3.3 points, 3 credits) → 3.3 × 3 = 9.9 quality points',
+            'Course 3: Psychology (A-, 3.7 points, 3 credits) → 3.7 × 3 = 11.1 quality points',
+            'Course 4: Chemistry Lab (B, 3.0 points, 1 credit) → 3.0 × 1 = 3.0 quality points',
+            'Total: 40.0 quality points ÷ 11 credits = 3.64 Semester GPA'
+          ]
+        }
+      ],
+      troubleshooting: [
+        {
+          id: 'grade-conversion',
+          title: 'Grade System Conversion',
+          content: 'Make sure you are using the correct grading scale for your institution.',
+          tips: [
+            'Check your school\'s official grading scale (4.0, 4.3, or 5.0 scale)',
+            'Verify plus/minus grade values (B+ vs B vs B-)',
+            'Some schools don\'t use plus/minus grades',
+            'International students: convert to your target country\'s system'
+          ]
+        },
+        {
+          id: 'credit-hours',
+          title: 'Credit Hours Accuracy',
+          content: 'Ensure credit hours are entered correctly for accurate GPA calculation.',
+          tips: [
+            'Check your transcript for official credit hours',
+            'Lab courses often have different credit values than lectures',
+            'Some courses may have variable credits (1-3 credits)',
+            'Pass/Fail courses typically don\'t count toward GPA'
+          ]
+        }
+      ]
+    };
+
+    // Content for Cumulative GPA Calculator
+    const cumulativeGPAContent = {
+      basics: [
+        {
+          id: 'what-is-cumulative-gpa',
+          title: 'What is Cumulative GPA?',
+          content: 'Cumulative GPA is your overall Grade Point Average across all semesters and courses throughout your academic career. It calculates the weighted average of all your grades, giving more weight to courses with more credit hours.',
+          examples: [
+            'All semesters combined: Freshman through Senior year → Single cumulative GPA',
+            'Graduate school applications typically require cumulative undergraduate GPA',
+            'Different from semester GPA which only covers one term'
+          ]
+        },
+        {
+          id: 'grading-system-conversion',
+          title: 'Grading System Conversions',
+          content: 'This calculator supports conversion between different grading systems for international students and different institutions.',
+          examples: [
+            'Input System: Your school\'s grades (4.0, 5.0, or percentage)',
+            'Target System: Convert to desired scale for applications',
+            'Automatic conversion: Enter grades in one scale, get results in another',
+            'Common conversions: US 4.0 ↔ European percentage ↔ Other scales'
+          ]
+        }
+      ],
+      formulas: [
+        {
+          id: 'cumulative-gpa-formula',
+          title: 'Cumulative GPA Calculation',
+          content: 'Cumulative GPA = Total Grade Points ÷ Total Credit Hours (across all terms)',
+          examples: [
+            'Grade Points = Grade Value × Credit Hours (for each course)',
+            'Sum all grade points from all courses across all semesters',
+            'Sum all credit hours from all courses',
+            'Divide total grade points by total credit hours'
+          ]
+        }
+      ],
+      examples: [
+        {
+          id: 'multi-semester-example',
+          title: 'Multi-Semester Calculation',
+          content: 'Calculate cumulative GPA across multiple semesters',
+          examples: [
+            'Semester 1: GPA 3.2, 15 credits → 48.0 grade points',
+            'Semester 2: GPA 3.6, 16 credits → 57.6 grade points', 
+            'Semester 3: GPA 3.8, 14 credits → 53.2 grade points',
+            'Total: 158.8 grade points ÷ 45 credits = 3.53 Cumulative GPA',
+            'Note: You can exclude courses by unchecking them'
+          ]
+        }
+      ],
+      troubleshooting: [
+        {
+          id: 'grade-exclusions',
+          title: 'Including/Excluding Courses',
+          content: 'Use the checkboxes to control which courses count toward your GPA calculation.',
+          tips: [
+            'Uncheck pass/fail courses that don\'t affect GPA',
+            'Exclude repeated courses if your school uses grade replacement',
+            'Include all courses for most accurate cumulative GPA',
+            'Check your school\'s policy on GPA calculation rules'
+          ]
+        },
+        {
+          id: 'transfer-credits',
+          title: 'Transfer and AP Credits',
+          content: 'Handle transfer credits and advanced placement courses correctly.',
+          tips: [
+            'Most transfer credits count toward total credits but not GPA',
+            'AP credits typically provide credits but no grade points',
+            'Check if your school includes transfer grades in GPA',
+            'Consult your registrar for official GPA calculation policies'
           ]
         }
       ]
@@ -207,66 +390,35 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
           title: 'What is Standard Deviation?',
           content: 'Standard deviation measures how spread out data points are from the mean. A low standard deviation means data points are close to the mean, while a high standard deviation means they are spread out over a wide range.',
           examples: [
+            'Data: 2, 4, 4, 4, 5, 5, 7, 9 → Sample SD = 2.14',
             'Low SD: Test scores 85, 87, 86, 88, 84 → SD ≈ 1.6',
             'High SD: Test scores 70, 95, 60, 90, 85 → SD ≈ 14.8'
           ]
         },
         {
-          id: 'sample-vs-population',
-          title: 'Sample vs Population Standard Deviation',
-          content: 'Sample standard deviation (s) uses n-1 in the denominator, while population standard deviation (σ) uses n. Use sample standard deviation when working with a subset of data.',
-          examples: [
-            'Sample SD: s = √[Σ(x - x̄)² / (n-1)]',
-            'Population SD: σ = √[Σ(x - μ)² / n]'
-          ]
-        },
-        {
-          id: 'input-formats-sd',
+          id: 'input-formats',
           title: 'Supported Input Formats',
-          content: 'Enter numbers in various formats. The calculator supports manual entry, CSV files, JSON data, and batch processing for large datasets.',
+          content: 'You can enter numbers separated by commas, spaces, or new lines. The calculator automatically handles different formats.',
           examples: [
-            'Manual: 1, 2, 3, 4, 5',
-            'CSV file: Upload data files',
-            'Batch: Process multiple datasets at once'
+            'Comma separated: 1, 2, 3, 4, 5',
+            'Space separated: 1 2 3 4 5',
+            'Line by line:\n1\n2\n3\n4\n5'
           ]
         }
       ],
       formulas: [
         {
-          id: 'sample-formula',
-          title: 'Sample Standard Deviation Formula',
-          content: 's = √[Σ(xᵢ - x̄)² / (n-1)]',
-          examples: [
-            'x̄ = sample mean',
-            'xᵢ = individual data point',
-            'n = sample size'
-          ]
-        },
-        {
-          id: 'population-formula',
-          title: 'Population Standard Deviation Formula',
-          content: 'σ = √[Σ(xᵢ - μ)² / n]',
-          examples: [
-            'μ = population mean',
-            'xᵢ = individual data point', 
-            'n = population size'
-          ]
-        },
-        {
-          id: 'variance-formula',
-          title: 'Variance Formula',
-          content: 'Variance is the square of standard deviation. It measures the average squared deviation from the mean.',
-          examples: [
-            'Sample variance: s² = Σ(xᵢ - x̄)² / (n-1)',
-            'Population variance: σ² = Σ(xᵢ - μ)² / n'
-          ]
+          id: 'basic-formula',
+          title: 'Standard Deviation Formulas',
+          content: 'Sample SD = √[Σ(x - x̄)² / (n-1)] and Population SD = √[Σ(x - μ)² / n]',
+          examples: ['Sample SD uses (n-1) for unbiased estimation', 'Population SD uses n for complete data sets']
         }
       ],
       examples: [
         {
-          id: 'simple-sd-example',
-          title: 'Simple Standard Deviation Example',
-          content: 'Calculate standard deviation for: 2, 4, 4, 4, 5, 5, 7, 9',
+          id: 'simple-example',
+          title: 'Simple Example',
+          content: 'Calculate standard deviation of: 2, 4, 4, 4, 5, 5, 7, 9',
           examples: [
             'Step 1: Calculate mean → (2+4+4+4+5+5+7+9)/8 = 5',
             'Step 2: Find deviations → -3, -1, -1, -1, 0, 0, 2, 4',
@@ -274,38 +426,143 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
             'Step 4: Sum squared deviations → 32',
             'Step 5: Sample SD → √(32/7) = 2.14'
           ]
+        }
+      ],
+      troubleshooting: [
+        {
+          id: 'invalid-data',
+          title: 'Invalid Data Entries',
+          content: 'The calculator will ignore non-numeric entries and show you which entries were excluded.',
+          tips: [
+            'Check for typos in your numbers',
+            'Remove any text or special characters',
+            'Use decimal points (.) not commas for decimals'
+          ]
+        }
+      ]
+    };
+
+    // Content for Percent Error Calculator
+    const percentErrorContent = {
+      basics: [
+        {
+          id: 'what-is-percent-error',
+          title: 'What is Percent Error?',
+          content: 'Percent error measures the accuracy of an experimental or measured value compared to a theoretical or expected value. It shows how far off your measurement is as a percentage.',
+          examples: [
+            'Theoretical: 9.8 m/s², Experimental: 9.6 m/s² → Percent Error = 2.04%',
+            'Expected grade: 100, Actual grade: 95 → Percent Error = 5.00%',
+            'Target value: 25.00, Measured: 24.75 → Percent Error = 1.00%'
+          ]
         },
         {
-          id: 'outlier-example',
-          title: 'Outlier Detection Example',
-          content: 'Identify outliers in dataset: 12, 14, 15, 13, 16, 45, 14, 13',
+          id: 'input-requirements',
+          title: 'Input Requirements',
+          content: 'You need two values: a theoretical (expected) value and an experimental (measured) value. The theoretical value cannot be zero.',
           examples: [
-            'Q1 = 13, Q3 = 15.5, IQR = 2.5',
-            'Lower bound: 13 - 1.5×2.5 = 9.25',
-            'Upper bound: 15.5 + 1.5×2.5 = 19.25',
-            'Outlier: 45 (exceeds upper bound)'
+            'Theoretical value: The expected or true value',
+            'Experimental value: The measured or observed value',
+            'Both values must be numerical'
+          ]
+        }
+      ],
+      formulas: [
+        {
+          id: 'basic-formula',
+          title: 'Percent Error Formula',
+          content: 'Percent Error = (|Experimental - Theoretical| / |Theoretical|) × 100%',
+          examples: [
+            'Absolute error = |Experimental - Theoretical|',
+            'Relative error = Absolute error / |Theoretical|',
+            'Accuracy = 100% - Percent Error'
+          ]
+        }
+      ],
+      examples: [
+        {
+          id: 'physics-example',
+          title: 'Physics Measurement',
+          content: 'Measuring gravitational acceleration',
+          examples: [
+            'Theoretical g: 9.8 m/s²',
+            'Experimental g: 9.6 m/s²',
+            'Absolute Error: |9.6 - 9.8| = 0.2 m/s²',
+            'Percent Error: (0.2 / 9.8) × 100% = 2.04%'
           ]
         }
       ],
       troubleshooting: [
         {
-          id: 'insufficient-data',
-          title: 'Insufficient Data Points',
-          content: 'Standard deviation requires at least 2 data points. For meaningful results, use 3 or more points.',
+          id: 'zero-theoretical',
+          title: 'Theoretical Value Cannot Be Zero',
+          content: 'Division by zero is undefined. Make sure your theoretical value is not zero.',
           tips: [
-            'Minimum 2 points for calculation',
-            'At least 3-5 points for reliable results',
-            'Large samples (n≥30) for normal distribution assumptions'
+            'Check if you entered values in the correct fields',
+            'Verify your theoretical value is correct',
+            'Use a different reference point if needed'
+          ]
+        }
+      ]
+    };
+
+    // Content for Range Calculator
+    const rangeContent = {
+      basics: [
+        {
+          id: 'what-is-range',
+          title: 'What is Data Range?',
+          content: 'The range is the difference between the maximum and minimum values in a dataset. It provides a simple measure of how spread out your data is.',
+          examples: [
+            'Data: 12, 15, 8, 22, 18, 7, 25, 14, 19, 11 → Range = 25 - 7 = 18',
+            'Test scores: 85, 92, 78, 96, 88 → Range = 96 - 78 = 18',
+            'Temperatures: -5°C, 2°C, 8°C → Range = 8 - (-5) = 13°C'
           ]
         },
         {
-          id: 'zero-variance',
-          title: 'Zero Standard Deviation',
-          content: 'When all data points are identical, standard deviation equals zero, indicating no variability.',
+          id: 'input-formats',
+          title: 'Supported Input Formats',
+          content: 'Enter numbers separated by commas, spaces, or new lines. At least 2 numbers are needed to calculate a range.',
+          examples: [
+            'Comma separated: 12, 15, 8, 22, 18',
+            'Space separated: 12 15 8 22 18',
+            'Line by line:\n12\n15\n8\n22\n18'
+          ]
+        }
+      ],
+      formulas: [
+        {
+          id: 'basic-formula',
+          title: 'Range and Distribution Formulas',
+          content: 'Range = Maximum - Minimum, IQR = Q3 - Q1, Outliers detected using 1.5×IQR method',
+          examples: [
+            'Range shows total spread of data',
+            'IQR (Interquartile Range) shows middle 50% spread',
+            'Outliers: Values beyond Q1 - 1.5×IQR or Q3 + 1.5×IQR'
+          ]
+        }
+      ],
+      examples: [
+        {
+          id: 'grade-analysis',
+          title: 'Grade Distribution Analysis',
+          content: 'Analyzing student grades: 95, 87, 92, 78, 89, 94, 81, 88, 90, 85',
+          examples: [
+            'Minimum: 78, Maximum: 95',
+            'Range: 95 - 78 = 17',
+            'Q1: 85, Q3: 92, IQR: 7',
+            'No outliers detected'
+          ]
+        }
+      ],
+      troubleshooting: [
+        {
+          id: 'single-value',
+          title: 'Single Value Input',
+          content: 'Range is 0 when only one value is provided. You need at least 2 values to calculate a meaningful range.',
           tips: [
-            'Check for data entry errors',
-            'Verify measurement precision',
-            'Consider if zero variance is expected'
+            'Add more data points to your dataset',
+            'Check if some values were not recognized',
+            'Ensure proper formatting of your input'
           ]
         }
       ]
@@ -313,203 +570,33 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
 
     // Choose content based on calculator type
     const baseContent = calculatorType === 'standard-deviation' ? standardDeviationContent : 
-                       calculatorType === 'weighted-mean' ? weightedMeanContent : meanContent;
+                       calculatorType === 'weighted-mean' ? weightedMeanContent : 
+                       calculatorType === 'final-grade' ? finalGradeContent :
+                       calculatorType === 'semester-grade' ? semesterGradeContent :
+                       calculatorType === 'cumulative-gpa' ? cumulativeGPAContent :
+                       calculatorType === 'gpa' ? cumulativeGPAContent :
+                       calculatorType === 'percent-error' ? percentErrorContent :
+                       calculatorType === 'range' ? rangeContent :
+                       meanContent;
 
     const contextSpecific = {
       student: {
-        basics: [
-          ...baseContent.basics,
-          {
-            id: 'why-important',
-            title: calculatorType === 'standard-deviation' ? 'Why is Standard Deviation Important?' :
-                   calculatorType === 'weighted-mean' ? 'Why is Weighted Mean Important?' : 'Why is the Mean Important?',
-            content: calculatorType === 'standard-deviation' 
-              ? 'Standard deviation helps you understand data variability and reliability. It\'s essential for quality control, risk assessment, and determining if your data follows expected patterns.'
-              : calculatorType === 'weighted-mean' 
-              ? 'Weighted mean gives more importance to certain values, making it essential for accurate GPA calculations, portfolio analysis, and situations where not all data points are equally significant.'
-              : 'The mean helps you understand the typical value in your data set. It\'s commonly used to calculate grade averages, compare performance, and analyze trends.',
-            examples: calculatorType === 'standard-deviation' 
-              ? [
-                  'Assess consistency in test scores',
-                  'Measure manufacturing quality control',
-                  'Evaluate investment risk and volatility'
-                ]
-              : calculatorType === 'weighted-mean' 
-              ? [
-                  'Calculate accurate GPA with course credits',
-                  'Analyze portfolio returns by investment size',
-                  'Weight survey responses by sample size'
-                ]
-              : [
-                  'Calculate your semester GPA',
-                  'Find average test scores',
-                  'Compare class performance'
-                ]
-          }
-        ],
-        examples: [
-          ...baseContent.examples,
-          ...(calculatorType === 'standard-deviation' ? [
-            {
-              id: 'test-score-variability',
-              title: 'Test Score Variability Example',
-              content: 'Compare consistency between two students with same average (85%):',
-              examples: [
-                'Student A scores: 83, 85, 87, 84, 86 → SD = 1.58 (consistent)',
-                'Student B scores: 70, 90, 85, 95, 75 → SD = 10.95 (inconsistent)',
-                'Both have mean = 85%, but Student A is more consistent'
-              ]
-            }
-          ] : [
-            {
-              id: 'grade-example',
-              title: 'Grade Average Example',
-              content: 'Calculate your course average from test scores: 88, 92, 76, 94, 85',
-              examples: [
-                'Sum: 88 + 92 + 76 + 94 + 85 = 435',
-                'Count: 5 tests',
-                'Average: 435 ÷ 5 = 87',
-                'Your course average is 87%'
-              ]
-            }
-          ])
-        ]
+        basics: baseContent.basics,
+        examples: baseContent.examples,
+        formulas: baseContent.formulas,
+        troubleshooting: baseContent.troubleshooting
       },
       research: {
-        basics: [
-          ...baseContent.basics,
-          ...(calculatorType === 'standard-deviation' ? [
-            {
-              id: 'advanced-statistics',
-              title: 'Advanced Statistical Analysis',
-              content: 'Standard deviation enables advanced statistical measures like coefficient of variation, skewness, and kurtosis for comprehensive data analysis.',
-              examples: [
-                'CV = (SD/Mean) × 100% - measures relative variability',
-                'Skewness - measures asymmetry of distribution',
-                'Kurtosis - measures tail heaviness of distribution'
-              ]
-            }
-          ] : [
-            {
-              id: 'sample-vs-population',
-              title: 'Sample vs Population Mean',
-              content: 'Understand the difference between sample mean (x̄) and population mean (μ) for proper statistical inference.',
-              examples: [
-                'Sample mean: represents a subset of data',
-                'Population mean: represents all possible data'
-              ]
-            }
-          ])
-        ],
-        formulas: [
-          ...baseContent.formulas,
-          ...(calculatorType === 'standard-deviation' ? [
-            {
-              id: 'coefficient-variation',
-              title: 'Coefficient of Variation',
-              content: 'CV = (σ/μ) × 100% - standardized measure of dispersion',
-              examples: [
-                'Low CV (<15%): Low relative variability',
-                'Medium CV (15-35%): Moderate variability',
-                'High CV (>35%): High relative variability'
-              ]
-            },
-            {
-              id: 'normality-testing',
-              title: 'Normality Assessment',
-              content: 'Use skewness and kurtosis to assess if data follows normal distribution',
-              examples: [
-                'Normal: Skewness ≈ 0, Kurtosis ≈ 3',
-                'Right-skewed: Skewness > 0',
-                'Left-skewed: Skewness < 0'
-              ]
-            }
-          ] : [
-            {
-              id: 'confidence-intervals',
-              title: 'Confidence Intervals',
-              content: 'CI = x̄ ± (t × SE), where SE = s/√n',
-              examples: [
-                't = critical t-value from t-distribution',
-                'SE = standard error of the mean',
-                's = sample standard deviation',
-                'n = sample size'
-              ]
-            },
-            {
-              id: 'outlier-detection',
-              title: 'Outlier Detection (IQR Method)',
-              content: 'Outliers are values beyond Q1 - 1.5×IQR or Q3 + 1.5×IQR',
-              examples: [
-                'Q1 = 25th percentile',
-                'Q3 = 75th percentile', 
-                'IQR = Q3 - Q1'
-              ]
-            }
-          ])
-        ]
+        basics: baseContent.basics,
+        examples: baseContent.examples,
+        formulas: baseContent.formulas,
+        troubleshooting: baseContent.troubleshooting
       },
       teacher: {
-        basics: [
-          ...baseContent.basics,
-          {
-            id: calculatorType === 'standard-deviation' ? 'performance-variability' : 'grade-analysis',
-            title: calculatorType === 'standard-deviation' ? 'Class Performance Variability Analysis' : 'Grade Distribution Analysis',
-            content: calculatorType === 'standard-deviation' 
-              ? 'Standard deviation reveals how consistently students are learning. Low SD indicates uniform understanding, while high SD suggests mixed comprehension levels that may require differentiated instruction.'
-              : 'Use the mean alongside grade distribution to understand overall class performance and identify learning gaps.',
-            examples: calculatorType === 'standard-deviation' 
-              ? [
-                  'Low SD (< 10): Class understands material uniformly',
-                  'Medium SD (10-20): Some students need extra support',
-                  'High SD (> 20): Wide range of understanding - differentiate instruction'
-                ]
-              : [
-                  'Class average below 70: review curriculum',
-                  'High standard deviation: varied understanding',
-                  'Grade distribution: identify struggling students'
-                ]
-          }
-        ],
-        examples: [
-          ...baseContent.examples,
-          ...(calculatorType === 'standard-deviation' ? [
-            {
-              id: 'class-assessment-analysis',
-              title: 'Class Assessment Variability Analysis',
-              content: 'Compare two classes with the same mean (75%) but different standard deviations:',
-              examples: [
-                'Class A: Mean = 75%, SD = 8 → Most students scored 67-83%',
-                'Class B: Mean = 75%, SD = 18 → Students scored 57-93%',
-                'Class A shows consistent understanding',
-                'Class B needs differentiated instruction strategies'
-              ],
-              tips: [
-                'Low SD: Effective uniform teaching approach',
-                'High SD: Implement tiered assignments',
-                'Monitor SD trends across multiple assessments'
-              ]
-            }
-          ] : [
-            {
-              id: 'class-analysis',
-              title: 'Class Performance Analysis',
-              content: 'Analyze a class of 30 students with an average of 78%',
-              examples: [
-                'Grade A (90-100): 6 students (20%)',
-                'Grade B (80-89): 12 students (40%)',
-                'Grade C (70-79): 8 students (27%)',
-                'Grade D (60-69): 3 students (10%)',
-                'Grade F (0-59): 1 student (3%)'
-              ],
-              tips: [
-                'Focus extra help on D/F students',
-                'Consider advanced material for A students',
-                'Class mean of 78% indicates good overall understanding'
-              ]
-            }
-          ])
-        ]
+        basics: baseContent.basics,
+        examples: baseContent.examples,
+        formulas: baseContent.formulas,
+        troubleshooting: baseContent.troubleshooting
       }
     };
 
@@ -544,22 +631,9 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
   const color = getModeColor();
 
   return (
-    <div className={`bg-white border border-gray-200 rounded-lg ${className}`}>
-      {/* Header */}
-      <div className="border-b border-gray-200 px-6 py-4">
-        <div className="flex items-center">
-          <div className={`p-2 bg-${color}-100 rounded-lg mr-3`}>
-            {getModeIcon()}
-          </div>
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">Help & Guide</h3>
-            <p className="text-sm text-gray-600 capitalize">{userMode} Mode Resources</p>
-          </div>
-        </div>
-      </div>
-
+    <div className={className}>
       {/* Tabs */}
-      <div className="px-6 pt-4">
+      <div className="mb-4">
         <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
           {(['basics', 'formulas', 'examples', 'troubleshooting'] as const).map((tab) => (
             <button
@@ -584,155 +658,207 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
       </div>
 
       {/* Content */}
-      <div className="p-6">
-        <div className="space-y-4">
-          {currentTopics.map((topic) => (
-            <div key={topic.id} className="border border-gray-200 rounded-lg">
-              <button
-                onClick={() => toggleTopic(topic.id)}
-                className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
-              >
-                <span className="font-medium text-gray-900">{topic.title}</span>
-                {expandedTopic === topic.id ? (
-                  <ChevronDown className="h-4 w-4 text-gray-500" />
-                ) : (
-                  <ChevronRight className="h-4 w-4 text-gray-500" />
-                )}
-              </button>
-              
-              {expandedTopic === topic.id && (
-                <div className="px-4 pb-4 border-t border-gray-100">
-                  <p className="text-gray-700 mb-3">{topic.content}</p>
-                  
-                  {topic.examples && topic.examples.length > 0 && (
-                    <div className="mb-3">
-                      <h5 className="text-sm font-medium text-gray-900 mb-2">Examples:</h5>
-                      <div className="bg-gray-50 rounded-lg p-3 space-y-1">
-                        {topic.examples.map((example, index) => (
-                          <div key={index} className="text-sm font-mono text-gray-700">
-                            {example}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {topic.tips && topic.tips.length > 0 && (
-                    <div className="mb-3">
-                      <h5 className="text-sm font-medium text-gray-900 mb-2">Tips:</h5>
-                      <div className={`bg-${color}-50 border border-${color}-200 rounded-lg p-3`}>
-                        {topic.tips.map((tip, index) => (
-                          <div key={index} className={`text-sm text-${color}-800 flex items-start mb-1 last:mb-0`}>
-                            <span className="mr-2">•</span>
-                            <span>{tip}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {topic.links && topic.links.length > 0 && (
-                    <div>
-                      <h5 className="text-sm font-medium text-gray-900 mb-2">Learn More:</h5>
-                      <div className="space-y-1">
-                        {topic.links.map((link, index) => (
-                          <a
-                            key={index}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={`text-sm text-${color}-600 hover:text-${color}-800 flex items-center`}
-                          >
-                            <ExternalLink className="h-3 w-3 mr-1" />
-                            {link.title}
-                          </a>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+      <div className="space-y-4">
+        {currentTopics.map((topic) => (
+          <div key={topic.id} className="border border-gray-200 rounded-lg">
+            <button
+              onClick={() => toggleTopic(topic.id)}
+              className="w-full px-4 py-3 text-left flex items-center justify-between hover:bg-gray-50 transition-colors"
+            >
+              <span className="font-medium text-gray-900">{topic.title}</span>
+              {expandedTopic === topic.id ? (
+                <ChevronDown className="h-4 w-4 text-gray-500" />
+              ) : (
+                <ChevronRight className="h-4 w-4 text-gray-500" />
               )}
-            </div>
-          ))}
-        </div>
+            </button>
+            
+            {expandedTopic === topic.id && (
+              <div className="px-4 pb-4 border-t border-gray-100">
+                <p className="text-gray-700 mb-3">{topic.content}</p>
+                
+                {topic.examples && topic.examples.length > 0 && (
+                  <div className="mb-3">
+                    <h5 className="text-sm font-medium text-gray-900 mb-2">Examples:</h5>
+                    <div className="bg-gray-50 rounded-lg p-3 space-y-1">
+                      {topic.examples.map((example, index) => (
+                        <div key={index} className="text-sm font-mono text-gray-700">
+                          {example}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
 
-        {/* Quick Tips */}
-        <div className={`mt-6 p-4 bg-${color}-50 border border-${color}-200 rounded-lg`}>
-          <h4 className={`text-sm font-medium text-${color}-900 mb-2 flex items-center`}>
-            <Lightbulb className="h-4 w-4 mr-1" />
-            Quick Tips for {userMode === 'student' ? 'Students' : userMode === 'research' ? 'Researchers' : 'Teachers'}
-          </h4>
-          <div className={`text-sm text-${color}-800 space-y-1`}>
-            {userMode === 'student' && (
-              <>
-                {calculatorType === 'standard-deviation' ? (
-                  <>
-                    <div>• Use sample SD for homework unless specified as population</div>
-                    <div>• Check the calculation steps to understand the process</div>
-                    <div>• Compare different datasets to understand variability</div>
-                  </>
-                ) : calculatorType === 'weighted-mean' ? (
-                  <>
-                    <div>• Enter your course grades and credit hours for accurate GPA</div>
-                    <div>• Use the calculation steps to understand weighting</div>
-                    <div>• Adjust precision for official transcripts (usually 2 decimals)</div>
-                  </>
-                ) : (
-                  <>
-                    <div>• Use the precision control to match your assignment requirements</div>
-                    <div>• Check the calculation steps to understand the process</div>
-                    <div>• Copy results for easy submission in your homework</div>
-                  </>
+                {topic.tips && topic.tips.length > 0 && (
+                  <div className="mb-3">
+                    <h5 className="text-sm font-medium text-gray-900 mb-2">Tips:</h5>
+                    <div className={`bg-${color}-50 border border-${color}-200 rounded-lg p-3`}>
+                      {topic.tips.map((tip, index) => (
+                        <div key={index} className={`text-sm text-${color}-800 flex items-start mb-1 last:mb-0`}>
+                          <span className="mr-2">•</span>
+                          <span>{tip}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </>
-            )}
-            {userMode === 'research' && (
-              <>
-                {calculatorType === 'standard-deviation' ? (
-                  <>
-                    <div>• Use outlier detection to identify anomalous data points</div>
-                    <div>• Consider coefficient of variation for relative comparisons</div>
-                    <div>• Assess normality using skewness and kurtosis measures</div>
-                  </>
-                ) : calculatorType === 'weighted-mean' ? (
-                  <>
-                    <div>• Consider weight distribution in your analysis</div>
-                    <div>• Use high precision for scientific calculations</div>
-                    <div>• Validate that weights represent true importance</div>
-                  </>
-                ) : (
-                  <>
-                    <div>• Enable outlier detection to identify unusual data points</div>
-                    <div>• Use confidence intervals for population parameter estimation</div>
-                    <div>• Consider statistical assumptions before interpreting results</div>
-                  </>
+
+                {topic.links && topic.links.length > 0 && (
+                  <div>
+                    <h5 className="text-sm font-medium text-gray-900 mb-2">Learn More:</h5>
+                    <div className="space-y-1">
+                      {topic.links.map((link, index) => (
+                        <a
+                          key={index}
+                          href={link.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className={`text-sm text-${color}-600 hover:text-${color}-800 flex items-center`}
+                        >
+                          <ExternalLink className="h-3 w-3 mr-1" />
+                          {link.title}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
                 )}
-              </>
-            )}
-            {userMode === 'teacher' && (
-              <>
-                {calculatorType === 'standard-deviation' ? (
-                  <>
-                    <div>• Monitor SD trends to assess teaching effectiveness</div>
-                    <div>• High SD indicates need for differentiated instruction</div>
-                    <div>• Use visualization to show students data distribution</div>
-                  </>
-                ) : calculatorType === 'weighted-mean' ? (
-                  <>
-                    <div>• Set appropriate weights for different assignments</div>
-                    <div>• Consider assignment difficulty when weighting</div>
-                    <div>• Export weighted grades for final grade calculation</div>
-                  </>
-                ) : (
-                  <>
-                    <div>• Use grade distribution to identify learning patterns</div>
-                    <div>• Compare class averages across different assignments</div>
-                    <div>• Export results for gradebook integration</div>
-                  </>
-                )}
-              </>
+              </div>
             )}
           </div>
+        ))}
+      </div>
+
+      {/* Quick Tips */}
+      <div className={`mt-6 p-4 bg-${color}-50 border border-${color}-200 rounded-lg`}>
+        <h4 className={`text-sm font-medium text-${color}-900 mb-2 flex items-center`}>
+          <Lightbulb className="h-4 w-4 mr-1" />
+          Quick Tips for {userMode === 'student' ? 'Students' : userMode === 'research' ? 'Researchers' : 'Teachers'}
+        </h4>
+        <div className={`text-sm text-${color}-800 space-y-1`}>
+          {userMode === 'student' && (
+            <>
+              {calculatorType === 'standard-deviation' ? (
+                <>
+                  <div>• Use sample SD for homework unless specified as population</div>
+                  <div>• Check the calculation steps to understand the process</div>
+                  <div>• Compare different datasets to understand variability</div>
+                </>
+              ) : calculatorType === 'weighted-mean' ? (
+                <>
+                  <div>• Enter your course grades and credit hours for accurate GPA</div>
+                  <div>• Use the calculation steps to understand weighting</div>
+                  <div>• Adjust precision for official transcripts (usually 2 decimals)</div>
+                </>
+              ) : calculatorType === 'final-grade' ? (
+                <>
+                  <div>• Be realistic with target grades - check if they're achievable</div>
+                  <div>• Include all assignments and their correct weights</div>
+                  <div>• Use this tool early in the semester for better planning</div>
+                </>
+              ) : calculatorType === 'semester-grade' ? (
+                <>
+                  <div>• Double-check your grading system matches your school's scale</div>
+                  <div>• Include all courses from the semester, including labs</div>
+                  <div>• Verify credit hours from your official transcript</div>
+                </>
+              ) : (calculatorType === 'cumulative-gpa' || calculatorType === 'gpa') ? (
+                <>
+                  <div>• Organize courses by semester for better tracking</div>
+                  <div>• Use grade exclusion features for pass/fail courses</div>
+                  <div>• Consider retaking courses with very low grades</div>
+                </>
+              ) : (
+                <>
+                  <div>• Use the precision control to match your assignment requirements</div>
+                  <div>• Check the calculation steps to understand the process</div>
+                  <div>• Copy results for easy submission in your homework</div>
+                </>
+              )}
+            </>
+          )}
+          {userMode === 'research' && (
+            <>
+              {calculatorType === 'standard-deviation' ? (
+                <>
+                  <div>• Use outlier detection to identify anomalous data points</div>
+                  <div>• Consider coefficient of variation for relative comparisons</div>
+                  <div>• Assess normality using skewness and kurtosis measures</div>
+                </>
+              ) : calculatorType === 'weighted-mean' ? (
+                <>
+                  <div>• Consider weight distribution in your analysis</div>
+                  <div>• Use high precision for scientific calculations</div>
+                  <div>• Validate that weights represent true importance</div>
+                </>
+              ) : calculatorType === 'final-grade' ? (
+                <>
+                  <div>• Analyze grade prediction patterns across different scenarios</div>
+                  <div>• Consider statistical implications of final exam weighting</div>
+                  <div>• Document assumptions about grading scale conversions</div>
+                </>
+              ) : calculatorType === 'semester-grade' ? (
+                <>
+                  <div>• Compare semester GPA trends across different academic periods</div>
+                  <div>• Analyze credit distribution patterns and their impact</div>
+                  <div>• Document grading scale variations across institutions</div>
+                </>
+              ) : (calculatorType === 'cumulative-gpa' || calculatorType === 'gpa') ? (
+                <>
+                  <div>• Track GPA trends across multiple academic years</div>
+                  <div>• Analyze impact of grading system conversions</div>
+                  <div>• Model different academic scenarios and outcomes</div>
+                </>
+              ) : (
+                <>
+                  <div>• Enable outlier detection to identify unusual data points</div>
+                  <div>• Use confidence intervals for population parameter estimation</div>
+                  <div>• Consider statistical assumptions before interpreting results</div>
+                </>
+              )}
+            </>
+          )}
+          {userMode === 'teacher' && (
+            <>
+              {calculatorType === 'standard-deviation' ? (
+                <>
+                  <div>• Monitor SD trends to assess teaching effectiveness</div>
+                  <div>• High SD indicates need for differentiated instruction</div>
+                  <div>• Use visualization to show students data distribution</div>
+                </>
+              ) : calculatorType === 'weighted-mean' ? (
+                <>
+                  <div>• Set appropriate weights for different assignments</div>
+                  <div>• Consider assignment difficulty when weighting</div>
+                  <div>• Export weighted grades for final grade calculation</div>
+                </>
+              ) : calculatorType === 'final-grade' ? (
+                <>
+                  <div>• Help students set realistic target grades early</div>
+                  <div>• Use predictions to identify at-risk students</div>
+                  <div>• Adjust final exam weights to ensure fair assessment</div>
+                </>
+              ) : calculatorType === 'semester-grade' ? (
+                <>
+                  <div>• Monitor semester GPA trends to assess student progress</div>
+                  <div>• Use batch import features for class-wide calculations</div>
+                  <div>• Help students understand credit hour impact on GPA</div>
+                </>
+              ) : (calculatorType === 'cumulative-gpa' || calculatorType === 'gpa') ? (
+                <>
+                  <div>• Track student academic progress across multiple years</div>
+                  <div>• Identify students at risk for academic probation</div>
+                  <div>• Guide students on graduation requirements and GPA goals</div>
+                </>
+              ) : (
+                <>
+                  <div>• Use grade distribution to identify learning patterns</div>
+                  <div>• Compare class averages across different assignments</div>
+                  <div>• Export results for gradebook integration</div>
+                </>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>
