@@ -33,20 +33,14 @@ export default function PercentErrorCalculatorClient() {
 
   const handleTheoreticalChange = (value: string) => {
     setTheoreticalValue(value);
-    if (value.trim() && experimentalValue.trim()) {
-      calculatePercentError(value, experimentalValue);
-    } else {
-      clearResults();
-    }
+    // Always attempt calculation when either input changes, let the hook handle validation
+    calculatePercentError(value, experimentalValue);
   };
 
   const handleExperimentalChange = (value: string) => {
     setExperimentalValue(value);
-    if (theoreticalValue.trim() && value.trim()) {
-      calculatePercentError(theoreticalValue, value);
-    } else {
-      clearResults();
-    }
+    // Always attempt calculation when either input changes, let the hook handle validation  
+    calculatePercentError(theoreticalValue, value);
   };
 
   const handleClearAll = () => {

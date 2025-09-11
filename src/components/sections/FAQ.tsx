@@ -2,9 +2,14 @@
 
 import React, { useState } from 'react'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { useInView } from 'framer-motion'
+import { useRef } from 'react'
 
 const FAQ = () => {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: "-100px" })
 
   const faqs = [
     {
@@ -37,40 +42,120 @@ const FAQ = () => {
     setOpenIndex(openIndex === index ? null : index)
   }
 
-  return (
-    <section className="py-16 bg-white">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Frequently Asked Questions</h2>
-          <p className="text-lg text-gray-600">
-            Everything you need to know about using our statistical tools
-          </p>
-        </div>
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.2,
+        staggerChildren: 0.1
+      }
+    }
+  }
 
-        <div className="space-y-4">
+  const itemVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.5,
+        ease: "easeOut"
+      }
+    }
+  }
+
+  const titleVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  }
+
+  return (
+    <section className="py-16 bg-white" ref={ref}>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div 
+          className="text-center mb-12"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
+          <motion.h2 
+            className="text-3xl font-bold text-gray-900 mb-4"
+            variants={titleVariants}
+          >
+            Frequently Asked Questions
+          </motion.h2>
+          <motion.p 
+            className="text-lg text-gray-600"
+            variants={titleVariants}
+          >
+            Everything you need to know about using our statistical tools
+          </motion.p>
+        </motion.div>
+
+        <motion.div 
+          className="space-y-4"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
           {faqs.map((faq, index) => (
-            <div key={index} className="border border-gray-200 rounded-lg">
-              <button
+            <motion.div 
+              key={index} 
+              className="border border-gray-200 rounded-lg overflow-hidden"
+              variants={itemVariants}
+              whileHover={{ 
+                scale: 1.02,
+                boxShadow: "0 4px 20px rgba(0,0,0,0.08)",
+                transition: { duration: 0.2 }
+              }}
+            >
+              <motion.button
                 className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors duration-200"
                 onClick={() => toggleFAQ(index)}
                 aria-expanded={openIndex === index}
+                whileHover={{ backgroundColor: "rgba(249, 250, 251, 1)" }}
+                whileTap={{ scale: 0.98 }}
               >
                 <span className="font-medium text-gray-900">{faq.question}</span>
-                {openIndex === index ? (
-                  <ChevronUp className="h-5 w-5 text-gray-500" />
-                ) : (
+                <motion.div
+                  animate={{ rotate: openIndex === index ? 180 : 0 }}
+                  transition={{ duration: 0.3 }}
+                >
                   <ChevronDown className="h-5 w-5 text-gray-500" />
-                )}
-              </button>
+                </motion.div>
+              </motion.button>
               
-              {openIndex === index && (
-                <div className="px-6 pb-4">
-                  <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
-                </div>
-              )}
-            </div>
+              <AnimatePresence>
+                {openIndex === index && (
+                  <motion.div
+                    className="overflow-hidden"
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: "auto", opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.3, ease: "easeInOut" }}
+                  >
+                    <motion.div 
+                      className="px-6 pb-4 bg-gray-50"
+                      initial={{ y: -10 }}
+                      animate={{ y: 0 }}
+                      transition={{ delay: 0.1 }}
+                    >
+                      <p className="text-gray-700 leading-relaxed">{faq.answer}</p>
+                    </motion.div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { UserMode } from '@/components/calculator/UserModeSelector';
+import { formatForCalculationSteps } from '@/lib/formatters/numberFormatter';
 
 export interface PercentErrorResult {
   percentError: number;
@@ -65,17 +66,17 @@ export function usePercentErrorCalculation(
     // Base calculation steps
     const steps = [
       userMode === 'research' 
-        ? `理论值: ${theoretical.toFixed(precision)}`
+        ? `理论值: ${formatForCalculationSteps(theoretical, userMode, precision)}`
         : userMode === 'teacher'
-          ? `期望值: ${theoretical.toFixed(precision)}`
-          : `理论值: ${theoretical.toFixed(precision)}`,
+          ? `期望值: ${formatForCalculationSteps(theoretical, userMode, precision)}`
+          : `理论值: ${formatForCalculationSteps(theoretical, userMode, precision)}`,
       userMode === 'research' 
-        ? `实验值: ${experimental.toFixed(precision)}`
+        ? `实验值: ${formatForCalculationSteps(experimental, userMode, precision)}`
         : userMode === 'teacher'
-          ? `学生结果: ${experimental.toFixed(precision)}`
-          : `实验值: ${experimental.toFixed(precision)}`,
-      `绝对误差 = |${experimental.toFixed(precision)} - ${theoretical.toFixed(precision)}| = ${absoluteError.toFixed(precision)}`,
-      `百分比误差 = (${absoluteError.toFixed(precision)} / |${theoretical.toFixed(precision)}|) × 100% = ${percentError.toFixed(precision)}%`
+          ? `学生结果: ${formatForCalculationSteps(experimental, userMode, precision)}`
+          : `实验值: ${formatForCalculationSteps(experimental, userMode, precision)}`,
+      `绝对误差 = |${formatForCalculationSteps(experimental, userMode, precision)} - ${formatForCalculationSteps(theoretical, userMode, precision)}| = ${formatForCalculationSteps(absoluteError, userMode, precision)}`,
+      `百分比误差 = (${formatForCalculationSteps(absoluteError, userMode, precision)} / |${formatForCalculationSteps(theoretical, userMode, precision)}|) × 100% = ${formatForCalculationSteps(percentError, userMode, precision)}%`
     ];
 
     let additionalData: any = {};
@@ -86,8 +87,8 @@ export function usePercentErrorCalculation(
       const accuracy = 100 - percentError;
 
       steps.push(
-        `相对误差 = ${relativeError.toFixed(precision + 2)}`,
-        `准确度 = ${accuracy.toFixed(precision)}%`
+        `相对误差 = ${formatForCalculationSteps(relativeError, userMode, precision + 2)}`,
+        `准确度 = ${formatForCalculationSteps(accuracy, userMode, precision)}%`
       );
 
       additionalData = {

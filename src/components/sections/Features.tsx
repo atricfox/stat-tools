@@ -1,7 +1,14 @@
+'use client'
+
 import React from 'react'
 import { Calculator, FileText, Link, Smartphone } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { useInView } from 'framer-motion'
+import { useRef } from 'react'
 
 const Features = () => {
+  const ref = useRef(null)
+  const isInView = useInView(ref, { once: true, margin: "-100px" })
   const features = [
     {
       icon: Calculator,
@@ -41,43 +48,147 @@ const Features = () => {
     }
   ]
 
-  return (
-    <section className="py-16 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Features You&apos;ll Love</h2>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Comprehensive statistical tools with user-friendly features
-          </p>
-        </div>
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        delayChildren: 0.2,
+        staggerChildren: 0.1
+      }
+    }
+  }
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+  const cardVariants = {
+    hidden: { y: 50, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.6,
+        ease: "easeOut"
+      }
+    }
+  }
+
+  const titleVariants = {
+    hidden: { y: 30, opacity: 0 },
+    visible: {
+      y: 0,
+      opacity: 1,
+      transition: {
+        duration: 0.8,
+        ease: "easeOut"
+      }
+    }
+  }
+
+  return (
+    <section className="py-16 bg-gray-50" ref={ref}>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <motion.div 
+          className="text-center mb-12"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
+          <motion.h2 
+            className="text-3xl font-bold text-gray-900 mb-4"
+            variants={titleVariants}
+          >
+            Features You&apos;ll Love
+          </motion.h2>
+          <motion.p 
+            className="text-lg text-gray-600 max-w-2xl mx-auto"
+            variants={titleVariants}
+          >
+            Comprehensive statistical tools with user-friendly features
+          </motion.p>
+        </motion.div>
+
+        <motion.div 
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          variants={containerVariants}
+        >
           {features.map((feature, index) => {
             const IconComponent = feature.icon
             return (
-              <div key={index} className="bg-white rounded-lg p-6 shadow-sm border border-gray-200">
+              <motion.div 
+                key={index} 
+                className="bg-white rounded-lg p-6 shadow-sm border border-gray-200 group cursor-pointer"
+                variants={cardVariants}
+                whileHover={{ 
+                  y: -8, 
+                  boxShadow: "0 20px 40px rgba(0,0,0,0.1)",
+                  transition: { duration: 0.3 }
+                }}
+                whileTap={{ scale: 0.98 }}
+              >
                 <div className="flex items-start">
-                  <div className="flex-shrink-0">
-                    <IconComponent className="h-6 w-6 text-blue-500" />
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                  <motion.div 
+                    className="flex-shrink-0"
+                    whileHover={{ rotate: 5, scale: 1.1 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <motion.div
+                      className="p-2 bg-blue-50 rounded-lg group-hover:bg-blue-100 transition-colors duration-300"
+                      whileHover={{ scale: 1.1 }}
+                    >
+                      <IconComponent className="h-6 w-6 text-blue-500 group-hover:text-blue-600 transition-colors duration-300" />
+                    </motion.div>
+                  </motion.div>
+                  <div className="ml-4">
+                    <motion.h3 
+                      className="text-lg font-semibold text-gray-900 mb-1 group-hover:text-blue-600 transition-colors duration-300"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.2 + index * 0.1 }}
+                    >
                       {feature.title}
-                    </h3>
-                    <p className="text-gray-600 text-sm mb-2">{feature.subtitle}</p>
+                    </motion.h3>
+                    <motion.p 
+                      className="text-gray-600 text-sm mb-2"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      transition={{ delay: 0.3 + index * 0.1 }}
+                    >
+                      {feature.subtitle}
+                    </motion.p>
                     {feature.items.length > 0 && (
-                      <ul className="text-sm text-gray-500 space-y-1">
+                      <motion.ul 
+                        className="text-sm text-gray-500 space-y-1"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4 + index * 0.1 }}
+                      >
                         {feature.items.map((item, itemIndex) => (
-                          <li key={itemIndex}>├ {item}</li>
+                          <motion.li 
+                            key={itemIndex}
+                            initial={{ x: -10, opacity: 0 }}
+                            animate={{ x: 0, opacity: 1 }}
+                            transition={{ delay: 0.5 + index * 0.1 + itemIndex * 0.1 }}
+                            className="flex items-center"
+                          >
+                            <motion.span
+                              className="mr-2 text-blue-400"
+                              animate={{ rotate: [0, 5, 0] }}
+                              transition={{ duration: 2, repeat: Infinity, delay: itemIndex * 0.5 }}
+                            >
+                              ├
+                            </motion.span>
+                            {item}
+                          </motion.li>
                         ))}
-                      </ul>
+                      </motion.ul>
                     )}
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )
           })}
-        </div>
+        </motion.div>
       </div>
     </section>
   )

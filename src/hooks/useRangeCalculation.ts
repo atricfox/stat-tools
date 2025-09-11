@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { UserMode } from '@/components/calculator/UserModeSelector';
+import { formatForCalculationSteps } from '@/lib/formatters/numberFormatter';
 
 export interface RangeResult {
   range: number;
@@ -162,9 +163,9 @@ export function useRangeCalculation(
         : userMode === 'teacher'
           ? `Found ${validNumbers.length} valid student grades`
           : `Found ${validNumbers.length} valid numbers: ${validNumbers.join(', ')}`,
-      `Minimum value: ${minimum.toFixed(precision)}`,
-      `Maximum value: ${maximum.toFixed(precision)}`,
-      `Range = Maximum - Minimum = ${maximum.toFixed(precision)} - ${minimum.toFixed(precision)} = ${range.toFixed(precision)}`
+      `Minimum value: ${formatForCalculationSteps(minimum, userMode, precision)}`,
+      `Maximum value: ${formatForCalculationSteps(maximum, userMode, precision)}`,
+      `Range = Maximum - Minimum = ${formatForCalculationSteps(maximum, userMode, precision)} - ${formatForCalculationSteps(minimum, userMode, precision)} = ${formatForCalculationSteps(range, userMode, precision)}`
     ];
 
     let additionalData: any = {};
@@ -176,14 +177,14 @@ export function useRangeCalculation(
       const outliers = detectOutliers(validNumbers);
 
       steps.push(
-        `First Quartile (Q1): ${quartiles.q1.toFixed(precision)}`,
-        `Second Quartile (Q2/Median): ${quartiles.q2.toFixed(precision)}`,
-        `Third Quartile (Q3): ${quartiles.q3.toFixed(precision)}`,
-        `Interquartile Range (IQR) = Q3 - Q1 = ${interquartileRange.toFixed(precision)}`
+        `First Quartile (Q1): ${formatForCalculationSteps(quartiles.q1, userMode, precision)}`,
+        `Second Quartile (Q2/Median): ${formatForCalculationSteps(quartiles.q2, userMode, precision)}`,
+        `Third Quartile (Q3): ${formatForCalculationSteps(quartiles.q3, userMode, precision)}`,
+        `Interquartile Range (IQR) = Q3 - Q1 = ${formatForCalculationSteps(interquartileRange, userMode, precision)}`
       );
 
       if (outliers.length > 0) {
-        steps.push(`Detected ${outliers.length} potential outliers: ${outliers.map(o => o.toFixed(precision)).join(', ')}`);
+        steps.push(`Detected ${outliers.length} potential outliers: ${outliers.map(o => formatForCalculationSteps(o, userMode, precision)).join(', ')}`);
       }
 
       additionalData = {

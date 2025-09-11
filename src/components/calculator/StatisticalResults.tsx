@@ -1,5 +1,5 @@
 import React from 'react';
-import { BarChart3, Target, TrendingUp, AlertTriangle, CheckCircle, Info, Download } from 'lucide-react';
+import { BarChart3, Target, TrendingUp, AlertTriangle, CheckCircle, Info, Download, ArrowUp, ArrowDown, Hash } from 'lucide-react';
 import { MeanResult } from '@/hooks/useMeanCalculation';
 import { MedianResult } from '@/hooks/useMedianCalculation';
 import { WeightedMeanResult } from '@/types/weightedMean';
@@ -7,6 +7,7 @@ import { StandardDeviationResult } from '@/types/standardDeviation';
 import { PercentErrorResult } from '@/hooks/usePercentErrorCalculation';
 import { RangeResult } from '@/hooks/useRangeCalculation';
 import { UserMode } from './UserModeSelector';
+import { formatForCalculationSteps } from '@/lib/formatters/numberFormatter';
 
 interface StatisticalResultsProps {
   result: MeanResult | MedianResult | WeightedMeanResult | StandardDeviationResult | PercentErrorResult | RangeResult | null;
@@ -48,7 +49,8 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
   
   if (!result) return null;
 
-  const formatNumber = (num: number | undefined) => num ? num.toFixed(precision) : '0';
+  const formatNumber = (num: number | undefined) => 
+    num !== undefined && num !== null ? formatForCalculationSteps(num, userMode, precision) : '0';
   
   // Type guards to determine result type
   const isMeanResult = (result: any): result is MeanResult => 
@@ -194,12 +196,12 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
 
           <div className="bg-green-50 border border-green-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <CheckCircle className="h-5 w-5 text-green-600" />
+              {isRangeResult(result) ? <ArrowUp className="h-5 w-5 text-green-600" /> : <CheckCircle className="h-5 w-5 text-green-600" />}
               <span className="text-sm font-medium text-green-800">
                 {isStandardDeviationResult(result) ? 'Mean' :
                  isWeightedResult(result) ? 'Valid Pairs' :
                  isPercentErrorResult(result) ? 'Absolute Error' :
-                 isRangeResult(result) ? 'Sample Size' : 'Sample Size'}
+                 isRangeResult(result) ? 'Maximum Value' : 'Sample Size'}
               </span>
             </div>
             <div className="text-2xl font-bold text-green-900">
@@ -208,13 +210,13 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                isWeightedResult(result) ? result.validPairs : 
                isStandardDeviationResult(result) ? formatNumber(result.mean) :
                isPercentErrorResult(result) ? formatNumber(result.absoluteError) :
-               isRangeResult(result) ? result.count : 0}
+               isRangeResult(result) ? formatNumber(result.maximum) : 0}
             </div>
             <div className="text-sm text-green-700 mt-1">
               {isStandardDeviationResult(result) ? 'Average Value' :
                isMedianResult(result) ? (userMode === 'teacher' ? 'Students' : 'Data Points') :
                isPercentErrorResult(result) ? 'Error Magnitude' :
-               isRangeResult(result) ? (userMode === 'teacher' ? 'Students' : 'Data Points') :
+               isRangeResult(result) ? 'Highest Value' :
                userMode === 'teacher' ? 'Students' : 
                isWeightedResult(result) ? 'Value-Weight Pairs' : 'Data Points'}
             </div>
@@ -222,12 +224,12 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
 
           <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
             <div className="flex items-center justify-between mb-2">
-              <TrendingUp className="h-5 w-5 text-gray-600" />
+              {isRangeResult(result) ? <Hash className="h-5 w-5 text-gray-600" /> : <TrendingUp className="h-5 w-5 text-gray-600" />}
               <span className="text-sm font-medium text-gray-800">
                 {isStandardDeviationResult(result) ? 'Sample Size' :
                  isWeightedResult(result) ? 'Total Weight' :
                  isPercentErrorResult(result) ? (result.accuracy !== undefined ? 'Accuracy' : 'Theoretical Value') :
-                 isRangeResult(result) ? 'Minimum Value' : 'Sum Total'}
+                 isRangeResult(result) ? 'Sample Size' : 'Sum Total'}
               </span>
             </div>
             <div className="text-2xl font-bold text-gray-900">
@@ -235,13 +237,13 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                isWeightedResult(result) ? formatNumber(result.totalWeights) : 
                isStandardDeviationResult(result) ? result.count :
                isPercentErrorResult(result) ? (result.accuracy !== undefined ? `${formatNumber(result.accuracy)}%` : formatNumber(result.theoreticalValue)) :
-               isRangeResult(result) ? formatNumber(result.minimum) : '0'}
+               isRangeResult(result) ? result.count : '0'}
             </div>
             <div className="text-sm text-gray-700 mt-1">
               {isStandardDeviationResult(result) ? 'Data Points' :
                isWeightedResult(result) ? 'Sum of all weights' :
                isPercentErrorResult(result) ? (result.accuracy !== undefined ? 'Measurement Accuracy' : 'Expected Value') :
-               isRangeResult(result) ? 'Lowest Value' : 'Sum of all values'}
+               isRangeResult(result) ? (userMode === 'teacher' ? 'Students' : 'Data Points') : 'Sum of all values'}
             </div>
           </div>
         </div>
@@ -322,12 +324,18 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="text-sm font-medium text-blue-800 mb-1">Maximum Value</div>
+                <div className="flex items-center justify-between mb-2">
+                  <ArrowUp className="h-5 w-5 text-blue-600" />
+                  <div className="text-sm font-medium text-blue-800">Maximum Value</div>
+                </div>
                 <div className="text-lg font-bold text-blue-900">{formatNumber(result.maximum)}</div>
                 <div className="text-xs text-blue-700 mt-1">Highest value in dataset</div>
               </div>
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="text-sm font-medium text-blue-800 mb-1">Minimum Value</div>
+                <div className="flex items-center justify-between mb-2">
+                  <ArrowDown className="h-5 w-5 text-blue-600" />
+                  <div className="text-sm font-medium text-blue-800">Minimum Value</div>
+                </div>
                 <div className="text-lg font-bold text-blue-900">{formatNumber(result.minimum)}</div>
                 <div className="text-xs text-blue-700 mt-1">Lowest value in dataset</div>
               </div>

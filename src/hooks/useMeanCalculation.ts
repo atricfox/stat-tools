@@ -1,5 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
 import { UserMode } from '@/components/calculator/UserModeSelector';
+import { formatForCalculationSteps } from '@/lib/formatters/numberFormatter';
 
 export interface MeanResult {
   mean: number;
@@ -166,8 +167,8 @@ export function useMeanCalculation(
         : userMode === 'teacher'
           ? `Found ${dataToUse.length} valid student grades`
           : `Found ${dataToUse.length} valid numbers: ${dataToUse.join(', ')}`,
-      `Sum = ${sum.toFixed(precision)}`,
-      `Mean = ${sum.toFixed(precision)} ÷ ${dataToUse.length} = ${mean.toFixed(precision)}`
+      `Sum = ${formatForCalculationSteps(sum, userMode, precision)}`,
+      `Mean = ${formatForCalculationSteps(sum, userMode, precision)} ÷ ${dataToUse.length} = ${formatForCalculationSteps(mean, userMode, precision)}`
     ];
 
     let additionalData: any = {};
@@ -181,12 +182,12 @@ export function useMeanCalculation(
       const confidenceInterval: [number, number] = [mean - marginOfError, mean + marginOfError];
 
       steps.push(
-        `Standard Error = ${stdError.toFixed(precision)}`,
-        `${confidenceLevel}% Confidence Interval: [${confidenceInterval[0].toFixed(precision)}, ${confidenceInterval[1].toFixed(precision)}]`
+        `Standard Error = ${formatForCalculationSteps(stdError, userMode, precision)}`,
+        `${confidenceLevel}% Confidence Interval: [${formatForCalculationSteps(confidenceInterval[0], userMode, precision)}, ${formatForCalculationSteps(confidenceInterval[1], userMode, precision)}]`
       );
 
       if (outliers.length > 0) {
-        steps.unshift(`Detected ${outliers.length} potential outliers: ${outliers.map(o => o.toFixed(2)).join(', ')}`);
+        steps.unshift(`Detected ${outliers.length} potential outliers: ${outliers.map(o => formatForCalculationSteps(o, userMode, Math.max(precision, 2))).join(', ')}`);
         if (ignoreOutliers) {
           steps.push('Outliers excluded from calculation');
         }
@@ -211,9 +212,9 @@ export function useMeanCalculation(
       const gradeDistribution = calculateGradeDistribution(dataToUse);
 
       steps[0] = `Found ${dataToUse.length} valid student grades`;
-      steps.splice(1, 0, `Grade range: ${scoreRange.min} - ${scoreRange.max}`);
-      steps[2] = `Sum of all grades: ${sum.toFixed(1)}`;
-      steps[3] = `Class average: ${sum.toFixed(1)} ÷ ${dataToUse.length} = ${mean.toFixed(precision)}`;
+      steps.splice(1, 0, `Grade range: ${formatForCalculationSteps(scoreRange.min, userMode, 1)} - ${formatForCalculationSteps(scoreRange.max, userMode, 1)}`);
+      steps[2] = `Sum of all grades: ${formatForCalculationSteps(sum, userMode, 1)}`;
+      steps[3] = `Class average: ${formatForCalculationSteps(sum, userMode, 1)} ÷ ${dataToUse.length} = ${formatForCalculationSteps(mean, userMode, precision)}`;
 
       additionalData = {
         scoreRange,

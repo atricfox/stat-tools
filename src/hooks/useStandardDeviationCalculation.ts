@@ -13,6 +13,7 @@ import {
   ConfidenceIntervalResult,
   StandardDeviationError
 } from '@/types/standardDeviation';
+import { formatForCalculationSteps } from '@/lib/formatters/numberFormatter';
 
 export const useStandardDeviationCalculation = (): UseStandardDeviationCalculation => {
   const [result, setResult] = useState<StandardDeviationResult | null>(null);
