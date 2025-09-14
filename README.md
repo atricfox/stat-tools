@@ -90,6 +90,15 @@ npm install -g @cloudflare/wrangler
 npx wrangler dev src/workers/signed-url/index.mjs --env dev
 ```
 
+## 文档与 Sprint 索引
+
+- 需求与架构位于 `docs/` 目录。
+- Sprint 计划：
+  - Sprint 11 — Total Hub（Aggregated Navigation）：`docs/05-development/sprints/Sprint-11-Plan-Total-Hub-Aggregated-Navigation.md`
+  - Sprint 12 — Glossary：`docs/05-development/sprints/Sprint-12-Plan-Glossary.md`（Issues: CSV/MD 同目录）
+  - Sprint 13 — Internal Linking（HowTo + FAQ + Cases）：`docs/05-development/sprints/Sprint-13-Plan-Internal-Linking.md`（Issues: CSV/MD 同目录）
+  - Sprint 14 — Legal Pages（About / Privacy / Terms）：`docs/05-development/sprints/Sprint-14-Plan-Legal-Pages.md`（Issues: CSV/MD 同目录）
+
 ## Cloudflare 部署（概要）
 
 步骤概览：

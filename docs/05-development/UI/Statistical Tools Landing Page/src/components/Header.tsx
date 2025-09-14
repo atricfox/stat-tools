@@ -22,7 +22,7 @@ const Header = () => {
             <a href="#guides" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
               Guides
             </a>
-            <a href="#about" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
+            <a href="/about" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
               About
             </a>
           </nav>
@@ -59,8 +59,8 @@ const Header = () => {
               >
                 Guides
               </a>
-              <a 
-                href="#about" 
+              <a
+                href="/about"
                 className="text-gray-600 hover:text-blue-500 py-2 transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >

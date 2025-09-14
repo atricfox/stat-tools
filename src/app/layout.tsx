@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import Script from 'next/script'
+import AttributionTracker from '@/components/analytics/AttributionTracker'
 import { headers } from 'next/headers'
 // Sentry 相关组件已移除
 
@@ -41,9 +42,36 @@ export default async function RootLayout({
 }) {
   const hdrs = await headers()
   const nonce = hdrs.get('x-csp-nonce') || undefined
+  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
   return (
     <html lang="en" className={inter.className}>
       <head>
+        {/* Google Analytics (GA4) - loaded only if configured */}
+        {gaId ? (
+          <>
+            <Script
+              id="ga4-lib"
+              src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="ga4-init" strategy="afterInteractive">
+              {`
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              window.gtag = gtag;
+              // Consent Mode v2 defaults (deny until user consent provided)
+              gtag('consent', 'default', {
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied',
+                'ad_storage': 'denied',
+                'analytics_storage': 'denied'
+              });
+              gtag('js', new Date());
+              gtag('config', '${gaId}', { anonymize_ip: true });
+            `}
+            </Script>
+          </>
+        ) : null}
         <Script
           id="ld-json-home"
           type="application/ld+json"
@@ -65,6 +93,8 @@ export default async function RootLayout({
         />
       </head>
       <body className="antialiased">
+        {/* Client-side attribution tracking (UTM/gclid) */}
+        <AttributionTracker />
         {children}
       </body>
     </html>

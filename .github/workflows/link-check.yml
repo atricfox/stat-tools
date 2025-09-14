@@ -1,0 +1,123 @@
+name: Link Check
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-links:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Build project
+      run: npm run build
+      env:
+        CI: true
+        
+    - name: Start server
+      run: |
+        npm run start &
+        sleep 10  # Wait for server to start
+      env:
+        PORT: 3000
+        
+    - name: Check links
+      run: npm run check-links -- --fail-on-broken --report=link-report.md
+      continue-on-error: true
+      id: link-check
+      
+    - name: Upload link report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: link-report
+        path: link-report.md
+        
+    - name: Comment PR with results
+      if: github.event_name == 'pull_request' && always()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('link-report.md', 'utf8');
+          
+          // Truncate if too long for GitHub comment
+          const maxLength = 65000;
+          const truncatedReport = report.length > maxLength 
+            ? report.substring(0, maxLength) + '\n\n... (truncated)'
+            : report;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: `## 🔍 Link Check Report\n\n${truncatedReport}`
+          });
+          
+    - name: Fail if broken links found
+      if: steps.link-check.outcome == 'failure'
+      run: |
+        echo "❌ Broken links were found. Check the link report for details."
+        exit 1
+
+  check-external-links:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+        
+    - name: Install dependencies
+      run: npm ci
+      
+    - name: Check external links
+      run: npm run check-links:external -- --report=external-links.md
+      continue-on-error: true
+      
+    - name: Upload external links report
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: external-links-report
+        path: external-links.md
+        
+    - name: Create issue if broken external links found
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const fs = require('fs');
+          const report = fs.readFileSync('external-links.md', 'utf8');
+          
+          await github.rest.issues.create({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            title: '🔗 Broken External Links Detected',
+            body: `The scheduled link check found broken external links:\n\n${report}`,
+            labels: ['bug', 'documentation']
+          });

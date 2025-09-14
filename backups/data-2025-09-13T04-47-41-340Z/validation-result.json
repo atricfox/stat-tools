@@ -1,0 +1,12 @@
+{
+  "isValid": true,
+  "errors": [],
+  "warnings": [],
+  "stats": {
+    "calculators": 12,
+    "groups": 4,
+    "glossaryTerms": 10,
+    "categories": {},
+    "topics": 2
+  }
+}

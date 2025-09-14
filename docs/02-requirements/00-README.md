@@ -2,6 +2,11 @@
 
 本目录包含所有功能需求规范书(FRS)和技术需求文档。
 
+## 🔎 索引与指引（权威）
+- 总 Hub（聚合导航页）：[04-aggregated-hub-sqlite.md](./04-aggregated-hub-sqlite.md)
+- Glossary（术语表）：[05-glossary-requirements.md](./05-glossary-requirements.md)
+- 内部超链接联动内容系统（HowTo/FAQ/案例）：[06-internal-linking-content-system.md](./06-internal-linking-content-system.md)
+
 ## 📚 主要文档
 
 ### [01-mvp-goals.md](./01-mvp-goals.md) 🎯

@@ -1,0 +1,92 @@
+{
+  "frontmatter": {
+    "type": "howto",
+    "slug": "calculate-gpa",
+    "title": "How to Calculate GPA (Grade Point Average)",
+    "summary": "Master GPA calculation with this comprehensive guide covering weighted and unweighted GPA, different grading scales, and tips for GPA improvement.",
+    "tags": ["gpa", "education", "grades", "academic", "calculation"],
+    "related": {
+      "tools": ["/calculator/gpa", "/calculator/unweighted-gpa"],
+      "glossary": ["gpa", "weighted-gpa", "unweighted-gpa"],
+      "faq": ["weighted-vs-unweighted-gpa", "gpa-calculation"],
+      "cases": ["improving-gpa-strategy"]
+    },
+    "mentions": {
+      "tools": ["gpa", "unweighted-gpa"],
+      "concepts": ["grade-points", "credit-hours", "cumulative-gpa"]
+    },
+    "seo": {
+      "metaDescription": "Complete guide to calculating GPA including weighted and unweighted methods, different scales, and strategies for improvement.",
+      "keywords": ["GPA calculation", "grade point average", "weighted GPA", "how to calculate GPA"]
+    },
+    "created": "2024-01-16T00:00:00Z",
+    "updated": "2024-01-16T00:00:00Z",
+    "status": "published",
+    "targetTool": "/calculator/gpa",
+    "prefillParams": {
+      "courses": "[{\"name\":\"Math\",\"grade\":\"A\",\"credits\":3},{\"name\":\"English\",\"grade\":\"B+\",\"credits\":3}]",
+      "scale": "4.0"
+    },
+    "difficulty": "beginner",
+    "prerequisites": ["Basic arithmetic", "Understanding of letter grades"],
+    "outcomes": [
+      "Calculate unweighted GPA",
+      "Calculate weighted GPA",
+      "Convert between GPA scales",
+      "Calculate cumulative GPA",
+      "Understand GPA impact on academics"
+    ],
+    "readingTime": 10
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "List Your Courses",
+      "description": "Write down all your courses with their letter grades and credit hours. Example: Math (A, 3 credits), English (B+, 3 credits), Science (A-, 4 credits)",
+      "tip": "Include all courses that count toward your GPA, but exclude pass/fail courses unless they affect GPA"
+    },
+    {
+      "id": "step-2",
+      "name": "Convert Letter Grades to Points",
+      "description": "Use the grading scale (usually 4.0): A=4.0, A-=3.7, B+=3.3, B=3.0, B-=2.7, C+=2.3, C=2.0, C-=1.7, D+=1.3, D=1.0, F=0.0",
+      "warning": "Different schools may use different scales - check your institution's grading policy"
+    },
+    {
+      "id": "step-3",
+      "name": "Calculate Grade Points",
+      "description": "Multiply each grade value by its credit hours. Math: 4.0 × 3 = 12.0, English: 3.3 × 3 = 9.9, Science: 3.7 × 4 = 14.8",
+      "tip": "Grade points represent the weighted value of each course based on credits"
+    },
+    {
+      "id": "step-4",
+      "name": "Sum Total Grade Points",
+      "description": "Add all grade points together: 12.0 + 9.9 + 14.8 = 36.7 total grade points",
+      "tip": "Double-check your addition to avoid calculation errors"
+    },
+    {
+      "id": "step-5",
+      "name": "Sum Total Credit Hours",
+      "description": "Add all credit hours: 3 + 3 + 4 = 10 total credit hours",
+      "warning": "Only include credit hours for courses that affect GPA"
+    },
+    {
+      "id": "step-6",
+      "name": "Divide to Get GPA",
+      "description": "GPA = Total Grade Points ÷ Total Credit Hours = 36.7 ÷ 10 = 3.67",
+      "tip": "Round to 2 decimal places for most purposes"
+    },
+    {
+      "id": "step-7",
+      "name": "For Weighted GPA (Optional)",
+      "description": "Add bonus points for advanced courses: AP/IB courses often add 1.0, Honors add 0.5. Recalculate with these bonuses",
+      "warning": "Weighted GPA scales vary significantly between schools - some use 5.0, others 6.0 scales"
+    },
+    {
+      "id": "step-8",
+      "name": "Calculate Cumulative GPA",
+      "description": "To include previous semesters: Add all grade points from all semesters, divide by total credit hours from all semesters",
+      "tip": "Keep a running record of your grade points and credit hours each semester"
+    }
+  ],
+  "content": "GPA (Grade Point Average) is a standardized way to measure academic achievement. This guide covers everything from basic GPA calculation to understanding weighted GPAs and improving your academic standing. Whether you're a high school student preparing for college or a university student tracking your progress, mastering GPA calculation is essential."
+}

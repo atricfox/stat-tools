@@ -148,7 +148,7 @@ export default function RangeCalculatorClient() {
         title="Range Calculator"
         description="Calculate data range, minimum, maximum, and distribution analysis with specialized tools for different use cases."
         breadcrumbs={[
-          { label: 'Calculators', href: '/calculator' },
+          { label: 'Calculators', href: '/statistics-calculators' },
           { label: 'Range Calculator' }
         ]}
         currentTool="range"

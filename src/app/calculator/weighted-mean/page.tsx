@@ -139,7 +139,7 @@ export default function WeightedMeanCalculator() {
       title="Weighted Mean Calculator"
       description="Calculate weighted averages with multiple input methods. Perfect for GPA calculations, research data analysis, and weighted scoring systems."
       breadcrumbs={[
-        { label: 'Calculators', href: '/calculator' },
+        { label: 'Calculators', href: '/statistics-calculators' },
         { label: 'Weighted Mean Calculator' }
       ]}
       currentTool="Weighted Mean Calculator"

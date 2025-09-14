@@ -1,0 +1,96 @@
+{
+  "frontmatter": {
+    "type": "case",
+    "slug": "improving-gpa-strategy",
+    "title": "Strategic GPA Improvement: From 2.8 to 3.5 in Two Semesters",
+    "summary": "Case study of a college student who strategically improved their GPA from 2.8 to 3.5 using data-driven course selection and grade targeting.",
+    "tags": ["gpa", "academic-planning", "case-study", "success-story"],
+    "related": {
+      "tools": ["/calculator/gpa", "/calculator/cumulative-gpa", "/calculator/final-grade"],
+      "faq": ["weighted-vs-unweighted-gpa", "calculate-cumulative-gpa"],
+      "glossary": ["gpa"]
+    },
+    "mentions": {
+      "tools": ["gpa", "cumulative-gpa", "final-grade"],
+      "concepts": ["grade-point-average", "academic-planning", "course-selection"]
+    },
+    "created": "2024-01-15T00:00:00Z",
+    "updated": "2024-01-15T00:00:00Z",
+    "status": "published",
+    "industry": "Education",
+    "problem": "Sarah, a sophomore engineering student, had a 2.8 GPA after three semesters and needed a 3.5 GPA to qualify for her dream internship program by the end of her junior year.",
+    "solution": "Using GPA calculators and strategic course planning, Sarah identified high-credit courses where she could excel, calculated exact grade targets for each course, and monitored progress throughout the semester.",
+    "results": [
+      "Raised GPA from 2.8 to 3.52 in two semesters",
+      "Secured the internship with a Fortune 500 company",
+      "Developed a systematic approach to academic planning",
+      "Helped 5 other students implement similar strategies"
+    ],
+    "lessons": [
+      "Data-driven planning is more effective than hoping for the best",
+      "Understanding GPA calculation mechanics enables strategic decisions",
+      "Regular progress monitoring allows for mid-course corrections",
+      "Balancing course difficulty with credit hours optimizes GPA impact"
+    ],
+    "toolsUsed": ["/calculator/gpa", "/calculator/cumulative-gpa", "/calculator/final-grade"],
+    "readingTime": 8
+  },
+  "content": {
+    "background": "Sarah was a talented engineering student who struggled in her first three semesters due to poor study habits and lack of strategic planning. With a 2.8 GPA and 45 completed credits, she needed to dramatically improve her performance to qualify for competitive internships.",
+    "challenge": "The internship program required a minimum 3.5 GPA. With only two semesters (30 credits) remaining before applications, Sarah needed to earn nearly straight A's. The challenge was complicated by required difficult engineering courses.",
+    "approach": {
+      "step1": {
+        "title": "Current State Analysis",
+        "description": "Using the cumulative GPA calculator, Sarah determined she needed a 4.0 GPA for 30 credits to reach 3.5 overall. This seemed impossible with difficult required courses."
+      },
+      "step2": {
+        "title": "Strategic Course Selection",
+        "description": "Sarah identified that she could take 18 credits per semester (36 total) instead of 15. She mixed challenging required courses (3 credits each) with higher-credit electives where she could excel (4-5 credits each)."
+      },
+      "step3": {
+        "title": "Grade Targeting",
+        "description": "For each course, Sarah used the final grade calculator to determine exactly what scores she needed on each assignment and exam. She allocated study time proportionally to credit hours and grade impact."
+      },
+      "step4": {
+        "title": "Progress Monitoring",
+        "description": "Every two weeks, Sarah recalculated her projected GPA based on actual grades received. This allowed her to adjust effort and seek help in courses where she was falling behind."
+      }
+    },
+    "results_detail": {
+      "semester4": {
+        "courses": [
+          "Thermodynamics (3 cr): B+",
+          "Technical Writing (4 cr): A",
+          "Statistics (5 cr): A",
+          "Engineering Ethics (3 cr): A",
+          "CAD Design (3 cr): A-"
+        ],
+        "semester_gpa": 3.78,
+        "cumulative_gpa": 3.15
+      },
+      "semester5": {
+        "courses": [
+          "Fluid Mechanics (3 cr): B+",
+          "Project Management (4 cr): A",
+          "Data Analysis (5 cr): A",
+          "Materials Science (3 cr): B+",
+          "Engineering Economics (3 cr): A"
+        ],
+        "semester_gpa": 3.72,
+        "cumulative_gpa": 3.52
+      }
+    },
+    "key_insights": [
+      "Taking more credits in courses where you can excel amplifies GPA impact",
+      "4-5 credit courses have disproportionate influence on GPA",
+      "Understanding grade calculations reduces anxiety and improves focus",
+      "Small improvements in multiple courses beat perfection in one course"
+    ],
+    "recommendations": [
+      "Start GPA improvement planning early in your academic career",
+      "Use calculators to model different scenarios before committing",
+      "Don't just aim for 'good grades' - have specific targets",
+      "Balance course load strategically, not just by difficulty"
+    ]
+  }
+}

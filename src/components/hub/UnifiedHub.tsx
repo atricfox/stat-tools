@@ -50,6 +50,8 @@ interface UnifiedHubProps {
   config?: Partial<HubConfig>;
   className?: string;
   onToolClick?: (tool: StatisticalTool) => void;
+  allowedToolUrls?: string[]; // 主题 Hub 可限制展示的工具 URL
+  filterPredicate?: (tool: StatisticalTool) => boolean; // 自定义过滤
 }
 
 // 默认配置
@@ -398,7 +400,9 @@ const SearchFilters: React.FC<SearchFiltersProps> = ({ filters, onFiltersChange,
 export const UnifiedHub: React.FC<UnifiedHubProps> = ({
   config: userConfig = {},
   className = '',
-  onToolClick
+  onToolClick,
+  allowedToolUrls,
+  filterPredicate,
 }) => {
   const config = { ...DEFAULT_CONFIG, ...userConfig };
   
@@ -416,27 +420,46 @@ export const UnifiedHub: React.FC<UnifiedHubProps> = ({
 
   // 过滤工具
   const filteredTools = useMemo(() => {
-    return toolsDataManager.filterTools(filters);
-  }, [filters]);
+    let base = toolsDataManager.filterTools(filters);
+    if (filterPredicate) {
+      base = base.filter(filterPredicate);
+    } else if (allowedToolUrls && allowedToolUrls.length > 0) {
+      const set = new Set(allowedToolUrls);
+      base = base.filter(t => set.has(t.url));
+    }
+    return base;
+  }, [filters, filterPredicate, allowedToolUrls]);
 
   // 特色工具
   const featuredTools = useMemo(() => {
-    return toolsDataManager.getFeaturedTools();
-  }, []);
+    const list = toolsDataManager.getFeaturedTools();
+    if (filterPredicate || (allowedToolUrls && allowedToolUrls.length > 0)) {
+      const set = new Set(allowedToolUrls);
+      return list.filter(t => (filterPredicate ? filterPredicate(t) : set.has(t.url)));
+    }
+    return list;
+  }, [filterPredicate, allowedToolUrls]);
 
   // 按分类分组工具
   const toolsByCategory = useMemo(() => {
     const grouped: Record<ToolCategory, StatisticalTool[]> = {} as Record<ToolCategory, StatisticalTool[]>;
-    
-    toolsDataManager.getAllCategories().forEach(category => {
+    const categories = toolsDataManager.getAllCategories();
+    categories.forEach(category => {
       grouped[category.id] = filteredTools.filter(tool => tool.category === category.id);
     });
-    
     return grouped;
   }, [filteredTools]);
 
   // 统计信息
-  const stats = useMemo(() => toolsDataManager.getToolStats(), []);
+  const stats = useMemo(() => {
+    if (filterPredicate || (allowedToolUrls && allowedToolUrls.length > 0)) {
+      const total = filteredTools.length;
+      const featured = filteredTools.filter(t => t.featured).length;
+      const beta = filteredTools.filter(t => t.beta).length;
+      return { totalTools: total, featuredTools: featured, betaTools: beta } as any;
+    }
+    return toolsDataManager.getToolStats();
+  }, [filteredTools, filterPredicate, allowedToolUrls]);
 
   return (
     <div className={`unified-hub ${className}`}>
@@ -534,7 +557,10 @@ export const UnifiedHub: React.FC<UnifiedHubProps> = ({
         {viewMode === 'categories' ? (
           // Category View
           <div>
-            {toolsDataManager.getAllCategories().map(category => (
+            {(filterPredicate || (allowedToolUrls && allowedToolUrls.length > 0)
+              ? toolsDataManager.getAllCategories().filter(category => toolsByCategory[category.id]?.length > 0)
+              : toolsDataManager.getAllCategories()
+            ).map(category => (
               <CategorySection
                 key={category.id}
                 category={category.id}

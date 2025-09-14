@@ -6,6 +6,8 @@ if (typeof global !== 'undefined' && typeof global.self === 'undefined') {
   global.self = global;
 }
 
+const createMDXPlugin = require('@next/mdx');
+
 /** @type {import('next').NextConfig} */
 const securityHeaders = [
   { key: 'X-Content-Type-Options', value: 'nosniff' },
@@ -14,6 +16,14 @@ const securityHeaders = [
   { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
 ]
 
+const withMDX = createMDXPlugin({
+  options: {
+    remarkPlugins: [],
+    rehypePlugins: [],
+  },
+});
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   eslint: {
     // Temporarily ignore ESLint errors during build
@@ -110,4 +120,4 @@ const nextConfig = {
   },
 }
 
-module.exports = nextConfig
+module.exports = withMDX(nextConfig)

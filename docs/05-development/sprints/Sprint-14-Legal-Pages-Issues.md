@@ -1,0 +1,17 @@
+# Sprint 14 — Legal Pages Issues
+
+| ID   | Title                         | Description                                                                 | Acceptance Criteria                                   | Labels               | Est.(h) | Depends On |
+|------|-------------------------------|-----------------------------------------------------------------------------|-------------------------------------------------------|----------------------|---------|------------|
+| T001 | 路由与渲染（3页）              | 创建 /about /privacy-policy /terms-of-service 的页面并渲染MDX内容              | 三页可访问; H1/Title/Meta/Canonical 初始正确          | Legal;FE             | 6       |            |
+| T002 | MDX Frontmatter 与骨架（3个）  | 为三页创建MDX骨架与Frontmatter(title/description/slug/updated/version/toc)   | Frontmatter校验通过; 初始内容可渲染                   | Legal;Content        | 6       | T001       |
+| T003 | ToC 组件与锚点（隐私/条款）     | 实现目录组件(移动端折叠)与段落锚点                                              | 目录点击定位正确; 锚点工作; 事件记录                  | Legal;UI             | 6       | T001       |
+| T004 | Metadata 与 JSON‑LD 注入       | generateMetadata与WebPage+BreadcrumbList注入                                  | Rich Results无告警; Meta与Canonical正确              | Legal;SEO            | 4       | T001       |
+| T005 | sitemap 集成（lastmod）        | 从Frontmatter.updated写入lastmod(回退mtime)                                   | sitemap节点与lastmod正确                              | Legal;Sitemap        | 4       | T002       |
+| T006 | 事件埋点（toc/contact/version）| 上报legal_toc_click/legal_contact_click/legal_version_view                    | mock gtag载荷正确; DebugView可见                      | Legal;Analytics      | 4       | T003;T004  |
+| T007 | A11y/性能优化                  | 焦点环/对比度/懒加载/CLS≈0/移动适配                                           | axe通过; CLS≈0                                        | Legal;A11y;Perf      | 4       |            |
+| T008 | 单元/集成测试                  | 覆盖渲染/ToC/JSON‑LD/lastmod/事件与快照                                        | CI通过; 覆盖率符合基线                                 | Legal;Testing        | 6       | T001;T007  |
+| T009 | 文档与上线检查单               | 编写内容指引与上线Checklist                                                   | 文档可被团队独立跟随                                   | Legal;Docs           | 4       | T001;T008  |
+| T010 | 预演与回归（含 GSC 检查）      | 预览演示与GSC检查; 手动回归关键路径                                           | 预演通过; GSC无新告警                                  | Legal;Review         | 4       | ALL        |
+| T011 | LegalLayout 三栏/双栏/单列响应式实现 | ≥1280 三栏; ≥1024 双栏; <1024 单列; 栅格与容器优化                              | 宽屏三栏可用; 中屏双栏; 小屏单列; CLS≈0                | Legal;UI             | 6       | T001       |
+| T012 | RightRail 侧栏（Contact/Meta/QuickLinks) | 实现联系卡/版本栏/快速链接侧卡并接入事件                                      | 右栏组件渲染; 事件载荷正确                              | Legal;UI;Analytics    | 6       | T001       |
+| T013 | ToC 粘性/高亮与移动折叠增强      | Sticky/IntersectionObserver 高亮; 移动端折叠                                     | 目录粘性与高亮正确; 移动折叠可用; 事件记录              | Legal;UI             | 4       | T003       |

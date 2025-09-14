@@ -1,0 +1,129 @@
+{
+  "groups": [
+    {
+      "group_name": "means-weighted",
+      "display_name": "Mean & Weighted Average",
+      "sort_order": 1,
+      "items": [
+        {
+          "name": "Mean Calculator",
+          "url": "/calculator/mean",
+          "description": "Calculate arithmetic mean (average) of a dataset",
+          "is_hot": true,
+          "is_new": false,
+          "sort_order": 1
+        },
+        {
+          "name": "Weighted Mean Calculator",
+          "url": "/calculator/weighted-mean",
+          "description": "Calculate weighted average with custom weights",
+          "is_hot": false,
+          "is_new": false,
+          "sort_order": 2
+        },
+        {
+          "name": "Median Calculator",
+          "url": "/calculator/median",
+          "description": "Compute the median of a dataset",
+          "is_hot": false,
+          "is_new": false,
+          "sort_order": 3
+        }
+      ]
+    },
+    {
+      "group_name": "dispersion",
+      "display_name": "Variance & Standard Deviation",
+      "sort_order": 2,
+      "items": [
+        {
+          "name": "Standard Deviation Calculator",
+          "url": "/calculator/standard-deviation",
+          "description": "Calculate standard deviation (sample/population)",
+          "is_hot": true,
+          "is_new": false,
+          "sort_order": 1
+        },
+        {
+          "name": "Variance Calculator",
+          "url": "/calculator/variance",
+          "description": "Compute variance of a dataset",
+          "is_hot": false,
+          "is_new": false,
+          "sort_order": 2
+        },
+        {
+          "name": "Range Calculator",
+          "url": "/calculator/range",
+          "description": "Find the difference between max and min",
+          "is_hot": false,
+          "is_new": false,
+          "sort_order": 3
+        }
+      ]
+    },
+    {
+      "group_name": "gpa-grades",
+      "display_name": "GPA & Grade Tools",
+      "sort_order": 3,
+      "items": [
+        {
+          "name": "GPA Calculator",
+          "url": "/calculator/gpa",
+          "description": "Calculate weighted GPA with multiple grading systems",
+          "is_hot": true,
+          "is_new": false,
+          "sort_order": 1
+        },
+        {
+          "name": "Unweighted GPA Calculator",
+          "url": "/calculator/unweighted-gpa",
+          "description": "Calculate unweighted GPA on standard 4.0 scale",
+          "is_hot": false,
+          "is_new": true,
+          "sort_order": 2
+        },
+        {
+          "name": "Cumulative GPA Calculator",
+          "url": "/calculator/cumulative-gpa",
+          "description": "Calculate cumulative GPA for graduate school applications",
+          "is_hot": false,
+          "is_new": false,
+          "sort_order": 3
+        },
+        {
+          "name": "Final Grade Calculator",
+          "url": "/calculator/final-grade",
+          "description": "Calculate the score needed on your final exam",
+          "is_hot": true,
+          "is_new": false,
+          "sort_order": 4
+        },
+        {
+          "name": "Semester Grade Calculator",
+          "url": "/calculator/semester-grade",
+          "description": "Calculate weighted semester grade from multiple courses",
+          "is_hot": false,
+          "is_new": false,
+          "sort_order": 5
+        }
+      ]
+    },
+    {
+      "group_name": "descriptive-others",
+      "display_name": "Other Statistical Tools",
+      "sort_order": 4,
+      "items": [
+        {
+          "name": "Percent Error Calculator",
+          "url": "/calculator/percent-error",
+          "description": "Calculate percent error between true and measured values",
+          "is_hot": false,
+          "is_new": false,
+          "sort_order": 1
+        }
+      ]
+    }
+  ],
+  "lastmod": "2025-09-12 10:44:43"
+}

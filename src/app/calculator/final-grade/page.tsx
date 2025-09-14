@@ -45,7 +45,7 @@ const jsonLd = {
 
 export default function FinalGradeCalculatorPage() {
   const breadcrumbs = [
-    { label: 'Calculators', href: '/calculator' },
+    { label: 'Calculators', href: '/statistics-calculators' },
     { label: 'Final Grade Calculator' }
   ];
 

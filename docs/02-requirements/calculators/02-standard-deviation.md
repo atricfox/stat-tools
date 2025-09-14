@@ -221,4 +221,4 @@ SEO/URL：
 
 ---
 
-请 Review: Accept / Comment - <修改点> / Modify - <优先项>，我将继续产出 Hub 页面与 JSON-LD 模板（推荐下一步以保证 SEO）。
+请 Review: Accept / Comment - <修改点> / Modify - <优先项>，我将继续产出总 Hub（聚合导航页）页面与 JSON-LD 模板（推荐下一步以保证 SEO）。

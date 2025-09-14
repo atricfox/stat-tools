@@ -235,7 +235,7 @@ export default function GPACalculatorClient() {
         title="GPA Calculator"
         description="Calculate your Grade Point Average with support for multiple grading systems. Perfect for students, academic advisors, and international applicants."
         breadcrumbs={[
-          { label: 'Calculators', href: '/calculator' },
+          { label: 'Calculators', href: '/statistics-calculators' },
           { label: 'GPA Calculator' }
         ]}
         currentTool="gpa"

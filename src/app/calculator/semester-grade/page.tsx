@@ -45,7 +45,7 @@ const jsonLd = {
 
 export default function SemesterGradeCalculatorPage() {
   const breadcrumbs = [
-    { label: 'Calculators', href: '/calculator' },
+    { label: 'Calculators', href: '/statistics-calculators' },
     { label: 'Semester Grade Calculator' }
   ];
 

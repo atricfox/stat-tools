@@ -1,0 +1,121 @@
+/* Legal pages accessibility and performance optimizations */
+
+/* Heading anchor links */
+.heading-link {
+  @apply text-gray-400 hover:text-blue-600 transition-colors duration-200;
+  font-size: 0.8em;
+  text-decoration: none;
+}
+
+.prose h1:hover .heading-link,
+.prose h2:hover .heading-link,
+.prose h3:hover .heading-link,
+.prose h4:hover .heading-link,
+.prose h5:hover .heading-link,
+.prose h6:hover .heading-link {
+  @apply opacity-100;
+}
+
+/* Focus management improvements */
+.prose h1:focus,
+.prose h2:focus,
+.prose h3:focus,
+.prose h4:focus,
+.prose h5:focus,
+.prose h6:focus {
+  @apply outline-none ring-2 ring-blue-500 ring-offset-2 rounded;
+}
+
+/* Mobile menu animations */
+@media (max-width: 767px) {
+  .legal-menu-transition {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Skip to content link for screen readers */
+.skip-to-content {
+  @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-blue-600 text-white px-4 py-2 rounded z-50;
+}
+
+/* Print optimizations */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .legal-print-break {
+    page-break-inside: avoid;
+  }
+
+  .prose {
+    max-width: none !important;
+  }
+}
+
+/* Performance optimizations */
+.legal-content-container {
+  contain: layout style paint;
+}
+
+.legal-toc-container {
+  contain: layout style;
+  will-change: transform;
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .prose {
+    @apply text-gray-900;
+  }
+
+  .prose a {
+    @apply text-blue-800 underline;
+  }
+
+  .prose h1,
+  .prose h2,
+  .prose h3,
+  .prose h4,
+  .prose h5,
+  .prose h6 {
+    @apply text-gray-900;
+  }
+}
+
+/* Focus visible improvements */
+.focus-visible\:ring-2:focus-visible {
+  @apply ring-2 ring-blue-500 ring-offset-2;
+}
+
+/* Touch target optimization */
+@media (hover: none) {
+  .legal-touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Loading states */
+.legal-loading {
+  @apply animate-pulse;
+}
+
+/* Error states */
+.legal-error {
+  @apply border-red-300 bg-red-50 text-red-800;
+}
+
+/* Success states */
+.legal-success {
+  @apply border-green-300 bg-green-50 text-green-800;
+}

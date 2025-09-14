@@ -60,7 +60,15 @@ const FeaturedTools = () => {
       name: 'GPA Calculator',
       slug: 'gpa',
       href: '/calculator/gpa',
-      description: 'Calculate unweighted Grade Point Average with multiple grading systems (4.0/4.3/4.5)',
+      description: 'Calculate weighted Grade Point Average with multiple grading systems (4.0/4.3/4.5)',
+      icon: GraduationCap,
+      popular: true
+    },
+    {
+      name: 'Unweighted GPA Calculator',
+      slug: 'unweighted-gpa',
+      href: '/calculator/unweighted-gpa',
+      description: 'Calculate unweighted Grade Point Average with standard 4.0 and plus/minus grading systems',
       icon: GraduationCap,
       popular: true
     },
@@ -180,7 +188,7 @@ const FeaturedTools = () => {
             className="text-3xl font-bold text-gray-900 mb-4"
             variants={titleVariants}
           >
-            Tools & Calculators
+            Statistics Calculators
           </motion.h2>
           <motion.p 
             className="text-lg text-gray-600 max-w-2xl mx-auto"
@@ -337,7 +345,7 @@ const FeaturedTools = () => {
           variants={titleVariants}
         >
           <motion.a 
-            href="/tool" 
+            href="/statistics-calculators" 
             className="inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors duration-200 font-medium"
             whileHover={{ 
               scale: 1.05,
@@ -346,7 +354,7 @@ const FeaturedTools = () => {
             }}
             whileTap={{ scale: 0.95 }}
           >
-            View All Tools
+            View All Calculators
             <motion.div
               className="ml-2"
               animate={{ x: [0, 3, 0] }}

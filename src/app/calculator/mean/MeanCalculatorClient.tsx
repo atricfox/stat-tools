@@ -137,7 +137,7 @@ export default function MeanCalculatorClient() {
         title="Mean Calculator"
         description="Calculate the arithmetic mean (average) with specialized tools for different use cases."
         breadcrumbs={[
-          { label: 'Calculators', href: '/calculator' },
+          { label: 'Calculators', href: '/statistics-calculators' },
           { label: 'Mean Calculator' }
         ]}
         currentTool="mean"

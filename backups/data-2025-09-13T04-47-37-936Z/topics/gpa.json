@@ -1,0 +1,32 @@
+{
+  "slug": "gpa",
+  "title": "GPA 计算",
+  "description": "GPA（Grade Point Average）是学生学业成绩的综合评估指标。",
+  "guides": [
+    {
+      "title": "Weighted vs Unweighted",
+      "text": "多数高中用 4.0 非加权；有加权课则参考学校政策。",
+      "icon": "graduation-cap",
+      "href": "/how-to/weighted-vs-unweighted"
+    },
+    {
+      "title": "Semester vs Cumulative",
+      "text": "学期成绩只看当期；累计 GPA 聚合所有已修课程。",
+      "icon": "calendar",
+      "href": "/how-to/semester-vs-cumulative"
+    }
+  ],
+  "faqs": [
+    {
+      "question": "是否支持 4.0/4.3/4.5 标尺？",
+      "answer": "工具支持常见标尺选择，详情见各计算器设置。",
+      "href": "/faq/gpa-scales"
+    },
+    {
+      "question": "是否能混合加权/非加权课程？",
+      "answer": "请先按学校政策确认；必要时拆分计算后再合并。",
+      "href": "/how-to/calc-weighted-gpa"
+    }
+  ]
+}
+

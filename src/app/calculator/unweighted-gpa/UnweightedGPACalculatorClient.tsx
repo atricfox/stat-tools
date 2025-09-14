@@ -76,7 +76,7 @@ export default function UnweightedGPACalculatorClient() {
       title={UI_CONTENT.title}
       description={UI_CONTENT.description}
       breadcrumbs={[
-        { label: 'Calculators', href: '/calculator' },
+        { label: 'Calculators', href: '/statistics-calculators' },
         { label: 'Unweighted GPA Calculator' }
       ]}
       currentTool="unweighted-gpa"
@@ -85,7 +85,7 @@ export default function UnweightedGPACalculatorClient() {
       <div className="space-y-6">
         {/* Control Panel */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="space-y-4">
             {/* Grading System Selector */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -109,19 +109,6 @@ export default function UnweightedGPACalculatorClient() {
               precision={precision}
               onPrecisionChange={setPrecision}
             />
-
-            {/* Load Example */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                {UI_CONTENT.labels.sampleData}
-              </label>
-              <button
-                onClick={() => loadExample(gradingSystem.id)}
-                className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {UI_CONTENT.buttons.loadExample}
-              </button>
-            </div>
           </div>
         </div>
 
@@ -134,25 +121,27 @@ export default function UnweightedGPACalculatorClient() {
           </div>
         )}
 
-        {/* Data Input Section */}
-        <UnweightedGPADataInput
-          courses={courses}
-          gradingSystem={gradingSystem}
-          onAddCourse={addCourse}
-          onUpdateCourse={updateCourse}
-          onRemoveCourse={removeCourse}
-          onClearAll={clearAll}
-          onLoadExample={loadExample}
-        />
-
-        {/* Results Section */}
-        {result && courses.length > 0 && (
-          <UnweightedGPAResults
-            result={result}
-            precision={precision}
-            onExport={handleExport}
+        <div className="space-y-6">
+          {/* Data Input Section */}
+          <UnweightedGPADataInput
+            courses={courses}
+            gradingSystem={gradingSystem}
+            onAddCourse={addCourse}
+            onUpdateCourse={updateCourse}
+            onRemoveCourse={removeCourse}
+            onClearAll={clearAll}
+            onLoadExample={loadExample}
           />
-        )}
+
+          {/* Results Section */}
+          {result && courses.length > 0 && (
+            <UnweightedGPAResults
+              result={result}
+              precision={precision}
+              onExport={handleExport}
+            />
+          )}
+        </div>
 
         {/* Calculation Steps Section */}
         {result && courses.length > 0 && (
@@ -193,7 +182,7 @@ export default function UnweightedGPACalculatorClient() {
           </div>
         )}
 
-        {/* Help Section */}
+        {/* Help Section - Clickable Header for expand/collapse */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 lg:p-8">
           <button
             onClick={() => setShowHelp(!showHelp)}
@@ -201,7 +190,7 @@ export default function UnweightedGPACalculatorClient() {
           >
             <h3 className="text-lg font-semibold text-gray-900">
               <HelpCircle className="w-5 h-5 inline mr-2" />
-              {UI_CONTENT.help.title}
+              Unweighted GPA Calculator Help
             </h3>
             <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${
               showHelp ? 'rotate-180' : ''
@@ -210,53 +199,11 @@ export default function UnweightedGPACalculatorClient() {
           
           {showHelp && (
             <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="space-y-4">
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-2">Quick Guide</h4>
-                  <ol className="list-decimal list-inside space-y-1 text-sm text-gray-600">
-                    <li>Select your grading system (4.0 Standard or Plus/Minus)</li>
-                    <li>Add courses with name, credits, and letter grade</li>
-                    <li>View your calculated unweighted GPA instantly</li>
-                    <li>Export or share your results</li>
-                  </ol>
-                </div>
-                
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-2">{UI_CONTENT.help.unweightedVsWeighted}</h4>
-                  <div className="text-sm text-gray-600 space-y-2">
-                    <p><strong>Unweighted GPA (This Calculator):</strong></p>
-                    <ul className="list-disc list-inside ml-4 space-y-1">
-                      <li>All courses count equally</li>
-                      <li>Standard 4.0 scale for all classes</li>
-                      <li>Used by many colleges for fair comparison</li>
-                    </ul>
-                    <p><strong>Weighted GPA:</strong></p>
-                    <ul className="list-disc list-inside ml-4 space-y-1">
-                      <li>AP/IB/Honors courses get extra points</li>
-                      <li>Can exceed 4.0 scale</li>
-                      <li>Shows academic rigor and challenge level</li>
-                    </ul>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-2">{UI_CONTENT.help.gradingSystems}</h4>
-                  <div className="text-sm text-gray-600">
-                    <p><strong>4.0 Standard Scale:</strong> A=4.0, B=3.0, C=2.0, D=1.0, F=0.0</p>
-                    <p><strong>4.0 Plus/Minus Scale:</strong> Includes A+, A-, B+, B-, etc. with intermediate values</p>
-                  </div>
-                </div>
-                
-                <div>
-                  <h4 className="text-md font-medium text-gray-900 mb-2">{UI_CONTENT.help.tips}</h4>
-                  <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                    <li>Most competitive colleges recalculate using unweighted GPA</li>
-                    <li>Focus on consistent performance across all subjects</li>
-                    <li>Aim for 3.0+ for good standing, 3.5+ for competitive schools</li>
-                    <li>Use this calculator to track your academic progress</li>
-                  </ul>
-                </div>
-              </div>
+              <HelpSection
+                userMode="student"
+                calculatorType="unweighted-gpa"
+                className="shadow-sm"
+              />
             </div>
           )}
         </div>

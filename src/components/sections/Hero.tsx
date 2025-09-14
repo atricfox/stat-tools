@@ -9,7 +9,10 @@ const Hero = () => {
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: route to search page when implemented
+    if (searchQuery.trim()) {
+      // Redirect to statistics-calculators page with search query
+      window.location.href = `/statistics-calculators?search=${encodeURIComponent(searchQuery.trim())}`
+    }
   }
 
   // Animation variants
@@ -147,7 +150,7 @@ const Hero = () => {
             variants={itemVariants}
           >
             <motion.a 
-              href="/calculator/mean" 
+              href="/statistics-calculators" 
               className="bg-blue-500 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-600 transition-all duration-200 hover:shadow-lg hover:-translate-y-0.5 inline-flex items-center"
               whileHover={{ 
                 scale: 1.05, 

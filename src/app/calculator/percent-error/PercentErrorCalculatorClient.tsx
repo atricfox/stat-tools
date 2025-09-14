@@ -147,7 +147,7 @@ export default function PercentErrorCalculatorClient() {
         title="Percent Error Calculator"
         description="Calculate percent error between theoretical and experimental values with specialized tools for students, teachers, and researchers."
         breadcrumbs={[
-          { label: 'Calculators', href: '/calculator' },
+          { label: 'Calculators', href: '/statistics-calculators' },
           { label: 'Percent Error Calculator' }
         ]}
         currentTool="percent-error"

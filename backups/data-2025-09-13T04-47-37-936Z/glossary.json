@@ -1,0 +1,262 @@
+{
+  "version": "1.0.0",
+  "lastmod": "2024-01-15T00:00:00Z",
+  "terms": [
+    {
+      "slug": "mean",
+      "title": "Mean",
+      "shortDescription": "The average value of a dataset, calculated by summing all values and dividing by the count",
+      "definition": "The mean, also known as the arithmetic mean or average, is a measure of central tendency that represents the typical value in a dataset. It is calculated by adding up all the values in a dataset and dividing by the number of values. The mean is sensitive to outliers and works best with normally distributed data. For example, the mean of [2, 4, 6, 8, 10] is 6.",
+      "misconceptions": [
+        "Mean and median are always the same - they differ when data is skewed",
+        "Mean is always the best measure of central tendency - median is better for skewed data"
+      ],
+      "relatedTools": [
+        "/calculator/mean",
+        "/calculator/weighted-mean"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "median",
+        "mode",
+        "weighted-mean",
+        "standard-deviation"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["central-tendency", "descriptive-statistics"],
+      "firstLetter": "M"
+    },
+    {
+      "slug": "median",
+      "title": "Median",
+      "shortDescription": "The middle value in a sorted dataset, dividing it into two equal halves",
+      "definition": "The median is the middle value when a dataset is arranged in ascending or descending order. For datasets with an odd number of values, the median is the middle value. For datasets with an even number of values, the median is the average of the two middle values. Unlike the mean, the median is not affected by extreme outliers, making it a robust measure of central tendency for skewed distributions.",
+      "misconceptions": [
+        "Median requires normally distributed data - it works well with any distribution",
+        "Median is always a value from the dataset - for even counts, it may be the average of two values"
+      ],
+      "relatedTools": [
+        "/calculator/median"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "mean",
+        "mode",
+        "quartiles",
+        "percentiles"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["central-tendency", "descriptive-statistics"],
+      "firstLetter": "M"
+    },
+    {
+      "slug": "standard-deviation",
+      "title": "Standard Deviation",
+      "shortDescription": "A measure of how spread out values are from the mean",
+      "definition": "Standard deviation is a measure of the amount of variation or dispersion in a dataset. It quantifies how much individual data points deviate from the mean. A low standard deviation indicates that values tend to be close to the mean, while a high standard deviation indicates that values are spread out over a wider range. In a normal distribution, approximately 68% of values fall within one standard deviation of the mean.",
+      "misconceptions": [
+        "Sample and population standard deviation are the same - sample SD uses n-1 for better estimation",
+        "Standard deviation can be negative - it's always non-negative as it's based on squared differences"
+      ],
+      "relatedTools": [
+        "/calculator/standard-deviation",
+        "/calculator/variance"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "variance",
+        "mean",
+        "range",
+        "coefficient-of-variation"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["dispersion", "descriptive-statistics"],
+      "firstLetter": "S"
+    },
+    {
+      "slug": "gpa",
+      "title": "GPA (Grade Point Average)",
+      "shortDescription": "A numerical representation of academic performance calculated from course grades",
+      "definition": "GPA (Grade Point Average) is a standardized method of calculating academic achievement. It converts letter grades to numerical values (typically on a 4.0, 4.3, or 4.5 scale) and calculates a weighted or unweighted average. Weighted GPA gives extra points for advanced courses (AP, IB, Honors), while unweighted GPA treats all courses equally. GPA is widely used for college admissions, scholarship applications, and academic standing determinations.",
+      "misconceptions": [
+        "All schools use the same GPA scale - scales vary from 4.0 to 5.0 or even 6.0",
+        "Higher GPA always means better performance - weighted vs unweighted comparisons can be misleading"
+      ],
+      "relatedTools": [
+        "/calculator/gpa",
+        "/calculator/unweighted-gpa",
+        "/calculator/cumulative-gpa"
+      ],
+      "relatedHubs": [
+        "/gpa"
+      ],
+      "seeAlso": [
+        "weighted-gpa",
+        "unweighted-gpa",
+        "cumulative-gpa",
+        "semester-gpa"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["academic", "grading"],
+      "firstLetter": "G"
+    },
+    {
+      "slug": "variance",
+      "title": "Variance",
+      "shortDescription": "The average of squared differences from the mean, measuring data spread",
+      "definition": "Variance is a statistical measure that represents the average of the squared differences from the mean. It quantifies how far a set of numbers are spread out from their average value. Variance is the square of the standard deviation and is expressed in squared units. While variance is important in statistical theory and calculations, standard deviation is often preferred for interpretation because it's in the same units as the original data.",
+      "misconceptions": [
+        "Variance and standard deviation are interchangeable - variance is SD squared with different units",
+        "Variance can be negative - it's always non-negative since it's based on squared values"
+      ],
+      "relatedTools": [
+        "/calculator/variance",
+        "/calculator/standard-deviation"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "standard-deviation",
+        "mean",
+        "covariance",
+        "range"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["dispersion", "descriptive-statistics"],
+      "firstLetter": "V"
+    },
+    {
+      "slug": "confidence-interval",
+      "title": "Confidence Interval",
+      "shortDescription": "A range of values that likely contains the true population parameter",
+      "definition": "A confidence interval is a range of values that is likely to contain a population parameter with a certain level of confidence. It is constructed from sample data and provides an estimate of uncertainty around a sample statistic. Common confidence levels are 90%, 95%, and 99%. A 95% confidence interval means that if we repeated the sampling process many times, about 95% of the confidence intervals would contain the true population parameter.",
+      "misconceptions": [
+        "95% CI means 95% of data falls within the interval - it's about parameter estimation, not data distribution",
+        "Wider intervals are always better - they're more likely to be correct but less precise"
+      ],
+      "relatedTools": [
+        "/calculator/confidence-interval"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "margin-of-error",
+        "standard-error",
+        "hypothesis-testing",
+        "p-value"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["inferential-statistics", "estimation"],
+      "firstLetter": "C"
+    },
+    {
+      "slug": "percentile",
+      "title": "Percentile",
+      "shortDescription": "A value below which a given percentage of observations fall",
+      "definition": "A percentile is a measure that indicates the value below which a given percentage of observations in a dataset falls. For example, the 75th percentile is the value below which 75% of the data points lie. Percentiles divide a dataset into 100 equal parts and are useful for understanding the relative standing of a value within a distribution. Common percentiles include quartiles (25th, 50th, 75th percentiles) and the median (50th percentile).",
+      "misconceptions": [
+        "Percentile and percentage are the same - percentile is a position, percentage is a proportion",
+        "90th percentile means scoring 90% - it means scoring better than 90% of others"
+      ],
+      "relatedTools": [
+        "/calculator/percentile"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "quartiles",
+        "median",
+        "deciles",
+        "interquartile-range"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["descriptive-statistics", "position-measures"],
+      "firstLetter": "P"
+    },
+    {
+      "slug": "weighted-mean",
+      "title": "Weighted Mean",
+      "shortDescription": "An average where each value contributes differently based on its weight",
+      "definition": "The weighted mean is a type of average where each value in the dataset is multiplied by a weight that reflects its importance or frequency before summing and dividing by the total weight. This is useful when some values are more significant than others. For example, in calculating GPA, course credits serve as weights. The weighted mean provides a more accurate representation when data points have different levels of importance or reliability.",
+      "misconceptions": [
+        "Weights must sum to 1 - they can sum to any positive value, the formula normalizes them",
+        "Weighted mean is always different from simple mean - they're equal when all weights are equal"
+      ],
+      "relatedTools": [
+        "/calculator/weighted-mean",
+        "/calculator/gpa"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "mean",
+        "weighted-median",
+        "gpa",
+        "expected-value"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["central-tendency", "descriptive-statistics"],
+      "firstLetter": "W"
+    },
+    {
+      "slug": "range",
+      "title": "Range",
+      "shortDescription": "The difference between the maximum and minimum values in a dataset",
+      "definition": "The range is the simplest measure of statistical dispersion, calculated as the difference between the largest and smallest values in a dataset. While easy to calculate and understand, the range is sensitive to outliers and doesn't provide information about the distribution of values between the extremes. It's often used as a quick measure of spread but should be supplemented with other measures like standard deviation for a complete picture.",
+      "misconceptions": [
+        "Range tells you about data distribution - it only shows the spread between extremes",
+        "Larger range always means more variation - it could be due to a single outlier"
+      ],
+      "relatedTools": [
+        "/calculator/range"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "interquartile-range",
+        "standard-deviation",
+        "variance",
+        "minimum-maximum"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["dispersion", "descriptive-statistics"],
+      "firstLetter": "R"
+    },
+    {
+      "slug": "percent-error",
+      "title": "Percent Error",
+      "shortDescription": "The percentage difference between an experimental and theoretical value",
+      "definition": "Percent error is a measure of how inaccurate a measurement or calculation is, expressed as a percentage of the true or theoretical value. It's calculated as the absolute difference between the experimental and theoretical values, divided by the theoretical value, then multiplied by 100. Percent error is commonly used in scientific experiments, quality control, and forecasting to assess accuracy. A lower percent error indicates better accuracy.",
+      "misconceptions": [
+        "Percent error can't exceed 100% - it can when experimental value is more than double the theoretical",
+        "Negative percent error means underestimation - we typically use absolute value for percent error"
+      ],
+      "relatedTools": [
+        "/calculator/percent-error"
+      ],
+      "relatedHubs": [
+        "/descriptive-statistics"
+      ],
+      "seeAlso": [
+        "absolute-error",
+        "relative-error",
+        "margin-of-error",
+        "accuracy"
+      ],
+      "updated": "2024-01-15T00:00:00Z",
+      "categories": ["error-analysis", "measurement"],
+      "firstLetter": "P"
+    }
+  ]
+}

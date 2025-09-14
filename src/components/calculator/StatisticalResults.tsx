@@ -6,11 +6,12 @@ import { WeightedMeanResult } from '@/types/weightedMean';
 import { StandardDeviationResult } from '@/types/standardDeviation';
 import { PercentErrorResult } from '@/hooks/usePercentErrorCalculation';
 import { RangeResult } from '@/hooks/useRangeCalculation';
+import { VarianceResult } from '@/types/variance';
 import { UserMode } from './UserModeSelector';
 import { formatForCalculationSteps } from '@/lib/formatters/numberFormatter';
 
 interface StatisticalResultsProps {
-  result: MeanResult | MedianResult | WeightedMeanResult | StandardDeviationResult | PercentErrorResult | RangeResult | null;
+  result: MeanResult | MedianResult | WeightedMeanResult | StandardDeviationResult | PercentErrorResult | RangeResult | VarianceResult | null;
   userMode: UserMode;
   precision: number;
   className?: string;
@@ -68,8 +69,11 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
   const isPercentErrorResult = (result: any): result is PercentErrorResult => 
     result && 'percentError' in result && 'absoluteError' in result && 'theoreticalValue' in result && 'experimentalValue' in result;
 
-  const isRangeResult = (result: any): result is RangeResult => 
+  const isRangeResult = (result: any): result is RangeResult =>
     result && 'range' in result && 'minimum' in result && 'maximum' in result && 'count' in result;
+
+  const isVarianceResult = (result: any): result is VarianceResult =>
+    result && 'sampleVariance' in result && 'populationVariance' in result && 'mean' in result && 'calculationType' in result;
 
   const copyResult = () => {
     let text = '';
@@ -86,6 +90,9 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
       text = `Percent Error: ${formatNumber(result.percentError)}%\nAbsolute Error: ${formatNumber(result.absoluteError)}\nTheoretical: ${formatNumber(result.theoreticalValue)}\nExperimental: ${formatNumber(result.experimentalValue)}`;
     } else if (isRangeResult(result)) {
       text = `Range: ${formatNumber(result.range)}\nMinimum: ${formatNumber(result.minimum)}\nMaximum: ${formatNumber(result.maximum)}\nCount: ${result.count}`;
+    } else if (isVarianceResult(result)) {
+      const variance = result.calculationType === 'population' ? result.populationVariance : result.sampleVariance;
+      text = `Variance: ${formatNumber(variance)}\nMean: ${formatNumber(result.mean)}\nStandard Deviation: ${formatNumber(result.standardDeviation)}\nCount: ${result.count}`;
     }
     onCopy?.(text);
   };
@@ -173,23 +180,26 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                  isMedianResult(result) ? 'Median (Middle Value)' :
                  isWeightedResult(result) ? 'Weighted Mean' :
                  isPercentErrorResult(result) ? 'Percent Error' :
-                 isRangeResult(result) ? 'Data Range' : 'Mean (Average)'}
+                 isRangeResult(result) ? 'Data Range' :
+                 isVarianceResult(result) ? 'Variance' : 'Mean (Average)'}
               </span>
             </div>
             <div className="text-2xl font-bold text-blue-900">
-              {isMeanResult(result) ? formatNumber(result.mean) : 
+              {isMeanResult(result) ? formatNumber(result.mean) :
                isMedianResult(result) ? formatNumber(result.median) :
-               isWeightedResult(result) ? formatNumber(result.weightedMean) : 
+               isWeightedResult(result) ? formatNumber(result.weightedMean) :
                isStandardDeviationResult(result) ? formatNumber(result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation) :
                isPercentErrorResult(result) ? `${formatNumber(result.percentError)}%` :
-               isRangeResult(result) ? formatNumber(result.range) : '0'}
+               isRangeResult(result) ? formatNumber(result.range) :
+               isVarianceResult(result) ? formatNumber(result.calculationType === 'population' ? result.populationVariance : result.sampleVariance) : '0'}
             </div>
             <div className="text-sm text-blue-700 mt-1">
               {isStandardDeviationResult(result) ? (result.calculationType === 'population' ? 'Population (σ)' : 'Sample (s)') :
                isMedianResult(result) ? (userMode === 'teacher' ? 'Class Median' : 'Middle Value') :
                isPercentErrorResult(result) ? 'Error Percentage' :
                isRangeResult(result) ? (userMode === 'teacher' ? 'Score Spread' : 'Data Spread') :
-               userMode === 'teacher' ? 'Class Average' : 
+               isVarianceResult(result) ? (result.calculationType === 'population' ? 'Population Variance (σ²)' : 'Sample Variance (s²)') :
+               userMode === 'teacher' ? 'Class Average' :
                isWeightedResult(result) ? 'Weighted Average' : 'Arithmetic Mean'}
             </div>
           </div>
@@ -201,23 +211,26 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                 {isStandardDeviationResult(result) ? 'Mean' :
                  isWeightedResult(result) ? 'Valid Pairs' :
                  isPercentErrorResult(result) ? 'Absolute Error' :
-                 isRangeResult(result) ? 'Maximum Value' : 'Sample Size'}
+                 isRangeResult(result) ? 'Maximum Value' :
+                 isVarianceResult(result) ? 'Standard Deviation' : 'Sample Size'}
               </span>
             </div>
             <div className="text-2xl font-bold text-green-900">
-              {isMeanResult(result) ? result.count : 
+              {isMeanResult(result) ? result.count :
                isMedianResult(result) ? result.count :
-               isWeightedResult(result) ? result.validPairs : 
+               isWeightedResult(result) ? result.validPairs :
                isStandardDeviationResult(result) ? formatNumber(result.mean) :
                isPercentErrorResult(result) ? formatNumber(result.absoluteError) :
-               isRangeResult(result) ? formatNumber(result.maximum) : 0}
+               isRangeResult(result) ? formatNumber(result.maximum) :
+               isVarianceResult(result) ? formatNumber(result.standardDeviation) : 0}
             </div>
             <div className="text-sm text-green-700 mt-1">
               {isStandardDeviationResult(result) ? 'Average Value' :
                isMedianResult(result) ? (userMode === 'teacher' ? 'Students' : 'Data Points') :
                isPercentErrorResult(result) ? 'Error Magnitude' :
                isRangeResult(result) ? 'Highest Value' :
-               userMode === 'teacher' ? 'Students' : 
+               isVarianceResult(result) ? 'Square root of variance' :
+               userMode === 'teacher' ? 'Students' :
                isWeightedResult(result) ? 'Value-Weight Pairs' : 'Data Points'}
             </div>
           </div>
@@ -229,21 +242,24 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                 {isStandardDeviationResult(result) ? 'Sample Size' :
                  isWeightedResult(result) ? 'Total Weight' :
                  isPercentErrorResult(result) ? (result.accuracy !== undefined ? 'Accuracy' : 'Theoretical Value') :
-                 isRangeResult(result) ? 'Sample Size' : 'Sum Total'}
+                 isRangeResult(result) ? 'Sample Size' :
+                 isVarianceResult(result) ? 'Mean' : 'Sum Total'}
               </span>
             </div>
             <div className="text-2xl font-bold text-gray-900">
-              {isMeanResult(result) ? formatNumber(result.sum) : 
-               isWeightedResult(result) ? formatNumber(result.totalWeights) : 
+              {isMeanResult(result) ? formatNumber(result.sum) :
+               isWeightedResult(result) ? formatNumber(result.totalWeights) :
                isStandardDeviationResult(result) ? result.count :
                isPercentErrorResult(result) ? (result.accuracy !== undefined ? `${formatNumber(result.accuracy)}%` : formatNumber(result.theoreticalValue)) :
-               isRangeResult(result) ? result.count : '0'}
+               isRangeResult(result) ? result.count :
+               isVarianceResult(result) ? formatNumber(result.mean) : '0'}
             </div>
             <div className="text-sm text-gray-700 mt-1">
               {isStandardDeviationResult(result) ? 'Data Points' :
                isWeightedResult(result) ? 'Sum of all weights' :
                isPercentErrorResult(result) ? (result.accuracy !== undefined ? 'Measurement Accuracy' : 'Expected Value') :
-               isRangeResult(result) ? (userMode === 'teacher' ? 'Students' : 'Data Points') : 'Sum of all values'}
+               isRangeResult(result) ? (userMode === 'teacher' ? 'Students' : 'Data Points') :
+               isVarianceResult(result) ? 'Average of all values' : 'Sum of all values'}
             </div>
           </div>
         </div>
@@ -403,6 +419,118 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                     </div>
                     <div className="text-xs text-yellow-600 mt-1">
                       Values outside 1.5 × IQR from Q1 and Q3
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Variance Calculator Display */}
+        {isVarianceResult(result) && (
+          <div className="mb-6">
+            <h4 className="text-lg font-medium text-gray-900 mb-3 flex items-center">
+              <BarChart3 className="h-4 w-4 text-purple-600 mr-2" />
+              Variance Analysis
+            </h4>
+
+            {/* Main variance statistics */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="text-sm font-medium text-purple-800 mb-1">Sample Variance</div>
+                <div className="text-lg font-bold text-purple-900">{formatNumber(result.sampleVariance)}</div>
+                <div className="text-xs text-purple-700 mt-1">s² = Σ(x - x̄)² / (n-1)</div>
+              </div>
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+                <div className="text-sm font-medium text-purple-800 mb-1">Population Variance</div>
+                <div className="text-lg font-bold text-purple-900">{formatNumber(result.populationVariance)}</div>
+                <div className="text-xs text-purple-700 mt-1">σ² = Σ(x - μ)² / n</div>
+              </div>
+            </div>
+
+            {/* Quartile analysis */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                <div className="text-sm font-medium text-indigo-800 mb-1">Q1</div>
+                <div className="text-lg font-bold text-indigo-900">{formatNumber(result.q1)}</div>
+                <div className="text-xs text-indigo-700 mt-1">25th percentile</div>
+              </div>
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                <div className="text-sm font-medium text-indigo-800 mb-1">Median</div>
+                <div className="text-lg font-bold text-indigo-900">{formatNumber(result.median)}</div>
+                <div className="text-xs text-indigo-700 mt-1">50th percentile</div>
+              </div>
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                <div className="text-sm font-medium text-indigo-800 mb-1">Q3</div>
+                <div className="text-lg font-bold text-indigo-900">{formatNumber(result.q3)}</div>
+                <div className="text-xs text-indigo-700 mt-1">75th percentile</div>
+              </div>
+              <div className="bg-indigo-50 border border-indigo-200 rounded-lg p-3">
+                <div className="text-sm font-medium text-indigo-800 mb-1">IQR</div>
+                <div className="text-lg font-bold text-indigo-900">{formatNumber(result.iqr)}</div>
+                <div className="text-xs text-indigo-700 mt-1">Q3 - Q1</div>
+              </div>
+            </div>
+
+            {/* Advanced statistics for research mode */}
+            {userMode === 'research' && (
+              <div className="mt-4">
+                <h5 className="text-md font-medium text-gray-800 mb-2">Advanced Statistics</h5>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div className="text-sm font-medium text-gray-800 mb-1">Skewness</div>
+                    <div className="text-lg font-bold text-gray-900">{formatNumber(result.skewness)}</div>
+                    <div className="text-xs text-gray-700 mt-1">
+                      {result.skewness > 0.5 ? 'Right-skewed' : result.skewness < -0.5 ? 'Left-skewed' : 'Symmetric'}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div className="text-sm font-medium text-gray-800 mb-1">Kurtosis</div>
+                    <div className="text-lg font-bold text-gray-900">{formatNumber(result.kurtosis)}</div>
+                    <div className="text-xs text-gray-700 mt-1">
+                      {Math.abs(result.kurtosis) < 0.5 ? 'Normal' : Math.abs(result.kurtosis) > 1 ? 'Heavy-tailed' : 'Moderate'}
+                    </div>
+                  </div>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <div className="text-sm font-medium text-gray-800 mb-1">Coefficient of Variation</div>
+                    <div className="text-lg font-bold text-gray-900">{formatNumber(result.coefficientOfVariation)}%</div>
+                    <div className="text-xs text-gray-700 mt-1">Relative variability</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Outliers detection */}
+            {result.outliers && result.outliers.length > 0 && (
+              <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <div className="flex items-start">
+                  <AlertTriangle className="h-4 w-4 text-yellow-600 mr-2 mt-0.5" />
+                  <div>
+                    <div className="text-sm font-medium text-yellow-800">Outliers Detected</div>
+                    <div className="text-sm text-yellow-700 mt-1">
+                      {result.outliers.length} outlier{result.outliers.length !== 1 ? 's' : ''}: {result.outliers.map(o => formatNumber(o.value)).join(', ')}
+                    </div>
+                    <div className="text-xs text-yellow-600 mt-1">
+                      Values outside 1.5 × IQR from Q1 and Q3
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Data quality info */}
+            {result.excludedDataPoints && result.excludedDataPoints.length > 0 && (
+              <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-start">
+                  <AlertTriangle className="h-4 w-4 text-red-600 mr-2 mt-0.5" />
+                  <div>
+                    <div className="text-sm font-medium text-red-800">Excluded Data Points</div>
+                    <div className="text-sm text-red-700 mt-1">
+                      {result.excludedDataPoints.length} data point{result.excludedDataPoints.length !== 1 ? 's were' : ' was'} excluded from calculation
+                    </div>
+                    <div className="text-xs text-red-600 mt-1">
+                      Excluded: {result.excludedDataPoints.map(p => formatNumber(p.value)).join(', ')}
                     </div>
                   </div>
                 </div>
@@ -593,8 +721,12 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                       <>The weighted mean considers the importance (weight) of each value. With {result.validPairs} pairs, 
                       the total weighted value is {formatNumber(result.totalWeightedValue)}, giving a weighted average of {formatNumber(result.weightedMean)}.</>
                     ) : isStandardDeviationResult(result) ? (
-                      <>Standard deviation measures how spread out your data is from the mean. With {result.count} data points 
+                      <>Standard deviation measures how spread out your data is from the mean. With {result.count} data points
                       and a mean of {formatNumber(result.mean)}, your {result.calculationType} standard deviation is {formatNumber(result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation)}.</>
+                    ) : isVarianceResult(result) ? (
+                      <>Variance measures how spread out your data is from the mean. With {result.count} data points and a mean of {formatNumber(result.mean)},
+                      your {result.calculationType} variance is {formatNumber(result.calculationType === 'population' ? result.populationVariance : result.sampleVariance)}.
+                      The standard deviation is {formatNumber(result.standardDeviation)}, which is the square root of variance.</>
                     ) : null}
                   </div>
                 </>
@@ -613,10 +745,16 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                       <>Weighted mean with {result.validPairs} value-weight pairs. The calculation considers the 
                       relative importance of each observation based on its weight in the analysis.</>
                     ) : isStandardDeviationResult(result) ? (
-                      <>{result.calculationType === 'population' ? 'Population' : 'Sample'} standard deviation with {result.count} observations. 
-                      A standard deviation of {formatNumber(result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation)} indicates 
-                      {result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation < result.mean * 0.1 ? ' low variability' : 
+                      <>{result.calculationType === 'population' ? 'Population' : 'Sample'} standard deviation with {result.count} observations.
+                      A standard deviation of {formatNumber(result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation)} indicates
+                      {result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation < result.mean * 0.1 ? ' low variability' :
                        result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation > result.mean * 0.3 ? ' high variability' : ' moderate variability'} in your dataset.</>
+                    ) : isVarianceResult(result) ? (
+                      <>{result.calculationType === 'population' ? 'Population' : 'Sample'} variance with {result.count} observations.
+                      A variance of {formatNumber(result.calculationType === 'population' ? result.populationVariance : result.sampleVariance)} indicates
+                      {result.calculationType === 'population' ? result.populationVariance : result.sampleVariance < result.mean * 0.01 ? ' low dispersion' :
+                       result.calculationType === 'population' ? result.populationVariance : result.sampleVariance > result.mean * 0.09 ? ' high dispersion' : ' moderate dispersion'} in your dataset.
+                      The coefficient of variation is {formatNumber(result.coefficientOfVariation)}%, suggesting {result.coefficientOfVariation < 15 ? ' low' : result.coefficientOfVariation > 35 ? ' high' : ' moderate'} relative variability.</>
                     ) : null}
                   </div>
                 </>
@@ -633,10 +771,16 @@ const StatisticalResults: React.FC<StatisticalResultsProps> = ({
                       The total weighted score is {formatNumber(result.totalWeightedValue)} out of {formatNumber(result.totalWeights)} possible points, 
                       giving a weighted average of {formatNumber(result.weightedMean)}.</>
                     ) : isStandardDeviationResult(result) ? (
-                      <>Your class of {result.count} students shows a standard deviation of {formatNumber(result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation)} 
-                      with an average score of {formatNumber(result.mean)}. This indicates 
-                      {result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation < 10 ? ' consistent performance' : 
+                      <>Your class of {result.count} students shows a standard deviation of {formatNumber(result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation)}
+                      with an average score of {formatNumber(result.mean)}. This indicates
+                      {result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation < 10 ? ' consistent performance' :
                        result.calculationType === 'population' ? result.populationStandardDeviation : result.sampleStandardDeviation > 20 ? ' varied performance levels' : ' moderate score spread'} across your students.</>
+                    ) : isVarianceResult(result) ? (
+                      <>Your class of {result.count} students shows a variance of {formatNumber(result.calculationType === 'population' ? result.populationVariance : result.sampleVariance)}
+                      with an average score of {formatNumber(result.mean)} and standard deviation of {formatNumber(result.standardDeviation)}. This indicates
+                      {result.calculationType === 'population' ? result.populationVariance : result.sampleVariance < 100 ? ' consistent performance' :
+                       result.calculationType === 'population' ? result.populationVariance : result.sampleVariance > 400 ? ' varied performance levels' : ' moderate score spread'} across your students.
+                      The quartile analysis shows Q1={formatNumber(result.q1)}, Median={formatNumber(result.median)}, Q3={formatNumber(result.q3)}, with an IQR of {formatNumber(result.iqr)}.</>
                     ) : null}
                   </div>
                 </>

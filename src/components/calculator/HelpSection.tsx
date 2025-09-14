@@ -17,7 +17,7 @@ import { UserMode } from './UserModeSelector';
 
 interface HelpSectionProps {
   userMode: UserMode;
-  calculatorType?: 'mean' | 'weighted-mean' | 'standard-deviation' | 'final-grade' | 'semester-grade' | 'cumulative-gpa' | 'gpa' | 'percent-error' | 'range';
+  calculatorType?: 'mean' | 'weighted-mean' | 'standard-deviation' | 'variance' | 'final-grade' | 'semester-grade' | 'cumulative-gpa' | 'gpa' | 'unweighted-gpa' | 'percent-error' | 'range';
   className?: string;
 }
 
@@ -304,6 +304,94 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
       ]
     };
 
+    // Content for Unweighted GPA Calculator
+    const unweightedGPAContent = {
+      basics: [
+        {
+          id: 'what-is-unweighted-gpa',
+          title: 'What is Unweighted GPA?',
+          content: 'Unweighted GPA treats all courses equally regardless of difficulty level. Every course uses the same 4.0 scale, making it a standard measure used by most colleges for fair comparison across different high schools.',
+          examples: [
+            'Regular Math: A = 4.0, Advanced Math: A = 4.0 (same weight)',
+            'All courses count equally toward your overall GPA',
+            'Most colleges recalculate applicant GPAs using unweighted scale'
+          ]
+        },
+        {
+          id: 'unweighted-vs-weighted',
+          title: 'Unweighted vs Weighted GPA',
+          content: 'Understanding the difference between unweighted and weighted GPAs is crucial for college applications.',
+          examples: [
+            'Unweighted: All A grades = 4.0 (regardless of course difficulty)',
+            'Weighted: AP/Honors A might = 4.5 or 5.0 (extra points for difficulty)',
+            'Colleges often prefer unweighted for fair comparison',
+            'Weighted GPA shows academic rigor and course selection'
+          ]
+        },
+        {
+          id: 'grading-systems',
+          title: 'Supported Grading Systems',
+          content: 'This calculator supports both standard 4.0 and plus/minus grading systems commonly used in schools.',
+          examples: [
+            '4.0 Standard: A=4.0, B=3.0, C=2.0, D=1.0, F=0.0',
+            'Plus/Minus: A+=4.0, A=4.0, A-=3.7, B+=3.3, etc.',
+            'Choose the system that matches your school\'s grading policy'
+          ]
+        }
+      ],
+      formulas: [
+        {
+          id: 'unweighted-gpa-formula',
+          title: 'Unweighted GPA Calculation',
+          content: 'Unweighted GPA = Total Grade Points ÷ Total Credit Hours',
+          examples: [
+            'Grade Points = Grade Value × Credit Hours (for each course)',
+            'Example: Course with A (4.0) and 3 credits = 12.0 grade points',
+            'Sum all grade points, divide by total credit hours',
+            'Result is your unweighted GPA on 4.0 scale'
+          ]
+        }
+      ],
+      examples: [
+        {
+          id: 'sample-calculation',
+          title: 'Sample GPA Calculation',
+          content: 'Step-by-step example of calculating unweighted GPA',
+          examples: [
+            'English: A (4.0) × 4 credits = 16.0 grade points',
+            'Math: B+ (3.3) × 3 credits = 9.9 grade points',
+            'Science: A- (3.7) × 4 credits = 14.8 grade points',
+            'History: B (3.0) × 3 credits = 9.0 grade points',
+            'Total: 49.7 grade points ÷ 14 credits = 3.55 GPA'
+          ]
+        }
+      ],
+      troubleshooting: [
+        {
+          id: 'academic-standing',
+          title: 'Understanding Academic Standing',
+          content: 'Different GPA ranges indicate different levels of academic performance.',
+          tips: [
+            '3.5-4.0: Excellent - Competitive for top colleges',
+            '3.0-3.4: Good - Solid academic standing',
+            '2.5-2.9: Fair - May need improvement for college admission',
+            'Below 2.0: At risk - Academic intervention may be needed'
+          ]
+        },
+        {
+          id: 'improving-gpa',
+          title: 'Strategies for GPA Improvement',
+          content: 'Tips for maintaining and improving your unweighted GPA.',
+          tips: [
+            'Focus on consistent performance across all subjects',
+            'Prioritize courses with higher credit hours for greater impact',
+            'Seek help early if struggling in any course',
+            'Use this calculator to track progress throughout the semester'
+          ]
+        }
+      ]
+    };
+
     // Content for Cumulative GPA Calculator
     const cumulativeGPAContent = {
       basics: [
@@ -442,6 +530,125 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
       ]
     };
 
+    // Content for Variance Calculator
+    const varianceContent = {
+      basics: [
+        {
+          id: 'what-is-variance',
+          title: 'What is Variance?',
+          content: 'Variance measures how far each number in the set is from the mean. It is the average of the squared differences from the mean. A high variance indicates that the data points are spread out, while a low variance indicates they are clustered around the mean.',
+          examples: [
+            'Data: 2, 4, 4, 4, 5, 5, 7, 9 → Sample Variance = 4.57',
+            'Low variance: Test scores 85, 87, 86, 88, 84 → Variance ≈ 2.5',
+            'High variance: Test scores 70, 95, 60, 90, 85 → Variance ≈ 193.0'
+          ]
+        },
+        {
+          id: 'sample-vs-population',
+          title: 'Sample vs Population Variance',
+          content: 'Sample variance (s²) uses (n-1) in the denominator for unbiased estimation of population variance. Population variance (σ²) uses n in the denominator when you have data from the entire population.',
+          examples: [
+            'Sample: s² = Σ(x - x̄)² / (n-1) - used when data is a sample',
+            'Population: σ² = Σ(x - μ)² / n - used when data is the entire population'
+          ]
+        },
+        {
+          id: 'input-formats',
+          title: 'Supported Input Formats',
+          content: 'You can enter numbers separated by commas, spaces, or new lines. The calculator automatically handles different formats.',
+          examples: [
+            'Comma separated: 1, 2, 3, 4, 5',
+            'Space separated: 1 2 3 4 5',
+            'Line by line:\n1\n2\n3\n4\n5'
+          ]
+        }
+      ],
+      formulas: [
+        {
+          id: 'variance-formulas',
+          title: 'Variance Formulas',
+          content: 'Sample Variance = Σ(x - x̄)² / (n-1) and Population Variance = Σ(x - μ)² / n',
+          examples: [
+            'Variance is the square of standard deviation: σ² = σ × σ',
+            'Sample variance provides unbiased estimate of population variance',
+            'Population variance is used when data includes all members of the population'
+          ]
+        },
+        {
+          id: 'calculation-steps',
+          title: 'Calculation Steps',
+          content: '1) Calculate the mean, 2) Find deviations from mean, 3) Square each deviation, 4) Sum squared deviations, 5) Divide by (n-1) for sample or n for population',
+          examples: [
+            'Mean: x̄ = Σx / n',
+            'Squared deviation: (xᵢ - x̄)²',
+            'Sum of squared deviations: SS = Σ(xᵢ - x̄)²',
+            'Sample variance: s² = SS / (n-1)',
+            'Population variance: σ² = SS / n'
+          ]
+        }
+      ],
+      examples: [
+        {
+          id: 'simple-example',
+          title: 'Simple Example',
+          content: 'Calculate variance of: 2, 4, 4, 4, 5, 5, 7, 9',
+          examples: [
+            'Step 1: Calculate mean → (2+4+4+4+5+5+7+9)/8 = 5',
+            'Step 2: Find deviations → -3, -1, -1, -1, 0, 0, 2, 4',
+            'Step 3: Square deviations → 9, 1, 1, 1, 0, 0, 4, 16',
+            'Step 4: Sum squared deviations → 32',
+            'Step 5: Sample variance → 32/7 = 4.57',
+            'Step 6: Population variance → 32/8 = 4.00'
+          ]
+        },
+        {
+          id: 'practical-example',
+          title: 'Practical Application',
+          content: 'Analyzing investment returns: 5%, 8%, -2%, 12%, 3%',
+          examples: [
+            'Mean return: (5+8-2+12+3)/5 = 5.2%',
+            'Deviations: -0.2, 2.8, -7.2, 6.8, -2.2',
+            'Squared deviations: 0.04, 7.84, 51.84, 46.24, 4.84',
+            'Sum of squared deviations: 110.8',
+            'Sample variance: 110.8 / 4 = 27.7',
+            'Population variance: 110.8 / 5 = 22.16'
+          ]
+        }
+      ],
+      troubleshooting: [
+        {
+          id: 'single-data-point',
+          title: 'Single Data Point',
+          content: 'Sample variance requires at least 2 data points (division by n-1). With one data point, only population variance can be calculated (result = 0).',
+          tips: [
+            'For sample analysis, collect at least 2 data points',
+            'For single values, use population variance',
+            'Consider the context of your analysis'
+          ]
+        },
+        {
+          id: 'invalid-data',
+          title: 'Invalid Data Entries',
+          content: 'The calculator will ignore non-numeric entries and show you which entries were excluded.',
+          tips: [
+            'Check for typos in your numbers',
+            'Remove any text or special characters',
+            'Use decimal points (.) not commas for decimals'
+          ]
+        },
+        {
+          id: 'interpretation',
+          title: 'Interpreting Results',
+          content: 'Variance is in squared units of your original data. For interpretation in original units, take the square root to get standard deviation.',
+          tips: [
+            'High variance → data spread out from mean',
+            'Low variance → data clustered around mean',
+            'Zero variance → all values identical'
+          ]
+        }
+      ]
+    };
+
     // Content for Percent Error Calculator
     const percentErrorContent = {
       basics: [
@@ -569,12 +776,14 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
     };
 
     // Choose content based on calculator type
-    const baseContent = calculatorType === 'standard-deviation' ? standardDeviationContent : 
-                       calculatorType === 'weighted-mean' ? weightedMeanContent : 
+    const baseContent = calculatorType === 'standard-deviation' ? standardDeviationContent :
+                       calculatorType === 'weighted-mean' ? weightedMeanContent :
+                       calculatorType === 'variance' ? varianceContent :
                        calculatorType === 'final-grade' ? finalGradeContent :
                        calculatorType === 'semester-grade' ? semesterGradeContent :
                        calculatorType === 'cumulative-gpa' ? cumulativeGPAContent :
                        calculatorType === 'gpa' ? cumulativeGPAContent :
+                       calculatorType === 'unweighted-gpa' ? unweightedGPAContent :
                        calculatorType === 'percent-error' ? percentErrorContent :
                        calculatorType === 'range' ? rangeContent :
                        meanContent;

@@ -138,7 +138,7 @@ export default function MedianCalculatorClient() {
         title="Median Calculator"
         description="Calculate the median (middle value) of your dataset with advanced statistical analysis tools."
         breadcrumbs={[
-          { label: 'Calculators', href: '/calculator' },
+          { label: 'Calculators', href: '/statistics-calculators' },
           { label: 'Median Calculator' }
         ]}
         currentTool="median"

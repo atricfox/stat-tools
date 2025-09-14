@@ -18,13 +18,22 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex space-x-8">
-            <a href="#tools" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
-              Tools
+            <a href="/statistics-calculators" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
+              Calculators
             </a>
-            <a href="#guides" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
+            <a href="/how-to" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
               Guides
             </a>
-            <a href="#about" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
+            <a href="/glossary" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
+              Glossary
+            </a>
+            <a href="/faq" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
+              FAQ
+            </a>
+            <a href="/cases" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
+              Cases
+            </a>
+            <a href="/about" className="text-gray-600 hover:text-blue-500 transition-colors duration-200">
               About
             </a>
           </nav>
@@ -50,21 +59,42 @@ const Header = () => {
           <div id="mobile-primary-nav" className="md:hidden py-4 border-t border-gray-200">
             <nav className="flex flex-col space-y-2">
               <a 
-                href="#tools" 
+                href="/statistics-calculators" 
                 className="text-gray-600 hover:text-blue-500 py-2 transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Tools
+                Calculators
               </a>
               <a 
-                href="#guides" 
+                href="/how-to" 
                 className="text-gray-600 hover:text-blue-500 py-2 transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >
                 Guides
               </a>
               <a 
-                href="#about" 
+                href="/glossary" 
+                className="text-gray-600 hover:text-blue-500 py-2 transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Glossary
+              </a>
+              <a 
+                href="/faq" 
+                className="text-gray-600 hover:text-blue-500 py-2 transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                FAQ
+              </a>
+              <a 
+                href="/cases" 
+                className="text-gray-600 hover:text-blue-500 py-2 transition-colors duration-200"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Cases
+              </a>
+              <a
+                href="/about"
                 className="text-gray-600 hover:text-blue-500 py-2 transition-colors duration-200"
                 onClick={() => setIsMenuOpen(false)}
               >

@@ -1,0 +1,17 @@
+# Sprint 13 — Internal Linking Issues
+
+| ID   | Title                                         | Description                                                                                   | Acceptance Criteria                                 | Labels                         | Est.(h) | Depends On |
+|------|-----------------------------------------------|-----------------------------------------------------------------------------------------------|-----------------------------------------------------|--------------------------------|---------|------------|
+| T001 | MDX目录与Frontmatter校验(Zod)                  | 为howto/faq/cases建立Frontmatter校验: type/slug/title/summary/tags/related/mentions/seo/updated | 必填/枚举通过; 错误有清晰提示                       | InternalLinking;Spec           | 6       |            |
+| T002 | 组件:HowToSteps/FAQList/CaseLayout/RelatedLinks | 实现可折叠步骤/FAQ/案例布局与相关链接(A11y)                                                  | ARIA与键盘可达通过; 视觉符合设计                    | InternalLinking;UI             | 8       | T001       |
+| T003 | JSON‑LD注入(HowTo/FAQ聚合/案例+Breadcrumb)     | 页面注入相应schema; FAQ详情仅WebPage+Breadcrumb                                             | 快照稳定; FAQ详情无FAQPage; GSC无新告警             | InternalLinking;SEO            | 6       | T002       |
+| T004 | 预填白名单与URL参数映射                         | HowTo→工具受控预填(白名单/映射/丢弃非法)                                                     | 白名单外参数被丢弃; CTA跳转正确                     | InternalLinking;Security       | 6       | T001       |
+| T005 | 推荐器(related>tags>mentions>updated)          | 相关内容排序与类型打散                                                                       | 显式related优先; 分布合理; 可配置权重               | InternalLinking;Recs           | 6       | T002       |
+| T006 | 内容索引与轻搜索(可选)                          | 生成索引(title/summary/tags/slug/type/updated)+Fuse搜索                                     | 聚合页搜索可用; 体积≤阈值                            | InternalLinking;Search         | 6       | T001       |
+| T007 | 事件上报与校验                                  | howto_step_expand/howto_tool_cta_click/faq_*/case_to_tool/related_link_click/search_use       | mock gtag载荷正确; DebugView抽查可见                | InternalLinking;Analytics      | 6       | T002;T003  |
+| T008 | Link Checker接入与CI                            | 校验站内链接并输出报告; STRICT开关; 变更集模式                                               | 无Error断链; 报告产出                                | InternalLinking;CI             | 6       | T001       |
+| T009 | A11y/性能优化                                   | 焦点环/键盘可达/懒加载/CLS≈0/首屏不上广告                                                   | axe通过; CLS≈0                                      | InternalLinking;A11y;Perf      | 6       |            |
+| T010 | 单元/集成测试(JSON‑LD/事件/渲染/搜索/推荐)     | 关键流测试与快照                                                                             | CI通过; 覆盖关键路径                                | InternalLinking;Testing        | 8       | T002;T009  |
+| T011 | 文档与上线流程                                   | 内容指南/预填白名单/测试清单与发布流程                                                       | 文档可供团队独立操作                                | InternalLinking;Docs           | 4       | T001;T010  |
+| T012 | 预演与回归(含GSC检查)                            | 预览演示+GSC检查+回归关键路径                                                                | 预演通过; GSC无新告警                                | InternalLinking;Review         | 6       | ALL        |
+

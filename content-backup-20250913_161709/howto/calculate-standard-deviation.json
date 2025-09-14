@@ -1,0 +1,90 @@
+{
+  "frontmatter": {
+    "type": "howto",
+    "slug": "calculate-standard-deviation",
+    "title": "How to Calculate Standard Deviation",
+    "summary": "Learn how to calculate standard deviation for both sample and population data, understand when to use each formula, and avoid common mistakes.",
+    "tags": ["standard-deviation", "statistics", "variability", "tutorial", "calculation"],
+    "related": {
+      "tools": ["/calculator/standard-deviation"],
+      "glossary": ["standard-deviation", "variance", "mean"],
+      "faq": ["sample-vs-population-sd"]
+    },
+    "mentions": {
+      "tools": ["standard-deviation"],
+      "concepts": ["variability", "dispersion", "spread"]
+    },
+    "seo": {
+      "metaDescription": "Complete guide to calculating standard deviation with formulas, examples, and step-by-step instructions for sample and population data.",
+      "keywords": ["standard deviation calculation", "sample standard deviation", "population standard deviation", "statistics"]
+    },
+    "created": "2024-01-15T00:00:00Z",
+    "updated": "2024-01-15T00:00:00Z",
+    "status": "published",
+    "targetTool": "/calculator/standard-deviation",
+    "prefillParams": {
+      "numbers": "10, 12, 14, 16, 18, 20",
+      "type": "sample"
+    },
+    "difficulty": "intermediate",
+    "prerequisites": ["Understanding of mean", "Basic algebra", "Square roots"],
+    "outcomes": [
+      "Calculate sample standard deviation",
+      "Calculate population standard deviation",
+      "Understand when to use each formula",
+      "Interpret standard deviation values"
+    ],
+    "readingTime": 8
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Organize Your Data",
+      "description": "List all your data points clearly. For example: 10, 12, 14, 16, 18, 20",
+      "tip": "Make sure your data is clean and doesn't contain any errors or outliers you don't want to include"
+    },
+    {
+      "id": "step-2",
+      "name": "Calculate the Mean",
+      "description": "Add all values and divide by the count. Mean = (10 + 12 + 14 + 16 + 18 + 20) ÷ 6 = 90 ÷ 6 = 15",
+      "tip": "The mean is the center point from which we'll measure deviations"
+    },
+    {
+      "id": "step-3",
+      "name": "Find Each Deviation",
+      "description": "Subtract the mean from each value: (10-15)=-5, (12-15)=-3, (14-15)=-1, (16-15)=1, (18-15)=3, (20-15)=5",
+      "warning": "Keep the sign (positive or negative) for now - we'll square them next"
+    },
+    {
+      "id": "step-4",
+      "name": "Square Each Deviation",
+      "description": "Square each deviation: (-5)²=25, (-3)²=9, (-1)²=1, (1)²=1, (3)²=9, (5)²=25",
+      "tip": "Squaring removes negative signs and gives more weight to larger deviations"
+    },
+    {
+      "id": "step-5",
+      "name": "Sum the Squared Deviations",
+      "description": "Add all squared deviations: 25 + 9 + 1 + 1 + 9 + 25 = 70",
+      "tip": "This is called the sum of squares"
+    },
+    {
+      "id": "step-6",
+      "name": "Divide by n or n-1",
+      "description": "For population: divide by n (6). For sample: divide by n-1 (5). Sample variance = 70 ÷ 5 = 14",
+      "warning": "Use n-1 for sample data (Bessel's correction) to avoid underestimating the population standard deviation"
+    },
+    {
+      "id": "step-7",
+      "name": "Take the Square Root",
+      "description": "Standard deviation = √14 ≈ 3.74",
+      "tip": "The result is in the same units as your original data"
+    },
+    {
+      "id": "step-8",
+      "name": "Interpret the Result",
+      "description": "A standard deviation of 3.74 means that on average, values deviate from the mean by about 3.74 units",
+      "tip": "About 68% of data falls within one standard deviation of the mean in a normal distribution"
+    }
+  ],
+  "content": "Standard deviation is a crucial measure of variability in statistics. It tells you how spread out your data is from the average (mean). This guide walks you through both sample and population standard deviation calculations, helping you understand when to use each and how to interpret the results."
+}

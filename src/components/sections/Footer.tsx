@@ -1,5 +1,5 @@
 import React from 'react'
-import { Calculator, Mail, Github, Twitter } from 'lucide-react'
+import { Calculator, Twitter } from 'lucide-react'
 
 const Footer = () => {
   return (
@@ -18,7 +18,7 @@ const Footer = () => {
           </div>
 
           <div>
-            <h3 className="font-semibold mb-4">Popular Tools</h3>
+            <h3 className="font-semibold mb-4">Popular Calculators</h3>
             <ul className="space-y-2 text-sm text-gray-300">
               <li><a href="/calculator/mean" className="hover:text-white transition-colors">Mean Calculator</a></li>
               <li><a href="#" className="hover:text-white transition-colors">Standard Deviation</a></li>
@@ -31,30 +31,23 @@ const Footer = () => {
           <div>
             <h3 className="font-semibold mb-4">Resources</h3>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li><a href="#" className="hover:text-white transition-colors">Statistics Guide</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">How to Use</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Examples</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Formulas</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">API Documentation</a></li>
+              <li><a href="/how-to" className="hover:text-white transition-colors">Statistics Guide</a></li>
+              <li><a href="/how-to" className="hover:text-white transition-colors">How to Use</a></li>
+              <li><a href="/glossary" className="hover:text-white transition-colors">Glossary</a></li>
+              <li><a href="/faq" className="hover:text-white transition-colors">FAQ</a></li>
+              <li><a href="/cases" className="hover:text-white transition-colors">Cases</a></li>
             </ul>
           </div>
 
           <div>
             <h3 className="font-semibold mb-4">Connect</h3>
             <ul className="space-y-2 text-sm text-gray-300">
-              <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+              <li><a href="/about" className="hover:text-white transition-colors">About Us</a></li>
+              <li><a href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</a></li>
+              <li><a href="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</a></li>
             </ul>
-            
+
             <div className="flex space-x-4 mt-6">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Mail className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
-                <Github className="h-5 w-5" />
-              </a>
               <a href="#" className="text-gray-400 hover:text-white transition-colors">
                 <Twitter className="h-5 w-5" />
               </a>

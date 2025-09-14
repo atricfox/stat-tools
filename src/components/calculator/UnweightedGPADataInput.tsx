@@ -282,7 +282,7 @@ export default function UnweightedGPADataInput({
         {courses.length === 0 && (
           <div className="text-center py-8 text-gray-500">
             <p className="mb-2">No courses added yet</p>
-            <p className="text-sm">Add your courses above or load example data to get started</p>
+            <p className="text-sm">Add your courses above or use the Load Example button to get started</p>
           </div>
         )}
       </div>

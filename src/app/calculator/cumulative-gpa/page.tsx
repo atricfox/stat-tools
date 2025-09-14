@@ -46,7 +46,7 @@ const jsonLd = {
 
 export default function CumulativeGPACalculatorPage() {
   const breadcrumbs = [
-    { label: 'Calculators', href: '/calculator' },
+    { label: 'Calculators', href: '/statistics-calculators' },
     { label: 'Cumulative GPA Calculator' }
   ];
 

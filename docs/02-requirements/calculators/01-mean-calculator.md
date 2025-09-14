@@ -87,7 +87,7 @@ reviewers: []
 
 ## 六、页面 UI 行为规范（关键交互）
 
-1. 页面顶部：标题、简短说明（Plain English）、面包屑返回 Hub（`/statistics-calculators/`）。
+1. 页面顶部：标题、简短说明（Plain English）、面包屑返回总 Hub（聚合导航页）（`/statistics-calculators/`）。
 2. 主输入区（首屏可见）：大文本框，支持逗号、换行、空格、制表符、中文逗号。
    - 占位文本示例："Enter numbers (comma, newline or space separated) — e.g. 12, 15, 20"。
 3. 参数区：Precision (0–10)、Ignore non-numeric (toggle)、Treat missing as (ignore/zero)。

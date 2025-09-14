@@ -152,7 +152,7 @@ export default function StandardDeviationClient() {
         title="Standard Deviation Calculator"
         description="Calculate sample and population standard deviation with step-by-step explanations for different use cases."
         breadcrumbs={[
-          { label: 'Calculators', href: '/calculator' },
+          { label: 'Calculators', href: '/statistics-calculators' },
           { label: 'Standard Deviation Calculator' }
         ]}
         currentTool="standard-deviation"
