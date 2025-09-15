@@ -13,8 +13,7 @@ interface PageProps {
 
 async function loadTermBySlug(slug: string) {
   try {
-    const result = await glossaryService.getTerms({ search: slug });
-    const term = result.terms.find(t => t.slug === slug);
+    const term = await glossaryService.getTermBySlug(slug);
     return term || null;
   } catch (error) {
     console.error('Failed to load term from database:', error);
@@ -93,12 +92,11 @@ export default async function GlossaryDetailPage({ params }: PageProps) {
     notFound();
   }
   
-  if (!term) {
-    notFound();
-  }
+  // Load glossary data for related terms
+  const glossaryData = await loadGlossaryData();
   
   // Get related terms
-  const relatedTerms = getRelatedTerms(glossaryData.terms, term.seeAlso);
+  const relatedTerms = glossaryData ? getRelatedTerms(glossaryData.terms, term.seeAlso) : [];
   
   // Generate JSON-LD structured data
   const jsonLd = {
@@ -139,7 +137,7 @@ export default async function GlossaryDetailPage({ params }: PageProps) {
       <GlossaryDetailClient 
         term={term} 
         relatedTerms={relatedTerms}
-        allTerms={glossaryData.terms}
+        allTerms={glossaryData?.terms || []}
       />
     </>
   );

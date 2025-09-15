@@ -151,12 +151,12 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
                 Results
               </h2>
               <ul className="space-y-2">
-                {caseStudy.results.map((result, index) => (
+                {caseStudy.results?.map((result, index) => (
                   <li key={index} className="flex items-start">
                     <span className="text-green-600 mr-2">✓</span>
                     <span className="text-gray-700">{result}</span>
                   </li>
-                ))}
+                )) || <li className="text-gray-500">No results available</li>}
               </ul>
               
               {/* Detailed Results */}

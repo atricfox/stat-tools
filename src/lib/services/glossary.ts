@@ -67,6 +67,18 @@ export class GlossaryService extends BaseService {
     }
 
     /**
+     * 转义 FTS5 查询字符串
+     * 处理包含连字符等特殊字符的搜索词
+     */
+    private escapeFTSQuery(query: string): string {
+        // 如果查询包含连字符或其他特殊字符，用双引号包围
+        if (query.includes('-') || query.includes('_') || /\s/.test(query)) {
+            return `"${query.replace(/"/g, '""')}"`;
+        }
+        return query;
+    }
+
+    /**
      * 获取所有分类
      */
     async getCategories(): Promise<Category[]> {
@@ -137,13 +149,15 @@ export class GlossaryService extends BaseService {
 
             // 处理搜索
             if (search) {
-                // 使用FTS5搜索
+                // 使用FTS5搜索，对包含特殊字符的搜索词进行转义
                 const searchCondition = whereClause ? 'AND' : 'WHERE';
                 whereClause += ` ${searchCondition} t.id IN (
                     SELECT rowid FROM glossary_fts
                     WHERE glossary_fts MATCH ?
                 )`;
-                params.push(search);
+                // 对搜索词进行FTS转义处理
+                const escapedSearch = this.escapeFTSQuery(search);
+                params.push(escapedSearch);
             }
 
             // 构建完整查询
@@ -335,7 +349,8 @@ export class GlossaryService extends BaseService {
                 LIMIT ?
             `;
 
-            const results = this.db.prepare(searchQuery).all(query, limit);
+            const escapedQuery = this.escapeFTSQuery(query);
+            const results = this.db.prepare(searchQuery).all(escapedQuery, limit);
 
             // 分析匹配的字段
             const suggestions: SearchSuggestion[] = await Promise.all(
