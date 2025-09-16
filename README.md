@@ -198,6 +198,41 @@ Cloudflare Pages：
 # Server-side secret
 wrangler pages project secret put SENTRY_DSN --project-name "$CF_PAGES_PROJECT"
 
+## 数据库（瘦身方案）
+
+项目已切换到精简版 SQLite 架构，所有 DDL 通过 migrations 管理，运行期不再创建/修改表结构。
+
+- 核心表：`slim_content`、`slim_content_details`、`calculator_groups`、`calculators`、`glossary_terms`、`content_types_static`
+- 兼容视图用于过渡：`v_content_items_legacy`、`v_howto_steps_from_details`、`v_case_details_from_details`
+- 全文索引（可选）：`content_search`（FTS5）
+
+常用命令：
+
+```bash
+# 迁移（幂等，可重复执行）
+npm run db:migrate:slim
+
+# 注入最小演示内容
+npm run db:seed:content
+
+# 重建全文索引（可选）
+npm run db:fts:refresh
+```
+
+启用 FTS 搜索（可选）：
+
+```bash
+# 设置环境变量（任一即可）
+export USE_FTS_SEARCH=1
+# 或
+export CONTENT_SEARCH_MODE=fts
+```
+
+注意事项：
+- `initializeDatabase()` 仅负责打开连接与 PRAGMA，DDL 必须通过 `migrations/`。
+- 首次启用 FTS 前建议先执行 `npm run db:fts:refresh`。
+- 旧的增强内容服务已移除：`src/lib/services/enhanced-content*.ts`。
+
 # Public variables (optional)
 wrangler pages project variable put NEXT_PUBLIC_SENTRY_DSN --project-name "$CF_PAGES_PROJECT" --value "$YOUR_PUBLIC_DSN"
 wrangler pages project variable put NEXT_PUBLIC_ENVIRONMENT --project-name "$CF_PAGES_PROJECT" --value "production"

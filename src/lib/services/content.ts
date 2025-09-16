@@ -87,14 +87,10 @@ export class ContentService extends BaseService {
 
         return this.queryWithCache(cacheKey, () => {
             const query = `
-                SELECT
-                    id,
-                    type_name,
-                    display_name
-                FROM content_types
+                SELECT id, type_name, display_name
+                FROM content_types_static
                 ORDER BY display_name ASC
             `;
-
             return this.db.prepare(query).all() as ContentType[];
         }, this.defaultCacheTTL);
     }
@@ -118,73 +114,34 @@ export class ContentService extends BaseService {
         const cacheKey = this.generateCacheKey('content:items', JSON.stringify(options));
 
         return this.queryWithCache(cacheKey, async () => {
-            // 构建WHERE条件
-            const conditions: Record<string, any> = {};
-            if (typeId) conditions.type_id = typeId;
-            if (status) conditions.status = status;
-
-            let whereClause = '';
+            // 构建WHERE条件（基于 slim_content + content_types_static）
+            let whereClause = 'WHERE 1=1';
             let params: any[] = [];
-
-            if (Object.keys(conditions).length > 0) {
-                const where = this.buildWhereClause(conditions);
-                whereClause = where.clause;
-                params = where.params;
-            }
-
-            // 处理类型名称
-            if (typeName) {
-                const typeCondition = whereClause ? 'AND' : 'WHERE';
-                whereClause += ` ${typeCondition} ct.type_name = ?`;
-                params.push(typeName);
-            }
-
-            // 处理搜索
+            if (status) { whereClause += ' AND sc.status = ?'; params.push(status); }
+            if (typeId) { whereClause += ' AND cts.id = ?'; params.push(typeId); }
+            if (typeName) { whereClause += ' AND sc.type = ?'; params.push(typeName); }
             if (search) {
-                // 使用FTS5搜索
-                const searchCondition = whereClause ? 'AND' : 'WHERE';
-                whereClause += ` ${searchCondition} ci.id IN (
-                    SELECT rowid FROM content_search
-                    WHERE content_search MATCH ?
-                )`;
-                params.push(search);
+                const like = `%${search}%`;
+                whereClause += ' AND (sc.title LIKE ? OR sc.summary LIKE ? OR sc.content LIKE ?)';
+                params.push(like, like, like);
             }
-
-            // 处理标签搜索
             if (tags && tags.length > 0) {
-                const tagCondition = whereClause ? 'AND' : 'WHERE';
-                const tagPlaceholders = tags.map(() => '?').join(', ');
-                whereClause += ` ${tagCondition} ci.id IN (
-                    SELECT DISTINCT content_id FROM content_metadata
-                    WHERE meta_key = 'tags' AND meta_value LIKE ('%' || ? || '%')
-                )`;
-                params.push(tags[0]); // 简化的标签搜索
+                const cond = tags.map(() => 'sc.tags LIKE ?').join(' OR ');
+                whereClause += ` AND (${cond})`;
+                tags.forEach(t => params.push(`%"${t}"%`));
             }
 
-            // 构建完整查询
             const countQuery = `
-                SELECT COUNT(DISTINCT ci.id) as count
-                FROM content_items ci
-                LEFT JOIN content_types ct ON ci.type_id = ct.id
+                SELECT COUNT(*) as count
+                FROM slim_content sc
+                JOIN content_types_static cts ON cts.type_name = sc.type
                 ${whereClause}
             `;
 
             const dataQuery = `
-                SELECT
-                    ci.id,
-                    ci.type_id,
-                    ci.slug,
-                    ci.title,
-                    ci.summary,
-                    ci.content,
-                    ci.status,
-                    ci.reading_time,
-                    ci.created_at,
-                    ci.updated_at,
-                    ct.type_name,
-                    ct.display_name as type_display_name
-                FROM content_items ci
-                LEFT JOIN content_types ct ON ci.type_id = ct.id
+                SELECT sc.*, cts.id as type_id, cts.type_name, cts.display_name as type_display_name
+                FROM slim_content sc
+                JOIN content_types_static cts ON cts.type_name = sc.type
                 ${whereClause}
                 ${this.buildOrderByClause(sortBy, sortOrder)}
             `;
@@ -245,22 +202,10 @@ export class ContentService extends BaseService {
 
         return this.queryWithCache(cacheKey, async () => {
             const query = `
-                SELECT
-                    ci.id,
-                    ci.type_id,
-                    ci.slug,
-                    ci.title,
-                    ci.summary,
-                    ci.content,
-                    ci.status,
-                    ci.reading_time,
-                    ci.created_at,
-                    ci.updated_at,
-                    ct.type_name,
-                    ct.display_name as type_display_name
-                FROM content_items ci
-                LEFT JOIN content_types ct ON ci.type_id = ct.id
-                WHERE ci.id = ?
+                SELECT sc.*, cts.id as type_id, cts.type_name, cts.display_name as type_display_name
+                FROM slim_content sc
+                JOIN content_types_static cts ON cts.type_name = sc.type
+                WHERE sc.id = ?
             `;
 
             const row = this.db.prepare(query).get(id);
@@ -297,22 +242,10 @@ export class ContentService extends BaseService {
 
         return this.queryWithCache(cacheKey, async () => {
             const query = `
-                SELECT
-                    ci.id,
-                    ci.type_id,
-                    ci.slug,
-                    ci.title,
-                    ci.summary,
-                    ci.content,
-                    ci.status,
-                    ci.reading_time,
-                    ci.created_at,
-                    ci.updated_at,
-                    ct.type_name,
-                    ct.display_name as type_display_name
-                FROM content_items ci
-                LEFT JOIN content_types ct ON ci.type_id = ct.id
-                WHERE ci.slug = ?
+                SELECT sc.*, cts.id as type_id, cts.type_name, cts.display_name as type_display_name
+                FROM slim_content sc
+                JOIN content_types_static cts ON cts.type_name = sc.type
+                WHERE sc.slug = ?
             `;
 
             const row = this.db.prepare(query).get(slug);
@@ -348,26 +281,15 @@ export class ContentService extends BaseService {
         const cacheKey = this.generateCacheKey('content:metadata', contentId);
 
         return this.queryWithCache(cacheKey, () => {
-            const query = `
-                SELECT
-                    meta_key,
-                    meta_value
-                FROM content_metadata
-                WHERE content_id = ?
-                ORDER BY meta_key ASC
-            `;
-
-            const rows = this.db.prepare(query).all(contentId) as ContentMetadata[];
-
+            const row = this.db.prepare(`SELECT * FROM slim_content WHERE id = ?`).get(contentId) as any;
+            if (!row) return {} as Record<string, any>;
+            let tags: any = [];
+            try { tags = JSON.parse(row.tags || '[]'); } catch { tags = []; }
             const metadata: Record<string, any> = {};
-            rows.forEach(row => {
-                try {
-                    metadata[row.meta_key] = JSON.parse(row.meta_value);
-                } catch {
-                    metadata[row.meta_key] = row.meta_value;
-                }
-            });
-
+            metadata.tags = tags;
+            if (row.difficulty) metadata.difficulty = row.difficulty;
+            if (row.industry) metadata.industry = row.industry;
+            if (row.target_tool) metadata.target_tool = row.target_tool;
             return metadata;
         }, this.defaultCacheTTL);
     }
@@ -379,22 +301,19 @@ export class ContentService extends BaseService {
         const cacheKey = this.generateCacheKey('content:howto:steps', contentId);
 
         return this.queryWithCache(cacheKey, () => {
-            const query = `
-                SELECT
-                    id,
-                    content_id,
-                    step_order,
-                    step_id,
-                    name,
-                    description,
-                    tip,
-                    warning
-                FROM howto_steps
-                WHERE content_id = ?
-                ORDER BY step_order ASC
-            `;
-
-            return this.db.prepare(query).all(contentId) as HowToStep[];
+            const row = this.db.prepare(`SELECT details FROM slim_content_details WHERE content_id = ?`).get(contentId) as any;
+            const details = row?.details ? JSON.parse(row.details) : {};
+            const steps = Array.isArray(details.steps) ? details.steps : [];
+            return steps.map((s: any, idx: number) => ({
+                id: contentId * 100000 + (idx + 1),
+                content_id: contentId,
+                step_order: s.stepOrder ?? (idx + 1),
+                step_id: s.stepId || String(idx + 1),
+                name: s.name || '',
+                description: s.description || '',
+                tip: s.tip,
+                warning: s.warning
+            })) as HowToStep[];
         }, this.defaultCacheTTL);
     }
 
@@ -405,31 +324,40 @@ export class ContentService extends BaseService {
         const cacheKey = this.generateCacheKey('content:search', query, limit);
 
         return this.queryWithCache(cacheKey, async () => {
-            // 使用FTS5搜索 - 简化版本避免snippet()函数参数问题
-            const searchQuery = `
-                SELECT
-                    ci.id,
-                    ci.type_id,
-                    ci.slug,
-                    ci.title,
-                    ci.summary,
-                    ci.content,
-                    ci.status,
-                    ci.reading_time,
-                    ci.created_at,
-                    ci.updated_at,
-                    ct.type_name,
-                    ct.display_name as type_display_name,
-                    content_search.rank as score
-                FROM content_items ci
-                LEFT JOIN content_types ct ON ci.type_id = ct.id
-                JOIN content_search ON ci.id = content_search.rowid
-                WHERE content_search MATCH ?
-                ORDER BY content_search.rank DESC, ci.title ASC
-                LIMIT ?
-            `;
+            const useFts = process.env.USE_FTS_SEARCH === '1' || process.env.CONTENT_SEARCH_MODE === 'fts';
+            let results: any[] = [];
 
-            const results = this.db.prepare(searchQuery).all(query, limit);
+            if (useFts) {
+                try {
+                    const ftsQuery = `
+                        SELECT sc.*, cts.id as type_id, cts.type_name, cts.display_name as type_display_name,
+                               content_search.rank as score
+                        FROM content_search
+                        JOIN slim_content sc ON content_search.rowid = sc.id
+                        JOIN content_types_static cts ON cts.type_name = sc.type
+                        WHERE content_search MATCH ?
+                        ORDER BY content_search.rank DESC, sc.title ASC
+                        LIMIT ?
+                    `;
+                    results = this.db.prepare(ftsQuery).all(query, limit) as any[];
+                } catch (e) {
+                    // fall back to LIKE below
+                }
+            }
+
+            if (!results || results.length === 0) {
+                const like = `%${query}%`;
+                const likeQuery = `
+                    SELECT sc.*, cts.id as type_id, cts.type_name, cts.display_name as type_display_name,
+                           1.0 as score
+                    FROM slim_content sc
+                    JOIN content_types_static cts ON cts.type_name = sc.type
+                    WHERE sc.title LIKE ? OR sc.summary LIKE ? OR sc.content LIKE ?
+                    ORDER BY sc.updated_at DESC, sc.title ASC
+                    LIMIT ?
+                `;
+                results = this.db.prepare(likeQuery).all(like, like, like, limit) as any[];
+            }
 
             const searchResults: SearchResult[] = await Promise.all(
                 results.map(async (result: any) => ({
@@ -501,32 +429,20 @@ export class ContentService extends BaseService {
             const tags = currentContent.metadata?.tags || [];
             if (tags.length === 0) return [];
 
-            // 基于标签查找相关内容
+            // 基于 tags 的简单相似：同类型 + tags 包含首个标签（slim 模型）
+            const like = `%"${tags[0]}"%`;
             const relatedQuery = `
-                SELECT DISTINCT
-                    ci.id,
-                    ci.type_id,
-                    ci.slug,
-                    ci.title,
-                    ci.summary,
-                    ci.content,
-                    ci.status,
-                    ci.reading_time,
-                    ci.created_at,
-                    ci.updated_at,
-                    ct.type_name,
-                    ct.display_name as type_display_name
-                FROM content_items ci
-                LEFT JOIN content_types ct ON ci.type_id = ct.id
-                LEFT JOIN content_metadata cm ON ci.id = cm.content_id
-                WHERE cm.meta_key = 'tags'
-                AND ci.id != ?
-                AND cm.meta_value LIKE ('%' || ? || '%')
-                ORDER BY ci.updated_at DESC
+                SELECT sc.*, cts.id as type_id, cts.type_name, cts.display_name as type_display_name
+                FROM slim_content sc
+                JOIN content_types_static cts ON cts.type_name = sc.type
+                WHERE sc.id != ?
+                AND sc.type = (SELECT type FROM slim_content WHERE id = ?)
+                AND sc.tags LIKE ?
+                ORDER BY sc.updated_at DESC
                 LIMIT ?
             `;
 
-            const results = this.db.prepare(relatedQuery).all(contentId, tags[0], limit);
+            const results = this.db.prepare(relatedQuery).all(contentId, contentId, like, limit);
 
             return await Promise.all(
                 results.map(async (row: any) => ({
@@ -566,24 +482,24 @@ export class ContentService extends BaseService {
         return this.queryWithCache(cacheKey, () => {
             const statsQuery = `
                 SELECT
-                    (SELECT COUNT(*) FROM content_items) as total_items,
-                    (SELECT COUNT(*) FROM content_types) as total_types,
-                    (SELECT COUNT(*) FROM content_items WHERE status = 'published') as published_items,
-                    (SELECT AVG(reading_time) FROM content_items WHERE reading_time IS NOT NULL) as avg_reading_time
+                    (SELECT COUNT(*) FROM slim_content) as total_items,
+                    (SELECT COUNT(*) FROM content_types_static) as total_types,
+                    (SELECT COUNT(*) FROM slim_content WHERE status = 'published') as published_items,
+                    (SELECT AVG(reading_time) FROM slim_content WHERE reading_time IS NOT NULL) as avg_reading_time
             `;
 
             const stats = this.db.prepare(statsQuery).get();
 
             const typeCountsQuery = `
                 SELECT
-                    ct.id,
-                    ct.type_name,
-                    ct.display_name,
-                    COUNT(ci.id) as item_count
-                FROM content_types ct
-                LEFT JOIN content_items ci ON ct.id = ci.type_id
-                GROUP BY ct.id
-                ORDER BY ct.display_name ASC
+                    cts.id,
+                    cts.type_name,
+                    cts.display_name,
+                    COUNT(sc.id) as item_count
+                FROM content_types_static cts
+                LEFT JOIN slim_content sc ON cts.type_name = sc.type
+                GROUP BY cts.id
+                ORDER BY cts.display_name ASC
             `;
 
             const typeCounts = this.db.prepare(typeCountsQuery).all();

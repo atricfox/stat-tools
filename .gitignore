@@ -40,6 +40,14 @@ pids
 *.seed
 *.pid.lock
 
+# Local SQLite databases
+data/*.db
+data/*.db-*
+backups/*.db
+backups/**/*.db
+content-backup-*/**/*.db
+statcal.db
+
 # Coverage directory used by tools like istanbul
 coverage/
 *.lcov

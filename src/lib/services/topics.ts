@@ -266,18 +266,38 @@ export class TopicsService extends BaseService {
         const cacheKey = this.generateCacheKey('topics:calculatorGroups', topicId);
 
         return this.queryWithCache(cacheKey, () => {
-            const query = `
-                SELECT meta_value
-                FROM content_metadata
-                WHERE content_id = ? AND meta_key = 'related_calculator_groups'
-            `;
-
-            const result = this.db.prepare(query).get(topicId);
-            if (!result || !result.meta_value) return [];
-
+            // DEPRECATED: content_metadata has been removed in slim schema.
+            // Fallback strategy: try to read from slim_content_details.details.related_calculator_groups
+            // or from slim_content.tags if present.
             try {
-                return JSON.parse(result.meta_value);
-            } catch {
+                const row = this.db.prepare(`
+                    SELECT sc.tags as tags, scd.details as details
+                    FROM slim_content sc
+                    LEFT JOIN slim_content_details scd ON scd.content_id = sc.id
+                    WHERE sc.id = ?
+                `).get(topicId) as any;
+                if (!row) return [];
+                // Try details.related_calculator_groups
+                if (row.details) {
+                    try {
+                        const details = JSON.parse(row.details);
+                        if (Array.isArray(details?.related_calculator_groups)) {
+                            return details.related_calculator_groups as string[];
+                        }
+                    } catch {}
+                }
+                // Try tags (if encoded)
+                if (row.tags) {
+                    try {
+                        const tags = JSON.parse(row.tags);
+                        if (Array.isArray(tags)) {
+                            return tags.filter((t: any) => typeof t === 'string');
+                        }
+                    } catch {}
+                }
+                return [];
+            } catch (e) {
+                console.warn('[DEPRECATED] getTopicCalculatorGroups relies on removed content_metadata; returning empty list.');
                 return [];
             }
         }, this.defaultCacheTTL);

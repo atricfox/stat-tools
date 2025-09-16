@@ -14,7 +14,26 @@ interface PageProps {
 async function loadTermBySlug(slug: string) {
   try {
     const term = await glossaryService.getTermBySlug(slug);
-    return term || null;
+    if (!term) return null;
+
+    // 转换字段名以匹配前端组件期望的格式
+    return {
+      slug: term.slug,
+      title: term.title,
+      shortDescription: term.short_description || '',
+      definition: term.definition,
+      firstLetter: term.first_letter || term.title.charAt(0).toUpperCase(),
+      categories: term.categories?.map(cat => cat.name) || [],
+      createdAt: term.created_at,
+      updatedAt: term.updated_at,
+      misconceptions: [],
+      relatedTools: [],
+      relatedHubs: [],
+      seeAlso: [],
+      externalLinks: [],
+      updated: term.updated_at,
+      seo: undefined,
+    };
   } catch (error) {
     console.error('Failed to load term from database:', error);
     return null;
