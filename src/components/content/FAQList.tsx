@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import { ChevronDown, ChevronRight, Search, HelpCircle, X } from 'lucide-react';
 import Link from 'next/link';
 import type { TFAQItem } from '@/lib/content/contentSchema';
+import { convertMarkdownToHtml, sanitizeHtml } from '@/lib/content/markdownToHtml';
 
 interface FAQListProps {
   items: TFAQItem[];
@@ -181,9 +182,12 @@ export default function FAQList({
                           id={`faq-${item.id}-answer`}
                           className="px-4 pb-4 pl-12"
                         >
-                          <div className="prose prose-sm max-w-none text-gray-700">
-                            {item.answer}
-                          </div>
+                          <div 
+                            className="faq-markdown-content"
+                            dangerouslySetInnerHTML={{
+                              __html: sanitizeHtml(convertMarkdownToHtml(item.answer))
+                            }}
+                          />
                           
                           {item.relatedQuestions && item.relatedQuestions.length > 0 && (
                             <div className="mt-4 pt-4 border-t border-gray-200">
