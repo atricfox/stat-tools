@@ -82,22 +82,8 @@ export class GlossaryService extends BaseService {
      * 获取所有分类
      */
     async getCategories(): Promise<Category[]> {
-        const cacheKey = this.generateCacheKey('glossary:categories');
-
-        return this.queryWithCache(cacheKey, () => {
-            const query = `
-                SELECT
-                    id,
-                    name,
-                    display_name,
-                    description,
-                    created_at
-                FROM categories
-                ORDER BY display_name ASC
-            `;
-
-            return this.db.prepare(query).all() as Category[];
-        }, this.defaultCacheTTL);
+        // categories表不存在，返回空数组
+        return [];
     }
 
     /**
@@ -192,16 +178,14 @@ export class GlossaryService extends BaseService {
                 params
             });
 
-            // 为每个术语获取分类
-            const termsWithCategories = await Promise.all(
-                result.data.map(async (term) => ({
-                    ...term,
-                    categories: await this.getTermCategories(term.id)
-                }))
-            );
+            // 为每个术语添加空分类（categories表不存在）
+            const termsWithCategories = result.data.map((term) => ({
+                ...term,
+                categories: []
+            }));
 
-            // 获取所有分类（用于前端）
-            const categories = await this.getCategories();
+            // 返回空分类列表（categories表不存在）
+            const categories: any[] = [];
 
             return {
                 terms: termsWithCategories,
@@ -280,24 +264,8 @@ export class GlossaryService extends BaseService {
      * 获取术语的分类
      */
     async getTermCategories(termId: number): Promise<Category[]> {
-        const cacheKey = this.generateCacheKey('glossary:term:categories', termId);
-
-        return this.queryWithCache(cacheKey, () => {
-            const query = `
-                SELECT
-                    c.id,
-                    c.name,
-                    c.display_name,
-                    c.description,
-                    c.created_at
-                FROM categories c
-                JOIN term_categories tc ON c.id = tc.category_id
-                WHERE tc.term_id = ?
-                ORDER BY c.display_name ASC
-            `;
-
-            return this.db.prepare(query).all(termId) as Category[];
-        }, this.defaultCacheTTL);
+        // categories表不存在，返回空数组
+        return [];
     }
 
     /**

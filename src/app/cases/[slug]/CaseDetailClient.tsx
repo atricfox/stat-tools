@@ -244,7 +244,7 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
             )}
 
             {/* Key Insights */}
-            {content.key_insights && (
+            {content.key_insights && Array.isArray(content.key_insights) && content.key_insights.length > 0 && (
               <div className="bg-white rounded-lg border border-gray-200 p-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Insights</h3>
                 <ul className="space-y-2 text-sm">

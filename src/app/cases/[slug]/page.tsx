@@ -39,7 +39,7 @@ async function loadCaseContent(slug: string) {
         challenge: caseDetails?.challenge || '',
         approach: caseDetails?.approach || {},
         results_detail: caseDetails?.results_detail || {},
-        key_insights: caseDetails?.key_insights || {},
+        key_insights: caseDetails?.key_insights || [],
         recommendations: caseDetails?.recommendations || {}
       }
     };
