@@ -128,7 +128,7 @@ const DataInput = ({
   const loadExample = useCallback(() => {
     const examples = {
       student: '85, 92, 78, 96, 88, 91, 83, 89, 87, 94',
-      research: '1.23e-4, 5.67e+2, 890.12, 3.45e-3, 2.11e+1, 9.87e-2',
+      research: '75.2, 82.1, 91.4, 67.8, 89.3, 72.6, 95.1, 84.7, 78.9, 86.2, 93.5, 71.3, 88.0, 76.4, 90.7, 83.8, 77.1, 92.3, 85.6, 79.2',
       teacher: `Student 1	85	90	88
 Student 2	92	87	91  
 Student 3	78	82	79

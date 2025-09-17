@@ -17,7 +17,7 @@ import { UserMode } from './UserModeSelector';
 
 interface HelpSectionProps {
   userMode: UserMode;
-  calculatorType?: 'mean' | 'weighted-mean' | 'standard-deviation' | 'variance' | 'final-grade' | 'semester-grade' | 'cumulative-gpa' | 'gpa' | 'unweighted-gpa' | 'percent-error' | 'range';
+  calculatorType?: 'mean' | 'weighted-mean' | 'standard-deviation' | 'variance' | 'final-grade' | 'semester-grade' | 'cumulative-gpa' | 'gpa' | 'unweighted-gpa' | 'percent-error' | 'range' | 'mean-confidence-intervals';
   className?: string;
 }
 
@@ -775,6 +775,127 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
       ]
     };
 
+    // Content for Mean Confidence Intervals Calculator
+    const meanConfidenceIntervalsContent = {
+      basics: [
+        {
+          id: 'what-are-confidence-intervals',
+          title: 'What are Confidence Intervals?',
+          content: 'Confidence intervals estimate the range where the true population mean likely falls. A 95% confidence interval means that if we repeated the sampling process many times, 95% of the intervals would contain the true population mean.',
+          examples: [
+            'Sample mean: 100, 95% CI: [95.2, 104.8] → True mean likely between 95.2 and 104.8',
+            'Narrow interval: precise estimate with large sample or low variability',
+            'Wide interval: less precise estimate with small sample or high variability'
+          ]
+        },
+        {
+          id: 'multiple-methods',
+          title: 'Multiple Estimation Methods',
+          content: 'This calculator provides four different methods for constructing confidence intervals, each with different assumptions and strengths.',
+          examples: [
+            'T-Interval: Standard method assuming normal distribution',
+            'Bootstrap Percentile: Non-parametric method using resampling',
+            'Bootstrap BCa: Bias-corrected and accelerated bootstrap method',
+            'Trimmed Mean Bootstrap: Robust method that reduces outlier influence'
+          ]
+        },
+        {
+          id: 'input-formats',
+          title: 'Supported Input Formats',
+          content: 'Enter sample data separated by commas, spaces, or new lines. At least 3 data points are required for meaningful confidence intervals.',
+          examples: [
+            'Comma separated: 12.3, 11.8, 13.1, 12.7, 11.9',
+            'Space separated: 12.3 11.8 13.1 12.7 11.9',
+            'Line by line:\n12.3\n11.8\n13.1\n12.7\n11.9'
+          ]
+        }
+      ],
+      formulas: [
+        {
+          id: 'confidence-interval-formulas',
+          title: 'Confidence Interval Formulas',
+          content: 'Different methods use different approaches to construct confidence intervals.',
+          examples: [
+            'T-Interval: x̄ ± t(α/2, n-1) × (s/√n)',
+            'Bootstrap Percentile: Uses percentiles of bootstrap distribution',
+            'Bootstrap BCa: Adjusts for bias and skewness in bootstrap distribution',
+            'Trimmed Bootstrap: Uses bootstrap of trimmed means for robustness'
+          ]
+        },
+        {
+          id: 'interpretation',
+          title: 'Interpreting Results',
+          content: 'Confidence intervals provide both point estimates and uncertainty measures.',
+          examples: [
+            'Point estimate: Sample mean as best guess for population mean',
+            'Interval width: Indicates precision of the estimate',
+            'Confidence level: Probability that interval contains true mean',
+            'Method comparison: Different methods may give slightly different intervals'
+          ]
+        }
+      ],
+      examples: [
+        {
+          id: 'research-example',
+          title: 'Research Data Analysis',
+          content: 'Analyzing experimental measurements: 24.2, 23.8, 24.5, 24.1, 23.9, 24.3, 24.0',
+          examples: [
+            'Sample mean: 24.11, Sample size: 7',
+            'T-interval (95%): [23.85, 24.37]',
+            'Bootstrap percentile (95%): [23.84, 24.36]',
+            'BCa bootstrap (95%): [23.86, 24.38]',
+            'All methods give similar results for this well-behaved data'
+          ]
+        },
+        {
+          id: 'outlier-example',
+          title: 'Data with Outliers',
+          content: 'When data contains outliers: 10.2, 10.1, 10.3, 10.0, 15.8, 10.2, 10.1',
+          examples: [
+            'Regular mean affected by outlier (15.8)',
+            'Trimmed mean bootstrap reduces outlier influence',
+            'BCa method adjusts for data asymmetry',
+            'Compare different methods to assess robustness'
+          ]
+        }
+      ],
+      troubleshooting: [
+        {
+          id: 'small-sample-size',
+          title: 'Small Sample Size Issues',
+          content: 'Very small samples (n < 5) may give unreliable confidence intervals.',
+          tips: [
+            'Collect more data points if possible',
+            'Bootstrap methods may be less reliable with n < 10',
+            'Consider using t-intervals for small samples from normal populations',
+            'Report sample size limitations in your analysis'
+          ]
+        },
+        {
+          id: 'method-selection',
+          title: 'Choosing the Right Method',
+          content: 'Different methods are appropriate for different data characteristics.',
+          tips: [
+            'T-interval: Good for normally distributed data',
+            'Bootstrap percentile: Robust to distribution shape',
+            'BCa bootstrap: Better for skewed or biased data',
+            'Trimmed mean: Best when outliers are present'
+          ]
+        },
+        {
+          id: 'wide-intervals',
+          title: 'Very Wide Confidence Intervals',
+          content: 'Extremely wide intervals indicate high uncertainty in the estimate.',
+          tips: [
+            'Check for outliers that increase variability',
+            'Consider if sample size is adequate for your research',
+            'High variability in data leads to wider intervals',
+            'Use trimmed mean method to reduce outlier impact'
+          ]
+        }
+      ]
+    };
+
     // Choose content based on calculator type
     const baseContent = calculatorType === 'standard-deviation' ? standardDeviationContent :
                        calculatorType === 'weighted-mean' ? weightedMeanContent :
@@ -786,6 +907,7 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
                        calculatorType === 'unweighted-gpa' ? unweightedGPAContent :
                        calculatorType === 'percent-error' ? percentErrorContent :
                        calculatorType === 'range' ? rangeContent :
+                       calculatorType === 'mean-confidence-intervals' ? meanConfidenceIntervalsContent :
                        meanContent;
 
     const contextSpecific = {
@@ -977,6 +1099,12 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
                   <div>• Use grade exclusion features for pass/fail courses</div>
                   <div>• Consider retaking courses with very low grades</div>
                 </>
+              ) : calculatorType === 'mean-confidence-intervals' ? (
+                <>
+                  <div>• Start with t-intervals, then compare with bootstrap methods</div>
+                  <div>• Use trimmed mean option when you suspect outliers</div>
+                  <div>• Check calculation steps to understand each method</div>
+                </>
               ) : (
                 <>
                   <div>• Use the precision control to match your assignment requirements</div>
@@ -1018,6 +1146,12 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
                   <div>• Analyze impact of grading system conversions</div>
                   <div>• Model different academic scenarios and outcomes</div>
                 </>
+              ) : calculatorType === 'mean-confidence-intervals' ? (
+                <>
+                  <div>• Compare multiple methods to assess estimate robustness</div>
+                  <div>• Use BCa bootstrap for asymmetric or biased distributions</div>
+                  <div>• Document method selection rationale in your research</div>
+                </>
               ) : (
                 <>
                   <div>• Enable outlier detection to identify unusual data points</div>
@@ -1058,6 +1192,12 @@ const HelpSection: React.FC<HelpSectionProps> = ({ userMode, calculatorType = 'm
                   <div>• Track student academic progress across multiple years</div>
                   <div>• Identify students at risk for academic probation</div>
                   <div>• Guide students on graduation requirements and GPA goals</div>
+                </>
+              ) : calculatorType === 'mean-confidence-intervals' ? (
+                <>
+                  <div>• Show students how different methods compare</div>
+                  <div>• Use real classroom data for practical examples</div>
+                  <div>• Emphasize interpretation over calculation mechanics</div>
                 </>
               ) : (
                 <>

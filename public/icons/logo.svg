@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="150 150 220 240" role="img">
+  <title>Mu-Sigma Mark — Transparent</title>
+  <!-- Σ -->
+  <path d="M320 160H210l70 80-70 80h110"
+        fill="none"
+        stroke="#0B84F3"
+        stroke-width="28"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <!-- μ -->
+  <path d="M160 184v120c0 30 20 52 50 52
+           24 0 42-14 50-36
+           8 22 26 36 50 36
+           30 0 50-22 50-52v-56"
+        fill="none"
+        stroke="#0E7490"
+        stroke-width="22"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <!-- 学术黄点缀 -->
+  <circle cx="342" cy="156" r="8" fill="#FACC15"/>
+</svg>
+

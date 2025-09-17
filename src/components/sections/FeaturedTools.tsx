@@ -35,16 +35,10 @@ const FeaturedTools = () => {
       popular: true
     },
     {
-      name: 't-Test Calculator',
-      slug: 't-test',
-      description: 'One-sample and two-sample t-test analysis',
-      icon: TrendingUp,
-      popular: false
-    },
-    {
-      name: 'Confidence Interval',
-      slug: 'confidence-interval',
-      description: 'Calculate confidence intervals for various parameters',
+      name: 'Mean Confidence Intervals Calculator',
+      slug: 'mean-confidence-intervals',
+      href: '/calculator/mean-confidence-intervals',
+      description: 'Calculate and compare multiple types of confidence intervals for the mean using t-distribution, Bootstrap, and robust methods',
       icon: Calculator,
       popular: true
     },
@@ -112,27 +106,6 @@ const FeaturedTools = () => {
       icon: GraduationCap,
       popular: true
     },
-    {
-      name: 'Correlation',
-      slug: 'correlation',
-      description: 'Pearson and Spearman correlation analysis',
-      icon: BarChart3,
-      popular: false
-    },
-    {
-      name: 'ANOVA Calculator',
-      slug: 'anova',
-      description: 'One-way and two-way ANOVA analysis',
-      icon: TrendingUp,
-      popular: false
-    },
-    {
-      name: 'Chi-Square Test',
-      slug: 'chi-square',
-      description: 'Goodness of fit and independence testing',
-      icon: BarChart3,
-      popular: false
-    }
   ]
 
   const popularTools = tools.filter(tool => tool.popular)

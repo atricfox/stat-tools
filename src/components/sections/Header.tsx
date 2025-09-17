@@ -1,7 +1,8 @@
 'use client'
 
 import React, { useState } from 'react'
-import { Menu, X, Calculator } from 'lucide-react'
+import { Menu, X } from 'lucide-react'
+import Logo from '@/components/ui/Logo'
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
@@ -12,8 +13,7 @@ const Header = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <a href="/" className="flex items-center" aria-label="TheStatsCalculator home">
-            <Calculator className="h-8 w-8 text-blue-500" />
-            <span className="ml-2 text-xl font-bold text-gray-900">TheStatsCalculator</span>
+            <Logo />
           </a>
 
           {/* Desktop Navigation */}

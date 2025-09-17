@@ -1,5 +1,6 @@
 import React from 'react'
-import { Calculator, Twitter } from 'lucide-react'
+import { Twitter } from 'lucide-react'
+import Logo from '@/components/ui/Logo'
 
 const Footer = () => {
   return (
@@ -7,9 +8,8 @@ const Footer = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
-            <div className="flex items-center mb-4">
-              <Calculator className="h-8 w-8 text-blue-400" />
-              <span className="ml-2 text-xl font-bold">TheStatsCalculator</span>
+            <div className="mb-4">
+              <Logo className="text-blue-400" textClassName="text-white" />
             </div>
             <p className="text-gray-300 text-sm leading-relaxed">
               Professional statistical calculators with step-by-step explanations. 
