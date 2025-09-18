@@ -1,7 +1,7 @@
 import Script from 'next/script';
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { contentService } from '@/lib/content/ContentService';
+import { EnhancedContentService } from '@/lib/services/enhanced-content';
 import type { THowToStep } from '@/lib/content/contentSchema';
 import HowToDetailClient from './HowToDetailClient';
 
@@ -13,39 +13,17 @@ interface PageProps {
 
 async function loadHowToContent(slug: string) {
   try {
-    // 使用数据库服务获取How-to内容
-    const howToItem = contentService.getContentItemBySlug(slug, 'howto');
-    if (!howToItem) {
+    const contentService = new EnhancedContentService();
+    const result = await contentService.getHowToWithSteps(slug);
+    
+    if (!result) {
       return null;
     }
 
-    // 获取步骤数据
-    const steps = contentService.getHowToStepsBySlug(slug);
-
     return {
-      frontmatter: {
-        slug: howToItem.slug,
-        title: howToItem.title,
-        summary: howToItem.summary,
-        difficulty: howToItem.difficulty,
-        industry: howToItem.industry,
-        target_tool: howToItem.target_tool,
-        tags: howToItem.tags || [],
-        outcomes: howToItem.outcomes || [],
-        prerequisites: howToItem.prerequisites || [],
-        readingTime: howToItem.reading_time,
-        created: howToItem.created_at,
-        updated: howToItem.updated_at,
-        featured: howToItem.featured,
-        priority: howToItem.priority,
-        author: howToItem.author ? {
-          name: howToItem.author,
-          role: howToItem.author_role
-        } : undefined,
-        targetTool: howToItem.target_tool
-      },
-      steps: steps,
-      content: howToItem.content || ''
+      frontmatter: result.howto,
+      steps: result.steps,
+      content: result.content
     };
   } catch (error) {
     console.error('Failed to load HowTo content from database:', error);
@@ -55,8 +33,8 @@ async function loadHowToContent(slug: string) {
 
 export async function generateStaticParams() {
   try {
-    // 使用数据库服务获取所有How-to指南的slug
-    const howToItems = contentService.getContentByType('howto');
+    const contentService = new EnhancedContentService();
+    const howToItems = await contentService.getHowToList();
 
     return howToItems.map(item => ({
       slug: item.slug,

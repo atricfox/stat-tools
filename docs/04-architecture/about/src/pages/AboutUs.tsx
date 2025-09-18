@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Users, Award, RefreshCw, Mail, Github, Linkedin } from 'lucide-react';
+import { Users, Award, RefreshCw, Mail } from 'lucide-react';
 import ContactForm from '../components/ContactForm';
 
 const AboutUs: React.FC = () => {
@@ -178,18 +178,6 @@ const AboutUs: React.FC = () => {
                     onClick={() => console.log('legal_contact_click', { channel: 'email' })}
                   >
                     contact@thestatscalculator.com
-                  </a>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <Github className="w-5 h-5 text-gray-600" aria-hidden="true" />
-                  <a
-                    href="https://github.com/thestatscalculator"
-                    className="text-gray-600 hover:text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded-md px-1"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() => console.log('legal_contact_click', { channel: 'github' })}
-                  >
-                    github.com/thestatscalculator
                   </a>
                 </div>
               </div>

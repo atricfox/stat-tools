@@ -32,14 +32,18 @@ async function loadCaseContent(slug: string) {
         tags: caseItem.tags || [],
         problem: caseDetails?.problem || '',
         solution: caseDetails?.solution || '',
-        updated: caseItem.updated_at
+        updated: caseItem.updated_at,
+        created: caseItem.created_at,
+        results: caseDetails?.results || [],
+        lessons: caseDetails?.lessons || [],
+        toolsUsed: caseDetails?.toolsUsed || []
       },
       content: {
         background: caseDetails?.background || '',
         challenge: caseDetails?.challenge || '',
         approach: caseDetails?.approach || {},
-        results_detail: caseDetails?.results_detail || {},
-        key_insights: caseDetails?.key_insights || [],
+        results_detail: caseDetails?.resultsDetail || {},
+        key_insights: caseDetails?.keyInsights || [],
         recommendations: caseDetails?.recommendations || {}
       }
     };

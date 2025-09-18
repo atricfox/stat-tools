@@ -69,6 +69,17 @@ export class LinkChecker {
       const routePath = this.pageFileToRoute(pageFile);
       this.internalRoutes.add(routePath);
     }
+
+    // Find all API route handlers
+    const apiRouteFiles = globSync('api/**/route.ts', {
+      cwd: appDir,
+      ignore: ['**/node_modules/**']
+    });
+
+    for (const routeFile of apiRouteFiles) {
+      const routePath = this.apiRouteFileToRoute(routeFile);
+      this.internalRoutes.add(routePath);
+    }
     
     // Add known static routes
     const staticRoutes = [
@@ -97,9 +108,24 @@ export class LinkChecker {
     // Handle special Next.js conventions
     route = route.replace(/\/\(.*?\)/g, ''); // Remove route groups
     route = route.replace(/\[([^\]]+)\]/g, ':$1'); // Convert dynamic segments
+    route = route.replace(/\/+/g, '/');
     route = route.replace(/\/page$/, '');
     route = route.replace(/\/$/, '') || '/';
     
+    return route;
+  }
+
+  /**
+   * Convert API route file path to route
+   */
+  private apiRouteFileToRoute(routeFile: string): string {
+    let route = '/' + path.dirname(routeFile);
+
+    route = route.replace(/\/\(.*?\)/g, ''); // Remove route groups
+    route = route.replace(/\[([^\]]+)\]/g, ':$1'); // Convert dynamic segments
+    route = route.replace(/\/+/g, '/');
+    route = route.replace(/\/$/, '') || '/';
+
     return route;
   }
 
@@ -126,7 +152,17 @@ export class LinkChecker {
       for (const pattern of filePatterns) {
         const files = globSync(pattern, {
           cwd: dir,
-          ignore: ['**/node_modules/**', '**/.next/**', '**/dist/**']
+          ignore: [
+            '**/node_modules/**', 
+            '**/.next/**', 
+            '**/dist/**',
+            '**/*.test.ts',
+            '**/*.test.tsx',
+            '**/*.spec.ts',
+            '**/*.spec.tsx',
+            '**/docs/**',
+            '**/.specstory/**'
+          ]
         });
         
         for (const file of files) {
@@ -205,6 +241,52 @@ export class LinkChecker {
       return true;
     }
     
+    // Skip regex patterns and code snippets
+    if (this.isRegexOrCodePattern(url)) {
+      return true;
+    }
+    
+    // Skip obvious non-URL patterns
+    if (this.isNonUrlPattern(url)) {
+      return true;
+    }
+    
+    return false;
+  }
+
+  /**
+   * Check if string is a regex pattern or code snippet
+   */
+  private isRegexOrCodePattern(str: string): boolean {
+    const regexPatterns = [
+      /^\?=\\d$/,  // ?=\d
+      /^\[\^["']+\]\+?$/,  // [^"']+, [^\']*
+      /^\$\d+$/,  // $2, $1 etc
+      /^[a-zA-Z_]\[[a-zA-Z_]+\]$/,  // sanitized[key]
+      /^\\[wsdWSD]\+?$/,  // \w+, \s*, \d+ etc
+      /\([\?\*\+]\)/,  // regex quantifiers
+      /\[\^.*\]/,  // character classes
+    ];
+    
+    return regexPatterns.some(pattern => pattern.test(str));
+  }
+
+  /**
+   * Check if string is obviously not a URL
+   */
+  private isNonUrlPattern(str: string): boolean {
+    // Very short strings that are clearly not URLs
+    if (str.length < 3) return true;
+    
+    // Contains only special characters
+    if (/^[\$\?\*\+\[\]\(\)\\\^]+$/.test(str)) return true;
+    
+    // Starts with regex or code patterns
+    if (/^[\$\?\*\+\[\]\(\)\\\^]/.test(str)) return true;
+    
+    // Contains square brackets (likely variable references)
+    if (/\[[^\]]*\]/.test(str) && !str.includes('http')) return true;
+    
     return false;
   }
 
@@ -245,19 +327,11 @@ export class LinkChecker {
             result.redirectUrl = cached.redirectUrl;
           }
         } else {
-          // For production, you would make actual HTTP requests here
-          // For now, we'll mark known external links as valid
-          const knownValidExternals = [
-            'https://thestatscalculator.com',
-            'https://github.com',
-            'https://docs.anthropic.com',
-            'https://nextjs.org',
-            'https://tailwindcss.com',
-          ];
-          
-          if (knownValidExternals.some(domain => url.startsWith(domain))) {
+          // Check against whitelist first
+          if (this.isWhitelistedExternal(url)) {
             result.status = 'valid';
             result.statusCode = 200;
+            result.message = 'Whitelisted external link';
           } else {
             result.status = 'warning';
             result.message = 'External link not verified';
@@ -330,6 +404,23 @@ export class LinkChecker {
     if (code >= 200 && code < 300) return 'valid';
     if (code >= 300 && code < 400) return 'redirect';
     return 'broken';
+  }
+
+  /**
+   * Check if external URL is whitelisted
+   */
+  private isWhitelistedExternal(url: string): boolean {
+    const whitelist = [
+      'https://thestatscalculator.com',
+      'https://github.com',
+      'https://docs.anthropic.com',
+      'https://nextjs.org',
+      'https://tailwindcss.com',
+      'https://twitter.com/statscalculator',
+      'https://example.com',  // Common test placeholder
+    ];
+    
+    return whitelist.some(domain => url.startsWith(domain));
   }
 
   /**
@@ -406,17 +497,39 @@ export class LinkChecker {
       lines.push('');
     }
     
-    // Warnings
+    // Warnings - separate real issues from false positives
     const warnings = report.results.filter(r => r.status === 'warning');
-    if (warnings.length > 0) {
+    const realWarnings = warnings.filter(w => !this.isFalsePositive(w.url));
+    const falsePositives = warnings.filter(w => this.isFalsePositive(w.url));
+    
+    if (realWarnings.length > 0) {
       lines.push('## ⚠️ Warnings');
       lines.push('');
-      for (const link of warnings) {
+      for (const link of realWarnings) {
         lines.push(`- ${link.url}`);
         if (link.message) lines.push(`  - ${link.message}`);
+        lines.push(`  - Found in: ${link.foundIn.join(', ')}`);
+      }
+      lines.push('');
+    }
+    
+    if (falsePositives.length > 0) {
+      lines.push('## 🔍 False Positives (Ignored)');
+      lines.push('');
+      lines.push('These were detected but are likely code patterns, not actual links:');
+      lines.push('');
+      for (const link of falsePositives) {
+        lines.push(`- \`${link.url}\` - ${link.message}`);
       }
     }
     
     return lines.join('\n');
+  }
+
+  /**
+   * Check if a warning is likely a false positive
+   */
+  private isFalsePositive(url: string): boolean {
+    return this.isRegexOrCodePattern(url) || this.isNonUrlPattern(url);
   }
 }

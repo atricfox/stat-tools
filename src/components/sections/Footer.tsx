@@ -48,7 +48,7 @@ const Footer = () => {
             </ul>
 
             <div className="flex space-x-4 mt-6">
-              <a href="#" className="text-gray-400 hover:text-white transition-colors">
+              <a href="https://twitter.com/statscalculator" className="text-gray-400 hover:text-white transition-colors" target="_blank" rel="noopener noreferrer" aria-label="Follow us on Twitter">
                 <Twitter className="h-5 w-5" />
               </a>
             </div>

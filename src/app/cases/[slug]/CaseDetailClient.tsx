@@ -147,12 +147,14 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
               {/* Approach Steps */}
               {content.approach && (
                 <div className="mt-6 space-y-4">
-                  {Object.entries(content.approach).map(([key, step]: [string, any]) => (
+                  {Object.entries(content.approach).map(([key, description]: [string, any]) => (
                     <div key={key} className="bg-white rounded-lg p-4">
-                      <h3 className="font-medium text-gray-900 mb-2">{step.title}</h3>
+                      <h3 className="font-medium text-gray-900 mb-2">
+                        {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
+                      </h3>
                       <div
                         className="prose prose-sm prose-gray max-w-none"
-                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(step.description)) }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(typeof description === 'string' ? description : description.description || '')) }}
                       />
                     </div>
                   ))}
@@ -166,43 +168,51 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
                 <TrendingUp className="w-5 h-5 mr-2 text-green-600" />
                 Results
               </h2>
-              <ul className="space-y-2">
-                {caseStudy.results?.map((result, index) => (
-                  <li key={index} className="flex items-start">
-                    <span className="text-green-600 mr-2">✓</span>
-                    <span className="text-gray-700">{result}</span>
-                  </li>
-                )) || <li className="text-gray-500">No results available</li>}
-              </ul>
               
-              {/* Detailed Results */}
-              {content.results_detail && (
-                <div className="mt-6 space-y-4">
+              {/* Show detailed results if available, otherwise show basic results */}
+              {content.results_detail && Object.keys(content.results_detail).length > 0 ? (
+                <div className="space-y-4">
                   {Object.entries(content.results_detail).map(([key, detail]: [string, any]) => (
                     <div key={key} className="bg-white rounded-lg p-4">
-                      <h3 className="font-medium text-gray-900 mb-2">
-                        {key.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                      <h3 className="font-medium text-gray-900 mb-2 flex items-center">
+                        <span className="text-green-600 mr-2">✓</span>
+                        {key.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}
                       </h3>
-                      {detail.courses && (
-                        <ul className="text-sm text-gray-600 space-y-1">
-                          {detail.courses.map((course: string, i: number) => (
-                            <li key={i}>{course}</li>
-                          ))}
-                        </ul>
-                      )}
-                      {detail.semester_gpa && (
-                        <p className="text-sm text-gray-600 mt-2">
-                          Semester GPA: <strong>{detail.semester_gpa}</strong>
-                        </p>
-                      )}
-                      {detail.cumulative_gpa && (
-                        <p className="text-sm text-gray-600">
-                          Cumulative GPA: <strong>{detail.cumulative_gpa}</strong>
-                        </p>
+                      {typeof detail === 'string' ? (
+                        <p className="text-gray-600">{detail}</p>
+                      ) : (
+                        <>
+                          {detail.courses && (
+                            <ul className="text-sm text-gray-600 space-y-1">
+                              {detail.courses.map((course: string, i: number) => (
+                                <li key={i}>{course}</li>
+                              ))}
+                            </ul>
+                          )}
+                          {detail.semester_gpa && (
+                            <p className="text-sm text-gray-600 mt-2">
+                              Semester GPA: <strong>{detail.semester_gpa}</strong>
+                            </p>
+                          )}
+                          {detail.cumulative_gpa && (
+                            <p className="text-sm text-gray-600">
+                              Cumulative GPA: <strong>{detail.cumulative_gpa}</strong>
+                            </p>
+                          )}
+                        </>
                       )}
                     </div>
                   ))}
                 </div>
+              ) : (
+                <ul className="space-y-2">
+                  {caseStudy.results?.map((result, index) => (
+                    <li key={index} className="flex items-start">
+                      <span className="text-green-600 mr-2">✓</span>
+                      <span className="text-gray-700">{result}</span>
+                    </li>
+                  )) || <li className="text-gray-500">No results available</li>}
+                </ul>
               )}
             </section>
 

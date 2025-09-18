@@ -4,7 +4,6 @@ import Footer from '@/components/sections/Footer';
 import Breadcrumb from '@/components/ui/Breadcrumb';
 import RelatedTools from '@/components/ui/RelatedTools';
 import PopularTools from '@/components/ui/PopularTools';
-import GoogleAdsPlaceholder from '@/components/ui/GoogleAdsPlaceholder';
 
 interface BreadcrumbItem {
   label: string;
@@ -61,7 +60,6 @@ const CalculatorLayout: React.FC<CalculatorLayoutProps> = ({
             
             {/* Sidebar Components */}
             <div className="lg:col-span-3 xl:col-span-3 space-y-6">
-              <GoogleAdsPlaceholder size="rectangle" position="sidebar" />
               <RelatedTools 
                 currentTool={currentTool} 
                 category={toolCategory}

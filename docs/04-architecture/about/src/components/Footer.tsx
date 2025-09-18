@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Github, Calculator } from 'lucide-react';
+import { Mail, Calculator } from 'lucide-react';
 
 const Footer: React.FC = () => {
   return (
@@ -22,15 +22,6 @@ const Footer: React.FC = () => {
                 aria-label="Email us"
               >
                 <Mail className="w-5 h-5" aria-hidden="true" />
-              </a>
-              <a
-                href="https://github.com/thestatscalculator"
-                className="text-gray-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 focus:ring-offset-gray-900 rounded-md p-1"
-                aria-label="Visit our GitHub"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="w-5 h-5" aria-hidden="true" />
               </a>
             </div>
           </div>

@@ -100,63 +100,464 @@ npm start
   - Sprint 13 — Internal Linking（HowTo + FAQ + Cases）：`docs/05-development/sprints/Sprint-13-Plan-Internal-Linking.md`（Issues: CSV/MD 同目录）
   - Sprint 14 — Legal Pages（About / Privacy / Terms）：`docs/05-development/sprints/Sprint-14-Plan-Legal-Pages.md`（Issues: CSV/MD 同目录）
 
-## Coolify 部署指南
+## 🚀 Coolify + GitHub 完整部署指南
 
-Coolify 是一个开源的自托管 PaaS 平台，类似于 Heroku 或 Vercel，但可以部署在自己的服务器上。
+Coolify 是一个开源的自托管 PaaS 平台，类似于 Heroku 或 Vercel，但可以部署在自己的服务器上。本指南将从零开始详细说明部署流程。
 
-### 前置条件
+### 📋 前置条件检查清单
 
-- 已安装并配置好 Coolify 平台
-- 已连接 GitHub/GitLab 仓库
-- 服务器至少 2GB 内存
+在开始部署之前，请确保您具备以下条件：
 
-### Coolify 部署步骤
+- [ ] 一台运行 Ubuntu 20.04+ / CentOS 8+ 的服务器（至少 2GB RAM，20GB 存储）
+- [ ] 服务器的 root 权限或 sudo 权限
+- [ ] 域名（可选，可使用 IP 地址）
+- [ ] GitHub 账号和要部署的仓库访问权限
 
-#### 1. 创建新应用
+### 🔧 第一步：在服务器上安装 Coolify
 
-1. 登录 Coolify 控制台
-2. 点击 "New Resource" → "Application"
-3. 选择 "Node.js" 作为构建包
-4. 连接您的 Git 仓库
-
-#### 2. 配置环境变量
-
-在 Coolify 应用设置中添加以下环境变量：
+#### 1.1 连接到您的服务器
 
 ```bash
-NODE_ENV=production
-DATABASE_PATH=/data/statcal.db
-NEXT_TELEMETRY_DISABLED=1
+# 通过 SSH 连接到您的服务器
+ssh root@YOUR_SERVER_IP
+# 或者如果您使用非 root 用户
+ssh username@YOUR_SERVER_IP
 ```
 
-#### 3. 配置构建设置
+#### 1.2 更新系统包
 
-在 Build 配置中：
+```bash
+# Ubuntu/Debian 系统
+sudo apt update && sudo apt upgrade -y
 
-- **Base Directory**: `/`
-- **Build Command**: `npm ci && npm run build`
-- **Output Directory**: `.next`
-- **Install Command**: `npm ci`
+# CentOS/RHEL 系统
+sudo yum update -y
+```
 
-#### 4. 配置运行设置
+#### 1.3 安装 Docker
 
-- **Start Command**: `npm start`
-- **Port**: `3000`
-- **Health Check Path**: `/api/health`
+```bash
+# Ubuntu/Debian 系统
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
 
-#### 5. 配置持久化存储
+# 将当前用户添加到 docker 组（可选）
+sudo usermod -aG docker $USER
 
-为 SQLite 数据库配置持久化存储：
+# 启动并启用 Docker 服务
+sudo systemctl start docker
+sudo systemctl enable docker
 
-1. 在 Coolify 中创建 Volume
-2. 挂载路径: `/data`
-3. 这将确保数据库在重新部署时不会丢失
+# 验证安装
+docker --version
+```
 
-#### 6. 部署应用
+#### 1.4 安装 Coolify
 
-1. 点击 "Deploy" 按钮
-2. 等待构建和部署完成
-3. Coolify 会自动分配域名或使用自定义域名
+```bash
+# 下载并运行 Coolify 安装脚本
+curl -fsSL https://get.coolify.io -o get-coolify.sh
+sudo sh get-coolify.sh
+
+# 或者使用一键安装命令
+curl -fsSL https://get.coolify.io | sudo bash
+```
+
+#### 1.5 验证 Coolify 安装
+
+```bash
+# 检查 Coolify 容器是否运行
+docker ps | grep coolify
+
+# 检查服务状态
+systemctl status coolify
+```
+
+### 🌐 第二步：初始化 Coolify 设置
+
+#### 2.1 访问 Coolify 界面
+
+1. 打开浏览器，访问：`http://YOUR_SERVER_IP:8000`
+2. 如果有域名，可以访问：`http://your-domain.com:8000`
+
+#### 2.2 完成初始设置
+
+1. **创建管理员账号**
+   - 邮箱：输入您的邮箱地址
+   - 用户名：选择一个管理员用户名
+   - 密码：设置强密码（至少 8 位，包含数字和特殊字符）
+
+2. **服务器设置**
+   - 点击 "Servers" → "Add Server"
+   - 选择 "This Server (localhost)"
+   - 验证连接是否成功
+
+3. **配置域名（可选但推荐）**
+   - 进入 "Settings" → "Instance Settings"
+   - 设置 "Instance FQDN"：`https://your-coolify-domain.com`
+   - 如果没有域名，可以先使用 IP：`http://YOUR_SERVER_IP:8000`
+
+### 🔗 第三步：连接 GitHub 仓库
+
+#### 3.1 设置 GitHub 应用
+
+1. **在 Coolify 中创建 GitHub 应用**
+   - 进入 "Sources" → "Add Source"
+   - 选择 "GitHub"
+   - 点击 "Create GitHub App"
+
+2. **在 GitHub 上授权应用**
+   - Coolify 会自动跳转到 GitHub
+   - 选择要授权的账号或组织
+   - 选择仓库权限（可以选择所有仓库或特定仓库）
+   - 点击 "Install & Authorize"
+
+3. **验证连接**
+   - 返回 Coolify，确认 GitHub 连接显示为 "Connected"
+   - 在 "Sources" 页面应该能看到您的 GitHub 账号
+
+#### 3.2 测试仓库访问
+
+```bash
+# 在 Coolify 服务器上测试 Git 克隆（可选验证步骤）
+git clone https://github.com/YOUR_USERNAME/stat-tools.git /tmp/test-clone
+ls /tmp/test-clone
+rm -rf /tmp/test-clone
+```
+
+### 📱 第四步：创建新应用项目
+
+#### 4.1 创建项目
+
+1. **进入项目管理**
+   - 点击左侧菜单 "Projects"
+   - 点击 "Create Project"
+   - 项目名称：`stat-tools`
+   - 描述：`Statistics Calculator Tools`
+   - 点击 "Create"
+
+#### 4.2 添加应用
+
+1. **创建新应用**
+   - 在项目页面点击 "New Resource"
+   - 选择 "Application"
+
+2. **选择构建方式**
+   - 选择 "Build from source code"
+   - 点击 "Continue"
+
+3. **配置源代码**
+   - **Source**: 选择您的 GitHub 连接
+   - **Repository**: 选择 `stat-tools` 仓库
+   - **Branch**: 选择 `main`（或您的主分支）
+   - **Build Pack**: 选择 "Node.js"
+   - 点击 "Continue"
+
+#### 4.3 基本应用设置
+
+1. **应用信息**
+   - **Name**: `stat-tools-app`
+   - **Description**: `Statistics Calculator Application`
+   - **Domain**: 留空（稍后配置）或输入自定义域名
+
+2. **端口设置**
+   - **Port**: `3000`
+   - **Expose Port**: 启用
+   - 点击 "Create Application"
+
+### ⚙️ 第五步：详细配置应用
+
+#### 5.1 环境变量配置
+
+1. **进入环境变量设置**
+   - 在应用页面点击 "Environment Variables" 标签页
+   - 点击 "Add Variable"
+
+2. **添加必需的环境变量**
+
+   | 变量名 | 值 | 说明 |
+   |--------|-----|------|
+   | `NODE_ENV` | `production` | Node.js 环境 |
+   | `PORT` | `3000` | 应用端口 |
+   | `DATABASE_PATH` | `/data/statcal.db` | 数据库文件路径 |
+   | `NEXT_TELEMETRY_DISABLED` | `1` | 禁用 Next.js 遥测 |
+   | `NEXT_PUBLIC_SITE_URL` | `https://your-domain.com` | 网站公开 URL |
+
+3. **保存环境变量**
+   - 逐一添加每个环境变量
+   - 每次添加后点击 "Save"
+
+#### 5.2 构建配置
+
+1. **进入构建设置**
+   - 点击 "Build" 标签页
+
+2. **配置构建命令**
+   - **Install Command**: `npm ci`
+   - **Build Command**: `npm run build`
+   - **Start Command**: `npm start`
+
+3. **高级构建设置**
+   - **Base Directory**: `/`（根目录）
+   - **Publish Directory**: `.next`
+   - **Node.js Version**: `20` 或 `latest`
+
+#### 5.3 持久化存储配置
+
+1. **创建存储卷**
+   - 点击 "Storages" 标签页
+   - 点击 "Add Storage"
+   - **Name**: `database-storage`
+   - **Mount Path**: `/data`
+   - **Host Path**: `/var/lib/coolify/applications/[app-id]/data`
+   - 点击 "Add Storage"
+
+2. **验证存储设置**
+   - 确保存储卷显示为 "Active"
+   - 这将确保数据库文件在重新部署时不会丢失
+
+#### 5.4 域名配置（可选但推荐）
+
+1. **添加自定义域名**
+   - 点击 "Domains" 标签页
+   - 点击 "Add Domain"
+   - 输入您的域名：`your-stat-tools-domain.com`
+   - 启用 "HTTPS" （推荐）
+   - 点击 "Add Domain"
+
+2. **DNS 配置**
+   ```bash
+   # 在您的 DNS 提供商处添加 A 记录
+   # 类型: A
+   # 名称: @ (或子域名)
+   # 值: YOUR_SERVER_IP
+   # TTL: 300
+   ```
+
+3. **SSL 证书**
+   - Coolify 会自动为您的域名申请 Let's Encrypt SSL 证书
+   - 等待几分钟让证书生效
+
+### 🚀 第六步：部署应用
+
+#### 6.1 首次部署
+
+1. **开始部署**
+   - 在应用主页点击 "Deploy" 按钮
+   - 或者使用快捷键组合触发部署
+
+2. **监控部署过程**
+   - 点击 "Logs" 标签页查看实时部署日志
+   - 部署过程大约需要 3-5 分钟
+
+3. **部署阶段说明**
+   ```bash
+   # 部署过程包含以下阶段：
+   ✅ 克隆仓库代码
+   ✅ 安装 Node.js 依赖 (npm ci)
+   ✅ 运行构建命令 (npm run build)
+   ✅ 创建容器镜像
+   ✅ 启动应用容器
+   ✅ 健康检查
+   ```
+
+#### 6.2 验证部署成功
+
+1. **检查应用状态**
+   - 应用状态应显示为 "Running"（绿色）
+   - CPU 和内存使用率应显示正常值
+
+2. **访问应用**
+   - 如果配置了域名：`https://your-domain.com`
+   - 如果使用 IP：`http://YOUR_SERVER_IP:PORT`
+   - 应该能看到 Stat Tools 主页
+
+3. **测试功能**
+   - 访问计算器页面：`/calculator/mean`
+   - 检查数据库连接是否正常
+   - 测试几个基本功能
+
+### 🔄 第七步：设置自动部署
+
+#### 7.1 配置 GitHub Webhooks
+
+1. **在 Coolify 中启用自动部署**
+   - 进入应用设置
+   - 点击 "Source" 标签页
+   - 启用 "Auto Deploy on Push"
+   - 选择触发分支：`main`
+
+2. **验证 Webhook**
+   - 在 GitHub 仓库设置中检查 Webhooks
+   - 应该有一个指向 Coolify 的 webhook
+
+#### 7.2 测试自动部署
+
+1. **推送代码变更**
+   ```bash
+   # 在本地进行小的代码修改
+   echo "# 测试自动部署" >> README.md
+   git add .
+   git commit -m "test: 测试自动部署功能"
+   git push origin main
+   ```
+
+2. **监控自动部署**
+   - 在 Coolify 中查看部署是否自动触发
+   - 检查部署日志确认成功
+
+### 🔍 第八步：监控和维护
+
+#### 8.1 设置监控
+
+1. **启用健康检查**
+   - 在应用设置中配置健康检查端点
+   - 路径：`/api/health`
+   - 间隔：30 秒
+
+2. **配置警报（可选）**
+   - 设置邮件通知
+   - 配置 Slack/Discord 集成
+
+#### 8.2 日常维护
+
+1. **查看日志**
+   ```bash
+   # 在 Coolify 界面查看实时日志
+   # 或通过 SSH 直接查看容器日志
+   docker logs $(docker ps | grep stat-tools | awk '{print $1}')
+   ```
+
+2. **数据备份**
+   ```bash
+   # 备份数据库
+   sudo cp /var/lib/coolify/applications/*/data/statcal.db /backup/statcal-$(date +%Y%m%d).db
+   ```
+
+### 🛠️ 故障排查指南
+
+#### 常见问题及解决方案
+
+1. **构建失败 - 依赖安装问题**
+   ```bash
+   # 检查 package.json 和 package-lock.json
+   # 确保 Node.js 版本兼容（需要 20+）
+   # 在构建设置中尝试清除缓存
+   ```
+
+2. **应用启动失败 - 端口冲突**
+   ```bash
+   # 检查端口配置是否为 3000
+   # 确保没有其他服务占用该端口
+   lsof -i :3000
+   ```
+
+3. **数据库连接失败**
+   ```bash
+   # 检查存储卷挂载是否正确
+   # 验证 DATABASE_PATH 环境变量
+   # 检查文件权限
+   sudo ls -la /var/lib/coolify/applications/*/data/
+   ```
+
+4. **域名访问问题**
+   ```bash
+   # 检查 DNS 记录
+   nslookup your-domain.com
+   
+   # 检查 SSL 证书
+   curl -I https://your-domain.com
+   ```
+
+5. **内存不足**
+   ```bash
+   # 检查服务器内存使用
+   free -h
+   
+   # 在 Coolify 中增加内存限制
+   # 或升级服务器配置
+   ```
+
+### 📚 进阶配置
+
+#### 设置 CI/CD 流水线
+
+创建 `.github/workflows/coolify-deploy.yml`：
+
+```yaml
+name: Deploy to Coolify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run typecheck
+      - run: npm run build
+      - run: npm test
+
+  deploy:
+    needs: test
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Deploy to Coolify
+        run: echo "Deployment triggered by webhook"
+        # Coolify 会通过 webhook 自动部署
+```
+
+#### 性能优化设置
+
+```bash
+# 在 Coolify 中配置资源限制
+CPU_LIMIT=1000m
+MEMORY_LIMIT=1Gi
+MEMORY_REQUEST=512Mi
+
+# 启用应用缓存
+CACHE_TTL=3600
+USE_MEMORY_CACHE=true
+```
+
+### 🎯 部署检查清单
+
+完成部署后，请按照以下清单验证：
+
+- [ ] ✅ 应用状态显示为 "Running"
+- [ ] ✅ 域名可以正常访问（如果配置了域名）
+- [ ] ✅ SSL 证书有效（HTTPS 正常）
+- [ ] ✅ 主页正常加载
+- [ ] ✅ 计算器功能正常工作
+- [ ] ✅ 数据库连接正常
+- [ ] ✅ 自动部署配置正确
+- [ ] ✅ 日志记录正常
+- [ ] ✅ 健康检查通过
+- [ ] ✅ 备份策略已设置
+
+### 📞 支持资源
+
+如果遇到问题，可以参考以下资源：
+
+- **Coolify 官方文档**: https://coolify.io/docs
+- **Coolify 社区论坛**: https://discord.gg/coolify
+- **GitHub Issues**: https://github.com/coollabsio/coolify/issues
+- **Next.js 部署文档**: https://nextjs.org/docs/deployment
+
+---
+
+**恭喜！** 您已经成功将 Stat Tools 部署到 Coolify 平台。应用现在可以通过自动化流程持续部署和更新。
 
 ### Docker 部署（可选）
 
