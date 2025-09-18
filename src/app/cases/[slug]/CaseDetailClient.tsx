@@ -7,6 +7,7 @@ import type { TCaseFrontmatter } from '@/lib/content/contentSchema';
 import Header from '@/components/sections/Header';
 import Footer from '@/components/sections/Footer';
 import RelatedLinks from '@/components/content/RelatedLinks';
+import { convertMarkdownToHtml, sanitizeHtml } from '@/lib/content/markdownToHtml';
 
 interface CaseDetailClientProps {
   caseStudy: TCaseFrontmatter;
@@ -107,7 +108,10 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
             {content.background && (
               <section className="bg-white rounded-lg border border-gray-200 p-6">
                 <h2 className="text-xl font-semibold text-gray-900 mb-4">Background</h2>
-                <p className="text-gray-700">{content.background}</p>
+                <div
+                  className="prose prose-gray max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(content.background)) }}
+                />
               </section>
             )}
 
@@ -117,9 +121,15 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
                 <Target className="w-5 h-5 mr-2 text-red-600" />
                 The Challenge
               </h2>
-              <p className="text-gray-700">{caseStudy.problem}</p>
+              <div
+                className="prose prose-gray max-w-none"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(caseStudy.problem)) }}
+              />
               {content.challenge && (
-                <p className="text-gray-700 mt-4">{content.challenge}</p>
+                <div
+                  className="prose prose-gray max-w-none mt-4"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(content.challenge)) }}
+                />
               )}
             </section>
 
@@ -129,7 +139,10 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
                 <Lightbulb className="w-5 h-5 mr-2 text-blue-600" />
                 The Solution
               </h2>
-              <p className="text-gray-700">{caseStudy.solution}</p>
+              <div
+                className="prose prose-gray max-w-none"
+                dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(caseStudy.solution)) }}
+              />
               
               {/* Approach Steps */}
               {content.approach && (
@@ -137,7 +150,10 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
                   {Object.entries(content.approach).map(([key, step]: [string, any]) => (
                     <div key={key} className="bg-white rounded-lg p-4">
                       <h3 className="font-medium text-gray-900 mb-2">{step.title}</h3>
-                      <p className="text-gray-700">{step.description}</p>
+                      <div
+                        className="prose prose-sm prose-gray max-w-none"
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(step.description)) }}
+                      />
                     </div>
                   ))}
                 </div>

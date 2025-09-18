@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronDown, ChevronRight, CheckCircle, AlertCircle, Lightbulb, Hash } from 'lucide-react';
 import type { THowToStep } from '@/lib/content/contentSchema';
+import { convertMarkdownToHtml, sanitizeHtml } from '@/lib/content/markdownToHtml';
 
 interface HowToStepsProps {
   steps: THowToStep[];
@@ -149,7 +150,10 @@ export default function HowToSteps({ steps, defaultExpanded = false, onStepExpan
                   id={`${step.id}-content`}
                   className="px-4 pb-4 pl-14 space-y-3"
                 >
-                  <p className="text-gray-700">{step.description}</p>
+                  <div
+                    className="prose prose-gray max-w-none text-gray-700"
+                    dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(step.description)) }}
+                  />
                   
                   {step.tip && (
                     <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg">

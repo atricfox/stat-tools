@@ -9,6 +9,7 @@ import Footer from '@/components/sections/Footer';
 import HowToSteps from '@/components/content/HowToSteps';
 import RelatedLinks from '@/components/content/RelatedLinks';
 import { generatePrefillUrl } from '@/lib/content/prefillWhitelist';
+import { convertMarkdownToHtml, sanitizeHtml } from '@/lib/content/markdownToHtml';
 
 interface HowToDetailClientProps {
   howto: THowToFrontmatter;
@@ -133,7 +134,10 @@ export default function HowToDetailClient({ howto, steps, content }: HowToDetail
             {/* Introduction */}
             {content && (
               <div className="bg-white rounded-lg border border-gray-200 p-6">
-                <p className="text-gray-700">{content}</p>
+                <div
+                  className="prose prose-gray max-w-none"
+                  dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(content)) }}
+                />
               </div>
             )}
 
