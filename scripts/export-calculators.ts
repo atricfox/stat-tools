@@ -47,8 +47,8 @@ function ensureDir(p: string) {
 function main() {
   const db = new Database(DB_FILE, { fileMustExist: true, readonly: true });
 
-  const groupsMetaStmt = db.prepare<unknown, GroupMetaRow>('SELECT group_name, display_name, sort_order FROM group_meta');
-  const calculatorsStmt = db.prepare<unknown, CalcRow>('SELECT * FROM calculator');
+  const groupsMetaStmt = db.prepare<unknown, GroupMetaRow>('SELECT group_name, display_name, sort_order FROM calculator_groups');
+  const calculatorsStmt = db.prepare<unknown, CalcRow>('SELECT * FROM calculators');
 
   const groupsMeta = groupsMetaStmt.all();
   const calculators = calculatorsStmt.all();

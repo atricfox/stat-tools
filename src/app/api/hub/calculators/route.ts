@@ -6,17 +6,19 @@ import { calculatorsCache } from '@/lib/cache/calculators-cache';
 
 export const revalidate = 3600; // Cache for 1 hour
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const cacheKey = 'calculators-hub-data';
-    const clientEtag = request.headers.get('if-none-match');
 
     // Check cache first
     const cachedEntry = calculatorsCache.get(cacheKey);
     if (cachedEntry) {
-      if (clientEtag === cachedEntry.etag) {
-        return new NextResponse(null, { status: 304 });
-      }
+      // Return cached data for static generation
+      const response = NextResponse.json(cachedEntry.data);
+      response.headers.set('Cache-Control', 'public, s-maxage=3600, stale-while-revalidate=1800');
+      response.headers.set('CDN-Cache-Control', 'public, s-maxage=3600');
+      response.headers.set('ETag', cachedEntry.etag);
+      return response;
     }
 
     // Fetch fresh data
