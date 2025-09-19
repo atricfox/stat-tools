@@ -1,11 +1,11 @@
 # Stat Tools - 部署与开发说明
 
-这是 Stat Tools 仓库的快速启动与部署说明，支持 Coolify 自建平台部署以及传统 Docker/Node.js 部署方式。
+这是 Stat Tools 仓库的快速启动与部署说明，支持 Vercel 零配置部署以及本地开发环境配置。
 
 ## 技术栈
 
 - **前端**: Next.js 15 + React 19 + TypeScript 5.1+
-- **部署**: Coolify 自建平台 / Docker / Node.js
+- **部署**: Vercel 零配置部署 / 本地开发
 - **数据库**: SQLite (本地文件)
 - **运行时**: Node.js 20+
 - **测试**: Playwright (E2E + API 测试)
@@ -100,392 +100,277 @@ npm start
   - Sprint 13 — Internal Linking（HowTo + FAQ + Cases）：`docs/05-development/sprints/Sprint-13-Plan-Internal-Linking.md`（Issues: CSV/MD 同目录）
   - Sprint 14 — Legal Pages（About / Privacy / Terms）：`docs/05-development/sprints/Sprint-14-Plan-Legal-Pages.md`（Issues: CSV/MD 同目录）
 
-## 🚀 Coolify + GitHub 完整部署指南
+## 🚀 Vercel 部署指南
 
-Coolify 是一个开源的自托管 PaaS 平台，类似于 Heroku 或 Vercel，但可以部署在自己的服务器上。本指南将从零开始详细说明部署流程。
+Vercel 是 Next.js 的官方推荐部署平台，提供零配置部署、全球 CDN、自动 HTTPS 等特性，是部署 Next.js 应用的最佳选择。
 
-### 📋 前置条件检查清单
+### 📋 前置条件
 
-在开始部署之前，请确保您具备以下条件：
+- [ ] GitHub 账号
+- [ ] Vercel 账号（可使用 GitHub 登录）
+- [ ] 项目代码已推送到 GitHub 仓库
 
-- [ ] 一台运行 Ubuntu 20.04+ / CentOS 8+ 的服务器（至少 2GB RAM，20GB 存储）
-- [ ] 服务器的 root 权限或 sudo 权限
-- [ ] 域名（可选，可使用 IP 地址）
-- [ ] GitHub 账号和要部署的仓库访问权限
+### 🔧 第一步：准备项目
 
-### 🔧 第一步：在服务器上安装 Coolify
+#### 1.1 检查项目结构
 
-#### 1.1 连接到您的服务器
+确保项目根目录包含以下文件：
 
 ```bash
-# 通过 SSH 连接到您的服务器
-ssh root@YOUR_SERVER_IP
-# 或者如果您使用非 root 用户
-ssh username@YOUR_SERVER_IP
+stat-tools/
+├── package.json          # 依赖配置
+├── next.config.js       # Next.js 配置
+├── vercel.json          # Vercel 配置（已创建）
+├── src/                 # 源代码
+├── data/                # 数据库文件（本地）
+└── migrations/          # 数据库迁移文件
 ```
 
-#### 1.2 更新系统包
+#### 1.2 验证 package.json 脚本
 
-```bash
-# Ubuntu/Debian 系统
-sudo apt update && sudo apt upgrade -y
+确保以下脚本存在：
 
-# CentOS/RHEL 系统
-sudo yum update -y
+```json
+{
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "typecheck": "tsc --noEmit"
+  }
+}
 ```
 
-#### 1.3 安装 Docker
+### 🌐 第二步：Vercel 账号设置
+
+#### 2.1 注册 Vercel 账号
+
+1. **访问 Vercel 官网**
+   - 打开 https://vercel.com
+   - 点击 "Sign Up"
+
+2. **使用 GitHub 登录**
+   - 选择 "Continue with GitHub"
+   - 授权 Vercel 访问您的 GitHub 账号
+   - 完成注册流程
+
+#### 2.2 安装 Vercel CLI（可选）
 
 ```bash
-# Ubuntu/Debian 系统
-curl -fsSL https://get.docker.com -o get-docker.sh
-sudo sh get-docker.sh
-
-# 将当前用户添加到 docker 组（可选）
-sudo usermod -aG docker $USER
-
-# 启动并启用 Docker 服务
-sudo systemctl start docker
-sudo systemctl enable docker
+# 全局安装 Vercel CLI
+npm install -g vercel
 
 # 验证安装
-docker --version
+vercel --version
+
+# 登录 Vercel
+vercel login
 ```
 
-#### 1.4 安装 Coolify
+### 📱 第三步：从 GitHub 部署
 
-```bash
-# 下载并运行 Coolify 安装脚本
-curl -fsSL https://get.coolify.io -o get-coolify.sh
-sudo sh get-coolify.sh
+#### 3.1 在 Vercel 控制台创建项目
 
-# 或者使用一键安装命令
-curl -fsSL https://get.coolify.io | sudo bash
-```
+1. **导入 GitHub 仓库**
+   - 登录 Vercel 控制台：https://vercel.com/dashboard
+   - 点击 "New Project"
+   - 选择 "Import Git Repository"
+   - 找到并选择 `stat-tools` 仓库
+   - 点击 "Import"
 
-#### 1.5 验证 Coolify 安装
+2. **项目基本配置**
+   - **Project Name**: `stat-tools` 或自定义名称
+   - **Framework Preset**: 自动检测为 "Next.js"
+   - **Root Directory**: `/`（保持默认）
+   - **Build Command**: `npm run build`（自动检测）
+   - **Output Directory**: `.next`（自动检测）
+   - **Install Command**: `npm install`（自动检测）
 
-```bash
-# 检查 Coolify 容器是否运行
-docker ps | grep coolify
+#### 3.2 配置环境变量
 
-# 检查服务状态
-systemctl status coolify
-```
+在部署前配置必要的环境变量：
 
-### 🌐 第二步：初始化 Coolify 设置
+1. **展开 "Environment Variables" 部分**
 
-#### 2.1 访问 Coolify 界面
+2. **添加生产环境变量**
 
-1. 打开浏览器，访问：`http://YOUR_SERVER_IP:8000`
-2. 如果有域名，可以访问：`http://your-domain.com:8000`
-
-#### 2.2 完成初始设置
-
-1. **创建管理员账号**
-   - 邮箱：输入您的邮箱地址
-   - 用户名：选择一个管理员用户名
-   - 密码：设置强密码（至少 8 位，包含数字和特殊字符）
-
-2. **服务器设置**
-   - 点击 "Servers" → "Add Server"
-   - 选择 "This Server (localhost)"
-   - 验证连接是否成功
-
-3. **配置域名（可选但推荐）**
-   - 进入 "Settings" → "Instance Settings"
-   - 设置 "Instance FQDN"：`https://your-coolify-domain.com`
-   - 如果没有域名，可以先使用 IP：`http://YOUR_SERVER_IP:8000`
-
-### 🔗 第三步：连接 GitHub 仓库
-
-#### 3.1 设置 GitHub 应用
-
-1. **在 Coolify 中创建 GitHub 应用**
-   - 进入 "Sources" → "Add Source"
-   - 选择 "GitHub"
-   - 点击 "Create GitHub App"
-
-2. **在 GitHub 上授权应用**
-   - Coolify 会自动跳转到 GitHub
-   - 选择要授权的账号或组织
-   - 选择仓库权限（可以选择所有仓库或特定仓库）
-   - 点击 "Install & Authorize"
-
-3. **验证连接**
-   - 返回 Coolify，确认 GitHub 连接显示为 "Connected"
-   - 在 "Sources" 页面应该能看到您的 GitHub 账号
-
-#### 3.2 测试仓库访问
-
-```bash
-# 在 Coolify 服务器上测试 Git 克隆（可选验证步骤）
-git clone https://github.com/YOUR_USERNAME/stat-tools.git /tmp/test-clone
-ls /tmp/test-clone
-rm -rf /tmp/test-clone
-```
-
-### 📱 第四步：创建新应用项目
-
-#### 4.1 创建项目
-
-1. **进入项目管理**
-   - 点击左侧菜单 "Projects"
-   - 点击 "Create Project"
-   - 项目名称：`stat-tools`
-   - 描述：`Statistics Calculator Tools`
-   - 点击 "Create"
-
-#### 4.2 添加应用
-
-1. **创建新应用**
-   - 在项目页面点击 "New Resource"
-   - 选择 "Application"
-
-2. **选择构建方式**
-   - 选择 "Build from source code"
-   - 点击 "Continue"
-
-3. **配置源代码**
-   - **Source**: 选择您的 GitHub 连接
-   - **Repository**: 选择 `stat-tools` 仓库
-   - **Branch**: 选择 `main`（或您的主分支）
-   - **Build Pack**: 选择 "Node.js"
-   - 点击 "Continue"
-
-#### 4.3 基本应用设置
-
-1. **应用信息**
-   - **Name**: `stat-tools-app`
-   - **Description**: `Statistics Calculator Application`
-   - **Domain**: 留空（稍后配置）或输入自定义域名
-
-2. **端口设置**
-   - **Port**: `3000`
-   - **Expose Port**: 启用
-   - 点击 "Create Application"
-
-### ⚙️ 第五步：详细配置应用
-
-#### 5.1 环境变量配置
-
-1. **进入环境变量设置**
-   - 在应用页面点击 "Environment Variables" 标签页
-   - 点击 "Add Variable"
-
-2. **添加必需的环境变量**
-
-   | 变量名 | 值 | 说明 |
+   | 变量名 | 值 | 环境 |
    |--------|-----|------|
-   | `NODE_ENV` | `production` | Node.js 环境 |
-   | `PORT` | `3000` | 应用端口 |
-   | `DATABASE_PATH` | `/data/statcal.db` | 数据库文件路径 |
-   | `NEXT_TELEMETRY_DISABLED` | `1` | 禁用 Next.js 遥测 |
-   | `NEXT_PUBLIC_SITE_URL` | `https://your-domain.com` | 网站公开 URL |
+   | `NODE_ENV` | `production` | Production |
+   | `NEXT_TELEMETRY_DISABLED` | `1` | All |
+   | `DATABASE_URL` | `file:./data/statcal.db` | All |
 
-3. **保存环境变量**
-   - 逐一添加每个环境变量
-   - 每次添加后点击 "Save"
+   > **注意**：Vercel 是无服务器环境，我们需要适配数据库配置
 
-#### 5.2 构建配置
+3. **点击 "Deploy" 开始部署**
 
-1. **进入构建设置**
-   - 点击 "Build" 标签页
+### ⚙️ 第四步：数据库适配 Vercel
 
-2. **配置构建命令**
-   - **Install Command**: `npm ci`
-   - **Build Command**: `npm run build`
-   - **Start Command**: `npm start`
+由于 Vercel 是无服务器环境，项目已经创建了适配文件：
 
-3. **高级构建设置**
-   - **Base Directory**: `/`（根目录）
-   - **Publish Directory**: `.next`
-   - **Node.js Version**: `20` 或 `latest`
+- `src/lib/db/vercel-db.ts` - Vercel 专用数据库工具
+- 更新了 `src/lib/db/db-utils.ts` - 自动检测 Vercel 环境
 
-#### 5.3 持久化存储配置
+### 🚀 第五步：首次部署
 
-1. **创建存储卷**
-   - 点击 "Storages" 标签页
-   - 点击 "Add Storage"
-   - **Name**: `database-storage`
-   - **Mount Path**: `/data`
-   - **Host Path**: `/var/lib/coolify/applications/[app-id]/data`
-   - 点击 "Add Storage"
+#### 5.1 触发部署
 
-2. **验证存储设置**
-   - 确保存储卷显示为 "Active"
-   - 这将确保数据库文件在重新部署时不会丢失
+点击 "Deploy" 按钮开始首次部署：
 
-#### 5.4 域名配置（可选但推荐）
+1. **构建过程监控**
+   - Vercel 会自动检测 Next.js 项目
+   - 执行 `npm install` 安装依赖
+   - 运行 `npm run build` 构建项目
+   - 部署到全球 CDN
 
-1. **添加自定义域名**
-   - 点击 "Domains" 标签页
+2. **部署状态检查**
+   ```bash
+   # 部署过程包含以下阶段：
+   ✅ 克隆代码仓库
+   ✅ 安装项目依赖
+   ✅ 运行 Next.js 构建
+   ✅ 优化静态资源
+   ✅ 部署到全球边缘网络
+   ✅ 生成预览 URL
+   ```
+
+#### 5.2 验证部署
+
+1. **获取部署 URL**
+   - 部署成功后，Vercel 会提供访问链接
+   - 格式通常为：`https://stat-tools-xxx.vercel.app`
+
+2. **功能测试**
+   - 访问主页验证加载正常
+   - 测试计算器功能：`/calculator/mean`
+   - 检查页面响应速度和 SEO
+
+### 🔧 第六步：配置自定义域名
+
+#### 6.1 添加域名
+
+1. **在 Vercel 项目设置中**
+   - 进入项目 → "Settings" → "Domains"
    - 点击 "Add Domain"
-   - 输入您的域名：`your-stat-tools-domain.com`
-   - 启用 "HTTPS" （推荐）
-   - 点击 "Add Domain"
+   - 输入您的域名：`thestatscalculator.com`
 
 2. **DNS 配置**
    ```bash
-   # 在您的 DNS 提供商处添加 A 记录
-   # 类型: A
-   # 名称: @ (或子域名)
-   # 值: YOUR_SERVER_IP
-   # TTL: 300
+   # 方法1: CNAME 记录（推荐）
+   CNAME  www  cname.vercel-dns.com
+   
+   # 方法2: A 记录
+   A      @    76.76.19.61
+   AAAA   @    2606:4700:90:0:f22e:fbec:5bed:a9b9
    ```
 
 3. **SSL 证书**
-   - Coolify 会自动为您的域名申请 Let's Encrypt SSL 证书
-   - 等待几分钟让证书生效
+   - Vercel 自动提供 SSL 证书
+   - 支持自动续期
 
-### 🚀 第六步：部署应用
+#### 6.2 域名验证
 
-#### 6.1 首次部署
+```bash
+# 验证 DNS 配置
+nslookup thestatscalculator.com
 
-1. **开始部署**
-   - 在应用主页点击 "Deploy" 按钮
-   - 或者使用快捷键组合触发部署
+# 检查 SSL 证书
+curl -I https://thestatscalculator.com
+```
 
-2. **监控部署过程**
-   - 点击 "Logs" 标签页查看实时部署日志
-   - 部署过程大约需要 3-5 分钟
+### 🔄 第七步：自动化部署
 
-3. **部署阶段说明**
+#### 7.1 Git 集成
+
+Vercel 自动监听 GitHub 仓库变化：
+
+1. **推送到 main 分支**
    ```bash
-   # 部署过程包含以下阶段：
-   ✅ 克隆仓库代码
-   ✅ 安装 Node.js 依赖 (npm ci)
-   ✅ 运行构建命令 (npm run build)
-   ✅ 创建容器镜像
-   ✅ 启动应用容器
-   ✅ 健康检查
-   ```
-
-#### 6.2 验证部署成功
-
-1. **检查应用状态**
-   - 应用状态应显示为 "Running"（绿色）
-   - CPU 和内存使用率应显示正常值
-
-2. **访问应用**
-   - 如果配置了域名：`https://your-domain.com`
-   - 如果使用 IP：`http://YOUR_SERVER_IP:PORT`
-   - 应该能看到 Stat Tools 主页
-
-3. **测试功能**
-   - 访问计算器页面：`/calculator/mean`
-   - 检查数据库连接是否正常
-   - 测试几个基本功能
-
-### 🔄 第七步：设置自动部署
-
-#### 7.1 配置 GitHub Webhooks
-
-1. **在 Coolify 中启用自动部署**
-   - 进入应用设置
-   - 点击 "Source" 标签页
-   - 启用 "Auto Deploy on Push"
-   - 选择触发分支：`main`
-
-2. **验证 Webhook**
-   - 在 GitHub 仓库设置中检查 Webhooks
-   - 应该有一个指向 Coolify 的 webhook
-
-#### 7.2 测试自动部署
-
-1. **推送代码变更**
-   ```bash
-   # 在本地进行小的代码修改
-   echo "# 测试自动部署" >> README.md
    git add .
-   git commit -m "test: 测试自动部署功能"
+   git commit -m "feat: 添加新功能"
    git push origin main
    ```
 
-2. **监控自动部署**
-   - 在 Coolify 中查看部署是否自动触发
-   - 检查部署日志确认成功
+2. **自动触发部署**
+   - 每次推送代码自动触发构建
+   - 支持预览部署（PR 分支）
+   - 生产部署（main 分支）
 
-### 🔍 第八步：监控和维护
+#### 7.2 部署预览
 
-#### 8.1 设置监控
+```bash
+# 创建功能分支进行预览
+git checkout -b feature/new-calculator
+# 修改代码...
+git push origin feature/new-calculator
+# Vercel 会为此分支创建预览部署
+```
 
-1. **启用健康检查**
-   - 在应用设置中配置健康检查端点
-   - 路径：`/api/health`
-   - 间隔：30 秒
+### 📊 第八步：监控和分析
 
-2. **配置警报（可选）**
-   - 设置邮件通知
-   - 配置 Slack/Discord 集成
+#### 8.1 Vercel Analytics
 
-#### 8.2 日常维护
+1. **启用分析**
+   - 在项目设置中启用 "Analytics"
+   - 查看页面访问量和性能指标
 
-1. **查看日志**
-   ```bash
-   # 在 Coolify 界面查看实时日志
-   # 或通过 SSH 直接查看容器日志
-   docker logs $(docker ps | grep stat-tools | awk '{print $1}')
-   ```
+2. **速度洞察**
+   - 监控 Core Web Vitals
+   - 页面加载时间分析
+   - 用户体验指标
 
-2. **数据备份**
-   ```bash
-   # 备份数据库
-   sudo cp /var/lib/coolify/applications/*/data/statcal.db /backup/statcal-$(date +%Y%m%d).db
-   ```
+#### 8.2 日志和调试
+
+```bash
+# 使用 Vercel CLI 查看日志
+vercel logs
+
+# 查看特定部署的日志
+vercel logs [deployment-url]
+```
 
 ### 🛠️ 故障排查指南
 
 #### 常见问题及解决方案
 
-1. **构建失败 - 依赖安装问题**
+1. **构建失败**
    ```bash
-   # 检查 package.json 和 package-lock.json
-   # 确保 Node.js 版本兼容（需要 20+）
-   # 在构建设置中尝试清除缓存
+   # 检查 build 日志
+   # 确保所有依赖正确安装
+   # 验证 TypeScript 类型检查通过
    ```
 
-2. **应用启动失败 - 端口冲突**
+2. **数据库相关错误**
    ```bash
-   # 检查端口配置是否为 3000
-   # 确保没有其他服务占用该端口
-   lsof -i :3000
+   # Vercel 使用内存数据库
+   # 确保 vercel-db.ts 正常工作
+   # 检查迁移文件路径
    ```
 
-3. **数据库连接失败**
+3. **环境变量问题**
    ```bash
-   # 检查存储卷挂载是否正确
-   # 验证 DATABASE_PATH 环境变量
-   # 检查文件权限
-   sudo ls -la /var/lib/coolify/applications/*/data/
+   # 在 Vercel 项目设置中检查环境变量
+   # 确保 production 环境变量正确设置
    ```
 
 4. **域名访问问题**
    ```bash
-   # 检查 DNS 记录
-   nslookup your-domain.com
+   # 检查 DNS 配置
+   dig thestatscalculator.com
    
-   # 检查 SSL 证书
-   curl -I https://your-domain.com
-   ```
-
-5. **内存不足**
-   ```bash
-   # 检查服务器内存使用
-   free -h
-   
-   # 在 Coolify 中增加内存限制
-   # 或升级服务器配置
+   # 验证 SSL 证书
+   openssl s_client -connect thestatscalculator.com:443
    ```
 
 ### 📚 进阶配置
 
-#### 设置 CI/CD 流水线
+#### 设置 GitHub Actions CI/CD
 
-创建 `.github/workflows/coolify-deploy.yml`：
+创建 `.github/workflows/vercel-deploy.yml`：
 
 ```yaml
-name: Deploy to Coolify
+name: Vercel Deployment
 
 on:
   push:
@@ -513,190 +398,361 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
-      - name: Deploy to Coolify
-        run: echo "Deployment triggered by webhook"
-        # Coolify 会通过 webhook 自动部署
+      - uses: actions/checkout@v4
+      - uses: amondnet/vercel-action@v25
+        with:
+          vercel-token: ${{ secrets.VERCEL_TOKEN }}
+          vercel-org-id: ${{ secrets.ORG_ID }}
+          vercel-project-id: ${{ secrets.PROJECT_ID }}
+          vercel-args: '--prod'
 ```
 
-#### 性能优化设置
+#### 性能优化配置
 
-```bash
-# 在 Coolify 中配置资源限制
-CPU_LIMIT=1000m
-MEMORY_LIMIT=1Gi
-MEMORY_REQUEST=512Mi
+更新 `vercel.json`：
 
-# 启用应用缓存
-CACHE_TTL=3600
-USE_MEMORY_CACHE=true
+```json
+{
+  "functions": {
+    "app/api/**": {
+      "maxDuration": 30
+    }
+  },
+  "headers": [
+    {
+      "source": "/static/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/calculator",
+      "destination": "/statistics-calculators",
+      "permanent": true
+    }
+  ]
+}
 ```
 
 ### 🎯 部署检查清单
 
-完成部署后，请按照以下清单验证：
+完成部署后，请验证以下项目：
 
-- [ ] ✅ 应用状态显示为 "Running"
-- [ ] ✅ 域名可以正常访问（如果配置了域名）
-- [ ] ✅ SSL 证书有效（HTTPS 正常）
-- [ ] ✅ 主页正常加载
-- [ ] ✅ 计算器功能正常工作
-- [ ] ✅ 数据库连接正常
-- [ ] ✅ 自动部署配置正确
-- [ ] ✅ 日志记录正常
-- [ ] ✅ 健康检查通过
-- [ ] ✅ 备份策略已设置
+- [ ] ✅ 应用正常访问（主域名和 www）
+- [ ] ✅ HTTPS 证书有效且自动续期
+- [ ] ✅ 所有计算器功能正常工作
+- [ ] ✅ 页面 SEO 元数据正确
+- [ ] ✅ 响应速度良好（< 3秒）
+- [ ] ✅ 移动端适配正常
+- [ ] ✅ 自动部署正常工作
+- [ ] ✅ 环境变量配置正确
+- [ ] ✅ 错误页面正常显示
+- [ ] ✅ Analytics 数据收集正常
+
+### 💰 成本说明
+
+**Vercel 免费计划限制：**
+- 100GB 带宽/月
+- 100 次部署/天
+- 无服务器函数执行时间：10 秒
+- 适合个人项目和小型应用
+
+**升级到 Pro 计划：**
+- 1TB 带宽/月
+- 无限部署
+- 60 秒函数执行时间
+- 高级分析功能
 
 ### 📞 支持资源
 
-如果遇到问题，可以参考以下资源：
-
-- **Coolify 官方文档**: https://coolify.io/docs
-- **Coolify 社区论坛**: https://discord.gg/coolify
-- **GitHub Issues**: https://github.com/coollabsio/coolify/issues
-- **Next.js 部署文档**: https://nextjs.org/docs/deployment
+- **Vercel 官方文档**: https://vercel.com/docs
+- **Next.js 部署指南**: https://nextjs.org/docs/deployment
+- **Vercel 社区**: https://github.com/vercel/vercel/discussions
+- **Vercel Discord**: https://vercel.com/discord
 
 ---
 
-**恭喜！** 您已经成功将 Stat Tools 部署到 Coolify 平台。应用现在可以通过自动化流程持续部署和更新。
+**恭喜！** 您已经成功将 Stat Tools 部署到 Vercel 平台。应用现在享有全球 CDN 加速、自动 HTTPS、无服务器架构等企业级特性。
 
-### Docker 部署（可选）
+## 🔄 增量更新工作流
 
-如果您的 Coolify 支持 Docker Compose，可以使用以下配置：
+### 🎯 Vercel 部署特点
 
-```yaml
-# docker-compose.yml
-version: '3.8'
+#### **无需手动数据库迁移**
+- Vercel 无服务器环境每次函数调用都是全新实例
+- `src/lib/db/vercel-db.ts` 自动初始化内存数据库
+- 迁移文件在每次冷启动时自动执行
 
-services:
-  app:
-    build: .
-    ports:
-      - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      - DATABASE_PATH=/data/statcal.db
-    volumes:
-      - ./data:/data
-    restart: unless-stopped
-```
+#### **完全自动化增量部署**
+- 任何代码修改推送到 GitHub 自动触发部署
+- 1-2 分钟内新版本全球上线
+- 支持预览部署（PR 分支）和生产部署（main 分支）
 
-### Dockerfile 配置
+### 📝 常见更新场景
 
-```dockerfile
-# Dockerfile
-FROM node:20-alpine
+#### **1. 内容更新**（最常见）
 
-WORKDIR /app
-
-# 复制依赖文件
-COPY package*.json ./
-
-# 安装依赖
-RUN npm ci --only=production
-
-# 复制源代码
-COPY . .
-
-# 构建应用
-RUN npm run build
-
-# 创建数据目录
-RUN mkdir -p /data
-
-# 运行数据库迁移
-RUN npm run db:migrate:slim
-
-EXPOSE 3000
-
-CMD ["npm", "start"]
-```
-
-### 环境变量说明
-
-| 变量名 | 说明 | 默认值 |
-|--------|------|---------|
-| `NODE_ENV` | 运行环境 | `production` |
-| `DATABASE_PATH` | SQLite 数据库路径 | `/data/statcal.db` |
-| `PORT` | 应用端口 | `3000` |
-| `NEXT_PUBLIC_SITE_URL` | 网站 URL | 自动检测 |
-
-### 备份与恢复
-
-#### 备份数据库
+更新 FAQ、教程、案例研究等内容：
 
 ```bash
-# 进入 Coolify 服务器
-ssh your-server
+# 修改内容文件
+edit migrations/006_seed_faq_content.sql
+edit migrations/007_seed_howto_content.sql
+edit migrations/008_seed_case_studies.sql
 
-# 备份数据库
-cp /var/lib/coolify/applications/[app-id]/data/statcal.db /backups/statcal-$(date +%Y%m%d).db
+# 提交并推送
+git add .
+git commit -m "update: 更新FAQ和教程内容"
+git push origin main
+
+# ✅ Vercel 自动部署，内容立即更新
 ```
 
-#### 恢复数据库
+#### **2. 新增计算器功能**
+
+添加新的统计计算器：
 
 ```bash
-# 恢复数据库
-cp /backups/statcal-20240101.db /var/lib/coolify/applications/[app-id]/data/statcal.db
+# 1. 更新数据库配置
+edit migrations/003_seed_calculator_data.sql
+# 添加新计算器到相应分组
+
+# 2. 创建计算器页面
+create src/app/calculator/new-tool/page.tsx
+create src/components/calculator/NewToolCalculator.tsx
+
+# 3. 添加相关文档
+edit migrations/006_seed_faq_content.sql
+# 添加相关FAQ
+
+# 4. 提交部署
+git add .
+git commit -m "feat: 新增置信区间计算器"
+git push origin main
 ```
 
-### 故障排查
+#### **3. 数据库结构调整**
 
-1. **查看日志**
-   - 在 Coolify 控制台查看应用日志
-   - 或通过 SSH: `docker logs [container-id]`
+添加新表或修改现有结构：
 
-2. **数据库权限问题**
-   ```bash
-   # 修复权限
-   chown -R 1000:1000 /data
-   ```
+```bash
+# 创建新迁移文件
+create migrations/009_add_user_preferences.sql
 
-3. **内存不足**
-   - 增加服务器内存
-   - 或在 Coolify 中配置内存限制
+# 内容示例：
+echo "-- Migration 009: Add User Preferences
+CREATE TABLE user_preferences (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_session TEXT UNIQUE NOT NULL,
+  favorite_calculators TEXT DEFAULT '[]',
+  theme_preference TEXT DEFAULT 'light',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);" > migrations/009_add_user_preferences.sql
 
-### 性能优化
+# 更新应用代码以使用新表
+edit src/lib/db/user-preferences.ts
 
-1. **启用缓存**
-   ```bash
-   CACHE_TTL=3600
-   USE_MEMORY_CACHE=true
-   ```
-
-2. **配置 CDN**
-   - 使用 Cloudflare 或其他 CDN 服务
-   - 配置静态资源缓存
-
-3. **数据库优化**
-   ```bash
-   # 定期优化数据库
-   npm run db:optimize
-   ```
-
-### CI/CD 配置（GitHub Actions）
-
-创建 `.github/workflows/deploy.yml`：
-
-```yaml
-name: Deploy to Coolify
-
-on:
-  push:
-    branches: [main]
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-      - run: npm ci
-      - run: npm run test
-      - run: npm run build
-      # Coolify 会自动通过 webhook 触发部署
+# 提交部署
+git add .
+git commit -m "feat: 添加用户偏好设置功能"
+git push origin main
 ```
+
+#### **4. 词汇表更新**
+
+添加新的统计学术语：
+
+```bash
+# 在现有文件中添加新术语
+edit migrations/004_seed_glossary_terms.sql
+
+# 或创建新的词汇表迁移
+create migrations/009_additional_glossary_terms.sql
+
+git commit -m "update: 扩展统计学词汇表"
+git push origin main
+```
+
+### 🚀 推荐工作流
+
+#### **开发-测试-部署循环**
+
+```bash
+# 1. 本地开发和测试
+npm run dev
+# 在 http://localhost:3000 验证功能
+
+# 2. 代码质量检查
+npm run lint
+npm run typecheck
+npm run build
+
+# 3. 提交代码
+git add .
+git commit -m "type: 简洁描述变更内容"
+
+# 4. 推送到 GitHub
+git push origin main
+
+# 5. 监控部署
+# 访问 https://vercel.com/dashboard 查看部署状态
+# 新版本通常在 1-2 分钟内上线
+```
+
+#### **提交消息规范**
+
+```bash
+# 新功能
+git commit -m "feat: 添加新的统计计算器"
+
+# 内容更新  
+git commit -m "update: 更新FAQ和教程内容"
+
+# 错误修复
+git commit -m "fix: 修复标准差计算精度问题"
+
+# 文档更新
+git commit -m "docs: 完善部署指南"
+
+# 性能优化
+git commit -m "perf: 优化数据库查询性能"
+```
+
+### 🔧 高级更新场景
+
+#### **批量内容更新**
+
+```bash
+# 1. 创建内容更新脚本
+create scripts/update-content.ts
+
+# 2. 批量更新多个迁移文件
+npm run update-content
+
+# 3. 验证更新
+git diff migrations/
+
+# 4. 提交所有更改
+git add migrations/
+git commit -m "update: 批量更新所有教育内容"
+git push origin main
+```
+
+#### **A/B测试新功能**
+
+```bash
+# 1. 创建功能分支
+git checkout -b feature/new-calculator-ui
+
+# 2. 开发新功能
+edit src/components/calculator/
+
+# 3. 推送分支
+git push origin feature/new-calculator-ui
+
+# 4. Vercel 自动创建预览部署
+# 访问预览URL测试新功能
+
+# 5. 合并到主分支
+git checkout main
+git merge feature/new-calculator-ui
+git push origin main
+```
+
+### 📊 部署监控和回滚
+
+#### **监控部署状态**
+
+1. **Vercel Dashboard**
+   - 访问 https://vercel.com/dashboard
+   - 查看部署历史和状态
+   - 监控性能指标
+
+2. **GitHub Integration**
+   - PR 状态检查
+   - 自动预览部署链接
+   - 部署成功/失败通知
+
+#### **快速回滚**
+
+```bash
+# 方法1: Git 回滚
+git revert HEAD
+git push origin main
+# Vercel 自动部署回滚版本
+
+# 方法2: Vercel Dashboard 回滚
+# 在 Vercel Dashboard 中选择之前的部署
+# 点击 "Promote to Production"
+```
+
+### ⚡ 性能优化建议
+
+#### **开发效率**
+
+1. **本地缓存**
+   ```bash
+   # 使用本地数据库文件加速开发
+   cp data/statcal.db data/statcal-backup.db
+   ```
+
+2. **分支策略**
+   ```bash
+   # 小改动直接推送main分支
+   # 大功能使用feature分支
+   git checkout -b feature/major-update
+   ```
+
+3. **批量提交**
+   ```bash
+   # 相关修改一起提交，减少部署次数
+   git add migrations/ src/components/
+   git commit -m "feat: 完整实现新计算器功能"
+   ```
+
+#### **部署优化**
+
+1. **构建缓存**
+   - Vercel 自动缓存 node_modules
+   - 利用 Next.js 增量构建特性
+
+2. **内容优化**
+   - 压缩图片和静态资源
+   - 利用 Vercel CDN 全球分发
+
+### 🎯 最佳实践总结
+
+#### **✅ 推荐做法**
+
+- 频繁小量提交，每次专注单一功能
+- 本地充分测试后再推送
+- 使用语义化提交消息
+- 利用预览部署测试新功能
+- 定期检查 Vercel 性能指标
+
+#### **❌ 避免事项**
+
+- 不要在生产分支直接实验
+- 避免一次提交过多无关变更
+- 不要忽略构建错误和警告
+- 避免频繁强制推送(force push)
+
+#### **🚨 紧急情况处理**
+
+```bash
+# 发现问题立即回滚
+git revert HEAD --no-edit
+git push origin main
+
+# 或在 Vercel Dashboard 快速回滚到稳定版本
+```
+
+通过这个工作流，您可以高效地维护和扩展 Stat Tools 应用，享受 Vercel 平台提供的现代化部署体验！
 
 ## 数据库（瘦身方案）
 
@@ -747,7 +803,7 @@ export CONTENT_SEARCH_MODE=fts
 
 - **Node.js**: 20.x 或更高版本
 - **npm**: 最新版本
-- **Coolify**: 自建 PaaS 平台（或 Docker）
+- **Vercel**: 无服务器部署平台
 
 ## 📁 项目结构
 
@@ -812,17 +868,17 @@ git push origin feature/your-feature-name
 
 ## 支持
 
-### Coolify 相关资源
+### Vercel 相关资源
 
-- [Coolify 官方文档](https://coolify.io/docs)
-- [Coolify GitHub](https://github.com/coollabsio/coolify)
-- [Coolify 社区](https://discord.gg/coolify)
+- [Vercel 官方文档](https://vercel.com/docs)
+- [Vercel GitHub](https://github.com/vercel/vercel)
+- [Vercel 社区](https://vercel.com/discord)
 
 ### 常见问题
 
 如遇到部署问题，请检查：
 
 1. Node.js 版本是否为 20+
-2. 数据库路径权限是否正确
-3. 环境变量是否正确配置
-4. 内存是否充足（建议 2GB+）
+2. Vercel 环境变量是否正确配置
+3. 项目构建是否通过 TypeScript 检查
+4. GitHub 仓库权限是否正确
