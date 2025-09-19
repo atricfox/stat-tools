@@ -154,7 +154,7 @@ export default function CaseDetailClient({ caseStudy, content }: CaseDetailClien
                       </h3>
                       <div
                         className="prose prose-sm prose-gray max-w-none"
-                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(typeof description === 'string' ? description : description.description || '')) }}
+                        dangerouslySetInnerHTML={{ __html: sanitizeHtml(convertMarkdownToHtml(description || '')) }}
                       />
                     </div>
                   ))}
