@@ -38,6 +38,11 @@ const nextConfig = {
     // Disable worker threads to prevent runtime issues
     workerThreads: false,
   },
+  outputFileTracingIncludes: {
+    '/api/:path*': ['./data/statcal.db', './data/calculators.json'],
+    '/app/:path*': ['./data/statcal.db', './data/calculators.json'],
+    '/:path*': ['./data/statcal.db', './data/calculators.json'],
+  },
   images: {
     formats: ['image/avif', 'image/webp'],
   },

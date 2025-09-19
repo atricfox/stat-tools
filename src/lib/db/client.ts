@@ -15,13 +15,14 @@ export function getDatabase(): Database.Database {
     const isBuildEnvironment = process.env.NEXT_PHASE === 'phase-production-build' ||
                              process.argv.some(arg => arg.includes('next build'));
 
-    // For development and build, always use local database
-    // For production, use DATABASE_PATH if set, otherwise default to production path
+    // Resolve database path based on environment
+    // Default to repository data directory for both build and runtime so Vercel bundles the file
+    const defaultDbPath = path.join(process.cwd(), 'data', 'statcal.db');
     let dbPath: string;
     if (process.env.NODE_ENV === 'production' && !isBuildEnvironment) {
-        dbPath = process.env.DATABASE_PATH || '/app/data/statcal.db';
+        dbPath = process.env.DATABASE_PATH || defaultDbPath;
     } else {
-        dbPath = path.join(process.cwd(), 'data', 'statcal.db');
+        dbPath = defaultDbPath;
     }
 
     // Ensure data directory exists for development
