@@ -1,10 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 180 180">
-  <defs>
-    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2563eb" />
-      <stop offset="100%" stop-color="#1d4ed8" />
-    </linearGradient>
-  </defs>
-  <rect width="180" height="180" rx="32" fill="url(#grad)" />
-  <text x="90" y="118" text-anchor="middle" font-size="108" font-family="'Segoe UI', 'Inter', sans-serif" fill="#ffffff" font-weight="600">∑</text>
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="150 150 220 240" role="img">
+  <title>Mu-Sigma Mark — Transparent</title>
+  <!-- Σ -->
+  <path d="M320 160H210l70 80-70 80h110"
+        fill="none"
+        stroke="#0B84F3"
+        stroke-width="28"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <!-- μ -->
+  <path d="M160 184v120c0 30 20 52 50 52
+           24 0 42-14 50-36
+           8 22 26 36 50 36
+           30 0 50-22 50-52v-56"
+        fill="none"
+        stroke="#0E7490"
+        stroke-width="22"
+        stroke-linecap="round"
+        stroke-linejoin="round"/>
+  <!-- 学术黄点缀 -->
+  <circle cx="342" cy="156" r="8" fill="#FACC15"/>
 </svg>
+
