@@ -13,7 +13,13 @@ export function getDb(): Database.Database {
   const defaultDbPath = process.env.DATABASE_URL?.replace('file:', '') || 
     path.join(process.cwd(), 'data', 'statcal.db');
 
-  // Production environment (including Vercel)
+  // Vercel serverless environment - always use in-memory database
+  if (process.env.VERCEL === '1') {
+    console.log('[DB] Detected Vercel environment, using in-memory database');
+    return getVercelDb();
+  }
+
+  // Production environment (non-Vercel)
   if (process.env.NODE_ENV === 'production') {
     // Try build directory first (for standalone deployments)
     const buildDbPath = path.join(process.cwd(), '.next', 'data', 'statcal.db');
@@ -34,8 +40,8 @@ export function getDb(): Database.Database {
       return db;
     }
     
-    // Fallback to in-memory database with migrations (Vercel serverless)
-    if (debug) console.log('[DB] Using fallback in-memory database');
+    // Fallback to in-memory database
+    console.log('[DB] No database file found, using in-memory fallback');
     return getVercelDb();
   }
 

@@ -106,7 +106,6 @@ export class GlossaryService extends BaseService {
         return this.queryWithCache(cacheKey, async () => {
             // 构建WHERE条件
             const conditions: Record<string, any> = {};
-            if (firstLetter) conditions.first_letter = firstLetter;
 
             let whereClause = '';
             let params: any[] = [];
@@ -131,6 +130,13 @@ export class GlossaryService extends BaseService {
                     whereClause += ` ${categoryCondition} c.name = ?`;
                     params.push(categoryName);
                 }
+            }
+
+            // 处理首字母过滤
+            if (firstLetter) {
+                const letterCondition = whereClause ? 'AND' : 'WHERE';
+                whereClause += ` ${letterCondition} t.first_letter = ?`;
+                params.push(firstLetter.toUpperCase());
             }
 
             // 处理搜索
@@ -178,7 +184,7 @@ export class GlossaryService extends BaseService {
                 params
             });
 
-            // 为每个术语添加空分类（categories表不存在）
+            // 为每个术语添加空分类
             const termsWithCategories = result.data.map((term) => ({
                 ...term,
                 categories: []
