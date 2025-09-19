@@ -6,12 +6,22 @@ import { getDb } from '../db/db-utils';
  * 提供通用的数据库操作和缓存功能
  */
 export abstract class BaseService {
-    protected db: Database.Database;
+    protected _db: Database.Database | null = null;
     protected cache: Map<string, { data: any; timestamp: number; ttl: number }> = new Map();
     protected defaultCacheTTL: number = 5 * 60 * 1000; // 5分钟
 
     constructor() {
-        this.db = getDb();
+        // 延迟初始化数据库连接
+    }
+
+    /**
+     * 延迟获取数据库连接
+     */
+    protected get db(): Database.Database {
+        if (!this._db) {
+            this._db = getDb();
+        }
+        return this._db;
     }
 
     /**

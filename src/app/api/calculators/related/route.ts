@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { CalculatorsService } from '@/lib/services/calculators';
+import { calculatorsService } from '@/lib/services/calculators';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -12,9 +12,6 @@ export async function GET(request: NextRequest) {
     if (!currentUrl) {
       return NextResponse.json({ error: 'currentUrl is required' }, { status: 400 });
     }
-
-    // Create service instance at runtime
-    const calculatorsService = new CalculatorsService();
 
     // Get current calculator info by URL
     const current = await calculatorsService.getCalculatorByUrl(currentUrl);
