@@ -89,68 +89,202 @@ function initializeVercelDatabase(db: Database.Database): void {
 }
 
 function seedBasicContent(db: Database.Database): void {
-  // Detect whether the schema already has a description column
-  const columns = db.prepare(`PRAGMA table_info(slim_content)`).all() as Array<{ name: string }>;
-  const hasDescriptionColumn = columns.some(column => column.name === 'description');
+  try {
+    // Seed glossary terms first (essential for glossary pages)
+    seedGlossaryTerms(db);
+    
+    // Seed basic how-to content
+    seedHowToContent(db);
+    
+    // Seed basic slim_content data
+    const columns = db.prepare(`PRAGMA table_info(slim_content)`).all() as Array<{ name: string }>;
+    const hasDescriptionColumn = columns.some(column => column.name === 'description');
 
-  const calculators = [
+    const calculators = [
+      {
+        id: 1,
+        type: 'calculator',
+        title: 'Mean Calculator',
+        slug: 'mean',
+        description: 'Calculate the mean (average) of a set of numbers',
+        status: 'published'
+      },
+      {
+        id: 2,
+        type: 'calculator',
+        title: 'Median Calculator',
+        slug: 'median',
+        description: 'Find the median value of a dataset',
+        status: 'published'
+      },
+      {
+        id: 3,
+        type: 'calculator',
+        title: 'Standard Deviation Calculator',
+        slug: 'standard-deviation',
+        description: 'Calculate standard deviation and variance',
+        status: 'published'
+      },
+      {
+        id: 4,
+        type: 'calculator',
+        title: 'Weighted Mean Calculator',
+        slug: 'weighted-mean',
+        description: 'Calculate weighted average of values',
+        status: 'published'
+      },
+      {
+        id: 5,
+        type: 'calculator',
+        title: 'GPA Calculator',
+        slug: 'gpa',
+        description: 'Calculate your Grade Point Average',
+        status: 'published'
+      }
+    ];
+
+    const insertCalculator = hasDescriptionColumn
+      ? db.prepare(`
+          INSERT OR IGNORE INTO slim_content (id, type, title, slug, description, status)
+          VALUES (@id, @type, @title, @slug, @description, @status)
+        `)
+      : db.prepare(`
+          INSERT OR IGNORE INTO slim_content (id, type, title, slug, summary, status)
+          VALUES (@id, @type, @title, @slug, @description, @status)
+        `);
+
+    for (const calculator of calculators) {
+      insertCalculator.run(calculator);
+    }
+
+    console.log('[DB] Basic content seeded');
+  } catch (error) {
+    console.error('[DB] Error seeding basic content:', error);
+  }
+}
+
+function seedGlossaryTerms(db: Database.Database): void {
+  console.log('[DB] Seeding glossary terms...');
+  
+  const terms = [
     {
       id: 1,
-      type: 'calculator',
-      title: 'Mean Calculator',
       slug: 'mean',
-      description: 'Calculate the mean (average) of a set of numbers',
-      status: 'published'
+      title: 'Mean (Average)',
+      short_description: 'The arithmetic average of a set of values',
+      definition: 'The arithmetic average of a set of values, calculated by adding all values and dividing by the number of values.',
+      first_letter: 'M'
     },
     {
       id: 2,
-      type: 'calculator',
-      title: 'Median Calculator',
       slug: 'median',
-      description: 'Find the median value of a dataset',
-      status: 'published'
+      title: 'Median',
+      short_description: 'The middle value in a dataset',
+      definition: 'The middle value in a dataset when values are arranged in ascending order. For even numbers of values, it\'s the average of the two middle values.',
+      first_letter: 'M'
     },
     {
       id: 3,
-      type: 'calculator',
-      title: 'Standard Deviation Calculator',
-      slug: 'standard-deviation',
-      description: 'Calculate standard deviation and variance',
-      status: 'published'
+      slug: 'mode',
+      title: 'Mode',
+      short_description: 'The most frequently occurring value',
+      definition: 'The value that appears most frequently in a dataset. A dataset can have one mode, multiple modes, or no mode.',
+      first_letter: 'M'
     },
     {
       id: 4,
-      type: 'calculator',
-      title: 'Weighted Mean Calculator',
-      slug: 'weighted-mean',
-      description: 'Calculate weighted average of values',
-      status: 'published'
+      slug: 'standard-deviation',
+      title: 'Standard Deviation',
+      short_description: 'A measure of variability',
+      definition: 'A measure of variability that indicates how spread out data points are from the mean. Lower values indicate data points are closer to the mean.',
+      first_letter: 'S'
     },
     {
       id: 5,
-      type: 'calculator',
-      title: 'GPA Calculator',
-      slug: 'gpa',
-      description: 'Calculate your Grade Point Average',
-      status: 'published'
+      slug: 'variance',
+      title: 'Variance',
+      short_description: 'The average of squared differences from the mean',
+      definition: 'The average of squared differences from the mean. It measures the spread of data points around the mean.',
+      first_letter: 'V'
     }
   ];
 
-  const insertCalculator = hasDescriptionColumn
-    ? db.prepare(`
-        INSERT OR IGNORE INTO slim_content (id, type, title, slug, description, status)
-        VALUES (@id, @type, @title, @slug, @description, @status)
-      `)
-    : db.prepare(`
-        INSERT OR IGNORE INTO slim_content (id, type, title, slug, summary, status)
-        VALUES (@id, @type, @title, @slug, @description, @status)
-      `);
+  const insertTerm = db.prepare(`
+    INSERT OR IGNORE INTO glossary_terms (id, slug, title, short_description, definition, first_letter, created_at, updated_at)
+    VALUES (@id, @slug, @title, @short_description, @definition, @first_letter, datetime('now'), datetime('now'))
+  `);
 
-  for (const calculator of calculators) {
-    insertCalculator.run(calculator);
+  for (const term of terms) {
+    insertTerm.run(term);
   }
 
-  console.log('[DB] Basic content seeded');
+  console.log(`[DB] Seeded ${terms.length} glossary terms`);
+}
+
+function seedHowToContent(db: Database.Database): void {
+  console.log('[DB] Seeding how-to content...');
+  
+  const howToGuides = [
+    {
+      id: 1,
+      slug: 'how-calculate-mean',
+      type: 'howto',
+      title: 'How to Calculate the Mean',
+      summary: 'Learn to calculate the arithmetic mean step by step',
+      description: 'A comprehensive guide on calculating the mean (average) of a dataset.',
+      content: 'The mean is calculated by adding all values and dividing by the count of values.',
+      status: 'published',
+      reading_time: 5,
+      priority: 1,
+      difficulty: 'beginner'
+    },
+    {
+      id: 2,
+      slug: 'how-to-calculate-percent-error',
+      type: 'howto',
+      title: 'How to Calculate Percent Error',
+      summary: 'Step-by-step guide for calculating percentage error',
+      description: 'Learn how to measure the accuracy of your measurements using percent error.',
+      content: 'Percent error = |measured - actual| / actual × 100%',
+      status: 'published',
+      reading_time: 7,
+      priority: 2,
+      difficulty: 'intermediate'
+    },
+    {
+      id: 3,
+      slug: 'how-to-calculate-range',
+      type: 'howto',
+      title: 'How to Calculate Range',
+      summary: 'Simple guide to finding the range of a dataset',
+      description: 'Understanding how to calculate the range as a measure of data spread.',
+      content: 'Range = Maximum value - Minimum value',
+      status: 'published',
+      reading_time: 3,
+      priority: 3,
+      difficulty: 'beginner'
+    }
+  ];
+
+  // Check if slim_content has description column
+  const columns = db.prepare(`PRAGMA table_info(slim_content)`).all() as Array<{ name: string }>;
+  const hasDescriptionColumn = columns.some(column => column.name === 'description');
+
+  const insertHowTo = hasDescriptionColumn
+    ? db.prepare(`
+        INSERT OR IGNORE INTO slim_content (id, slug, type, title, summary, description, content, status, reading_time, priority, difficulty, created_at, updated_at)
+        VALUES (@id, @slug, @type, @title, @summary, @description, @content, @status, @reading_time, @priority, @difficulty, datetime('now'), datetime('now'))
+      `)
+    : db.prepare(`
+        INSERT OR IGNORE INTO slim_content (id, slug, type, title, summary, content, status, reading_time, priority, difficulty, created_at, updated_at)
+        VALUES (@id, @slug, @type, @title, @summary, @content, @status, @reading_time, @priority, @difficulty, datetime('now'), datetime('now'))
+      `);
+
+  for (const guide of howToGuides) {
+    insertHowTo.run(guide);
+  }
+
+  console.log(`[DB] Seeded ${howToGuides.length} how-to guides`);
 }
 
 export function closeVercelDb(): void {

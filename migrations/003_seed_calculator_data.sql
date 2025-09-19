@@ -30,4 +30,4 @@ INSERT INTO calculators (id, group_id, name, url, description, is_hot, is_new, s
 (10, 4, 'Correlation Calculator', '/calculator/correlation', 'Calculate correlation coefficient between datasets', 0, 1, 1, '2025-09-19 10:00:00', '2025-09-19 10:00:00'),
 (11, 4, 'T-Test Calculator', '/calculator/t-test', 'Perform statistical t-tests for hypothesis testing', 0, 1, 2, '2025-09-19 10:00:00', '2025-09-19 10:00:00'),
 (12, 4, 'Percent Error Calculator', '/calculator/percent-error', 'Calculate percentage error between values', 0, 0, 3, '2025-09-19 10:00:00', '2025-09-19 10:00:00'),
-(13, 4, 'Confidence Interval Calculator', '/calculator/confidence-interval', 'Calculate confidence intervals for statistical estimates', 0, 1, 4, '2025-09-19 10:00:00', '2025-09-19 10:00:00');
+(13, 4, 'Mean Confidence Intervals Calculator', '/calculator/mean-confidence-intervals', 'Calculate multiple types of confidence intervals for the mean: t-interval, Bootstrap percentile, BCa, and trimmed mean', 0, 1, 4, '2025-09-19 10:00:00', '2025-09-19 10:00:00');

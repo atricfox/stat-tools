@@ -6,10 +6,10 @@
   "functions": {
     "app/api/**": {
       "maxDuration": 30,
-      "includeFiles": "data/**/*"
+      "includeFiles": ["data/**/*", "migrations/**/*"]
     },
     "app/**": {
-      "includeFiles": "data/**/*"
+      "includeFiles": ["data/**/*", "migrations/**/*"]
     }
   },
   "headers": [
