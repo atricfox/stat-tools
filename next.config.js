@@ -6,6 +6,7 @@ if (typeof global !== 'undefined' && typeof global.self === 'undefined') {
   global.self = global;
 }
 
+const path = require('path');
 const createMDXPlugin = require('@next/mdx');
 
 /** @type {import('next').NextConfig} */
@@ -45,6 +46,12 @@ const nextConfig = {
   
   // Enhanced webpack configuration for code splitting
   webpack: (config, { dev, isServer }) => {
+    config.resolve = config.resolve || {};
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+    };
+
     // Fix Node.js polyfills for client-side bundles
     if (!isServer) {
       config.resolve.fallback = {
