@@ -70,12 +70,14 @@ CREATE TABLE glossary_terms (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
   slug TEXT UNIQUE NOT NULL,
   title TEXT NOT NULL,
+  short_description TEXT,
   definition TEXT NOT NULL,
   example TEXT,
   category TEXT,
   related_terms TEXT DEFAULT '[]',
   tags TEXT DEFAULT '[]',
   difficulty TEXT DEFAULT 'beginner',
+  first_letter TEXT,
   created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
   updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
