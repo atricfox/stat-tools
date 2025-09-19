@@ -165,7 +165,27 @@ function seedBasicContent(db: Database.Database): void {
 
 function seedGlossaryTerms(db: Database.Database): void {
   console.log('[DB] Seeding glossary terms...');
-  
+  const glossaryColumns = db.prepare(`PRAGMA table_info(glossary_terms)`).all() as Array<{ name: string }>;
+
+  if (glossaryColumns.length === 0) {
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS glossary_terms (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        slug TEXT UNIQUE NOT NULL,
+        title TEXT NOT NULL,
+        short_description TEXT,
+        definition TEXT NOT NULL,
+        first_letter CHAR(1),
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('[DB] Created glossary_terms table for Vercel seed');
+  } else if (!glossaryColumns.some(column => column.name === 'short_description')) {
+    db.exec('ALTER TABLE glossary_terms ADD COLUMN short_description TEXT');
+    console.log('[DB] Added missing short_description column to glossary_terms');
+  }
+
   const terms = [
     {
       id: 1,
