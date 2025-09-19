@@ -89,22 +89,65 @@ function initializeVercelDatabase(db: Database.Database): void {
 }
 
 function seedBasicContent(db: Database.Database): void {
-  // Insert basic calculator content
-  const insertCalculator = db.prepare(`
-    INSERT OR IGNORE INTO slim_content (id, type, title, slug, description, status)
-    VALUES (?, ?, ?, ?, ?, ?)
-  `);
+  // Detect whether the schema already has a description column
+  const columns = db.prepare(`PRAGMA table_info(slim_content)`).all() as Array<{ name: string }>;
+  const hasDescriptionColumn = columns.some(column => column.name === 'description');
 
   const calculators = [
-    [1, 'calculator', 'Mean Calculator', 'mean', 'Calculate the mean (average) of a set of numbers', 'published'],
-    [2, 'calculator', 'Median Calculator', 'median', 'Find the median value of a dataset', 'published'],
-    [3, 'calculator', 'Standard Deviation Calculator', 'standard-deviation', 'Calculate standard deviation and variance', 'published'],
-    [4, 'calculator', 'Weighted Mean Calculator', 'weighted-mean', 'Calculate weighted average of values', 'published'],
-    [5, 'calculator', 'GPA Calculator', 'gpa', 'Calculate your Grade Point Average', 'published'],
+    {
+      id: 1,
+      type: 'calculator',
+      title: 'Mean Calculator',
+      slug: 'mean',
+      description: 'Calculate the mean (average) of a set of numbers',
+      status: 'published'
+    },
+    {
+      id: 2,
+      type: 'calculator',
+      title: 'Median Calculator',
+      slug: 'median',
+      description: 'Find the median value of a dataset',
+      status: 'published'
+    },
+    {
+      id: 3,
+      type: 'calculator',
+      title: 'Standard Deviation Calculator',
+      slug: 'standard-deviation',
+      description: 'Calculate standard deviation and variance',
+      status: 'published'
+    },
+    {
+      id: 4,
+      type: 'calculator',
+      title: 'Weighted Mean Calculator',
+      slug: 'weighted-mean',
+      description: 'Calculate weighted average of values',
+      status: 'published'
+    },
+    {
+      id: 5,
+      type: 'calculator',
+      title: 'GPA Calculator',
+      slug: 'gpa',
+      description: 'Calculate your Grade Point Average',
+      status: 'published'
+    }
   ];
 
-  for (const calc of calculators) {
-    insertCalculator.run(...calc);
+  const insertCalculator = hasDescriptionColumn
+    ? db.prepare(`
+        INSERT OR IGNORE INTO slim_content (id, type, title, slug, description, status)
+        VALUES (@id, @type, @title, @slug, @description, @status)
+      `)
+    : db.prepare(`
+        INSERT OR IGNORE INTO slim_content (id, type, title, slug, summary, status)
+        VALUES (@id, @type, @title, @slug, @description, @status)
+      `);
+
+  for (const calculator of calculators) {
+    insertCalculator.run(calculator);
   }
 
   console.log('[DB] Basic content seeded');

@@ -36,6 +36,7 @@ CREATE TABLE slim_content (
   type TEXT NOT NULL CHECK (type IN ('faq','howto','case','calculator')),
   title TEXT NOT NULL,
   summary TEXT,
+  description TEXT,
   content TEXT,
   status TEXT DEFAULT 'published',
   reading_time INTEGER,
