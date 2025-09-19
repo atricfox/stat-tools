@@ -4,7 +4,7 @@
  */
 
 import Database from 'better-sqlite3';
-import { getDatabase } from '../db/client';
+import { getDb } from '../db/db-utils';
 
 // 内容项接口
 export interface ContentItem {
@@ -113,7 +113,7 @@ export class ContentService {
     private db: Database.Database;
 
     constructor() {
-        this.db = getDatabase();
+        this.db = getDb();
     }
 
     getContentItem(id: number): ContentItem | null {

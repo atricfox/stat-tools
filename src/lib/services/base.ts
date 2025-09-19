@@ -1,5 +1,5 @@
 import Database from 'better-sqlite3';
-import { getDatabase } from '../db/client';
+import { getDb } from '../db/db-utils';
 
 /**
  * 数据库服务基类
@@ -11,7 +11,7 @@ export abstract class BaseService {
     protected defaultCacheTTL: number = 5 * 60 * 1000; // 5分钟
 
     constructor() {
-        this.db = getDatabase();
+        this.db = getDb();
     }
 
     /**
