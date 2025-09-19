@@ -33,6 +33,11 @@ export const metadata: Metadata = {
     title: 'Professional Statistical Calculators | TheStatsCalculator',
     description: 'Free statistical calculators with step-by-step explanations for students and researchers.',
   },
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/apple-icon.svg',
+  },
 }
 
 export default async function RootLayout({
