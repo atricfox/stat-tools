@@ -26,6 +26,7 @@
     "migrate:howto:dry": "tsx scripts/migrate-howto-content.ts --dry-run --verbose",
     "migrate:howto:priority": "tsx scripts/migrate-howto-content.ts --priority",
     "prebuild": "if [ \"$SKIP_EXPORT\" != \"true\" ]; then npm run export:calculators || echo 'skip export (no db or deps)'; fi",
+    "postbuild": "mkdir -p .next/data && cp -f data/statcal.db .next/data/ 2>/dev/null || echo 'Database file not found, using fallback' && cp -f data/calculators.json .next/data/ 2>/dev/null || echo 'Calculators JSON not found'",
     "check-links": "tsx scripts/check-links.ts",
     "check-links:external": "tsx scripts/check-links-external.ts",
     "check-links:ci": "npm run check-links -- --fail-on-broken --report=link-report.md",
