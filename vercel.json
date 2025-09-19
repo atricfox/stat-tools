@@ -5,7 +5,11 @@
   "framework": "nextjs",
   "functions": {
     "app/api/**": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "includeFiles": ["data/statcal.db", "data/calculators.json"]
+    },
+    "app/**": {
+      "includeFiles": ["data/statcal.db", "data/calculators.json"]
     }
   },
   "headers": [

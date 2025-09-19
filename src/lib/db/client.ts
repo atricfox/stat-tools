@@ -40,17 +40,28 @@ export function getDatabase(): Database.Database {
         // In development, we'll let the database be created on first run
     }
 
-    dbInstance = new Database(dbPath);
+    const databaseOptions: Database.Options = {};
+    const isReadOnlyRuntime = process.env.NODE_ENV === 'production' && !isBuildEnvironment;
+    if (isReadOnlyRuntime) {
+        databaseOptions.readonly = true;
+        databaseOptions.fileMustExist = true;
+    }
+
+    dbInstance = new Database(dbPath, databaseOptions);
 
     // 启用外键约束
     dbInstance.pragma('foreign_keys = ON');
 
-    // 性能优化配置
-    dbInstance.pragma('journal_mode = WAL');     // Write-Ahead Logging 模式
-    dbInstance.pragma('synchronous = NORMAL');    // 同步模式平衡性能和安全性
-    dbInstance.pragma('cache_size = 1000');       // 缓存大小
-    dbInstance.pragma('temp_store = MEMORY');      // 临时表存储在内存中
-    dbInstance.pragma('mmap_size = 268435456');    // 256MB 内存映射
+    // 性能优化配置 - 在生产的只读环境中跳过需要写入的 PRAGMA
+    if (!isReadOnlyRuntime) {
+        dbInstance.pragma('journal_mode = WAL');     // Write-Ahead Logging 模式
+        dbInstance.pragma('synchronous = NORMAL');    // 同步模式平衡性能和安全性
+        dbInstance.pragma('cache_size = 1000');       // 缓存大小
+        dbInstance.pragma('temp_store = MEMORY');      // 临时表存储在内存中
+        dbInstance.pragma('mmap_size = 268435456');    // 256MB 内存映射
+    } else {
+        dbInstance.pragma('query_only = 1');
+    }
 
     return dbInstance;
 }
