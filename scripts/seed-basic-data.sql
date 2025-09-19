@@ -131,6 +131,9 @@ FROM calculator_groups cg WHERE cg.group_name = 'descriptive-others';
 -- 3. 术语数据 (glossary_terms)
 -- ==========================================
 
+-- Older database snapshots may miss the short_description column
+ALTER TABLE glossary_terms ADD COLUMN IF NOT EXISTS short_description TEXT;
+
 INSERT OR IGNORE INTO glossary_terms (slug, title, short_description, definition) VALUES
 
 ('mean', 'Mean', 'The average of a set of numbers', 
