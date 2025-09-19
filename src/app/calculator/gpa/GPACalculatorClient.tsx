@@ -7,12 +7,12 @@ import {
   RefreshCw,
   ChevronDown
 } from 'lucide-react';
-import CalculatorLayout from '@/components/layout/CalculatorLayout';
-import PrecisionControl from '@/components/calculator/PrecisionControl';
-import GradePointSystemSelector from '@/components/calculator/GradePointSystemSelector';
-import GPADataInput from '@/components/calculator/GPADataInput';
-import CalculationSteps, { CalculationStep } from '@/components/calculator/CalculationSteps';
-import HelpSection from '@/components/calculator/HelpSection';
+import CalculatorLayout from '../../../components/layout/CalculatorLayout';
+import PrecisionControl from '../../../components/calculator/PrecisionControl';
+import GradePointSystemSelector from '../../../components/calculator/GradePointSystemSelector';
+import GPADataInput from '../../../components/calculator/GPADataInput';
+import CalculationSteps, { CalculationStep } from '../../../components/calculator/CalculationSteps';
+import HelpSection from '../../../components/calculator/HelpSection';
 import { useGPACalculation } from '@/hooks/useGPACalculation';
 import { DEFAULT_GRADE_SYSTEMS } from '@/lib/gpaCalculation';
 import { GradePointSystem } from '@/types/gpa';
