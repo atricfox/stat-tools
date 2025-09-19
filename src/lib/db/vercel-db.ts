@@ -20,11 +20,32 @@ export function getVercelDb(): Database.Database {
     const isVercel = process.env.VERCEL === '1';
 
     if (isVercel && isProduction) {
-      // In Vercel production, use in-memory database
-      console.log('[DB] Using in-memory database for Vercel production');
+      // Prefer bundled read-only database if available (copied during build)
+      const candidatePaths = [
+        // Packaged database inside the build output (runtime)
+        path.join(process.cwd(), '.next', 'data', 'statcal.db'),
+        // Source database bundled with the repository (build time)
+        path.join(process.cwd(), 'data', 'statcal.db')
+      ];
+
+      for (const dbPath of candidatePaths) {
+        if (fs.existsSync(dbPath)) {
+          console.log(`[DB] Using bundled SQLite database: ${dbPath}`);
+          dbInstance = new Database(dbPath, {
+            readonly: true,
+            fileMustExist: true
+          });
+          dbInstance.pragma('foreign_keys = ON');
+          dbInstance.pragma('query_only = 1');
+          return dbInstance;
+        }
+      }
+
+      // Fallback: initialize in-memory database
+      console.log('[DB] Bundled database not found, using in-memory database for Vercel production');
       dbInstance = new Database(':memory:');
-      
-      // Initialize schema and seed data
+
+      // Initialize schema and seed data (best-effort)
       initializeVercelDatabase(dbInstance);
     } else {
       // Local development - use file database
@@ -77,13 +98,18 @@ function initializeVercelDatabase(db: Database.Database): void {
         try {
           db.exec(migrationSQL);
         } catch (error: any) {
-          // Ignore "duplicate column" errors which can happen with ALTER TABLE
-          if (error.message && error.message.includes('duplicate column')) {
-            console.log(`[DB] Column already exists, skipping: ${file}`);
-          } else {
-            // Re-throw other errors
-            throw error;
+          const message = error?.message || '';
+          // Log and continue for non-critical schema differences
+          if (
+            message.includes('duplicate column') ||
+            message.includes('no such column') ||
+            message.includes('no such table') ||
+            message.includes('already exists')
+          ) {
+            console.warn(`[DB] Skipping migration ${file}: ${message}`);
+            continue;
           }
+          throw error;
         }
       }
     }
