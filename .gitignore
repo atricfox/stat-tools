@@ -81,6 +81,7 @@ Thumbs.db
 *.tmp
 temp/
 tmp/
+temp-content/
 
 # Cloudflare
 .dev.vars
@@ -90,8 +91,19 @@ wrangler.toml.bak
 *.bak
 *.backup
 *~
+migrations-backup/
 
 # Cache directories
 .cache/
 .parcel-cache/
 .eslintcache
+
+# Claude Code settings
+.claude/
+
+# Temporary content files
+enhanced-*.md
+STRUCTURED_CONTENT_MIGRATION.md
+
+# Development tools
+.specstory/
