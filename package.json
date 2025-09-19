@@ -25,7 +25,7 @@
     "migrate:howto": "tsx scripts/migrate-howto-content.ts",
     "migrate:howto:dry": "tsx scripts/migrate-howto-content.ts --dry-run --verbose",
     "migrate:howto:priority": "tsx scripts/migrate-howto-content.ts --priority",
-    "prebuild": "npm run export:calculators || echo 'skip export (no db or deps)'",
+    "prebuild": "if [ \"$SKIP_EXPORT\" != \"true\" ]; then npm run export:calculators || echo 'skip export (no db or deps)'; fi",
     "check-links": "tsx scripts/check-links.ts",
     "check-links:external": "tsx scripts/check-links-external.ts",
     "check-links:ci": "npm run check-links -- --fail-on-broken --report=link-report.md",

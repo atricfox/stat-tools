@@ -1,0 +1,29 @@
+# Nixpacks configuration for Coolify deployment
+# This file tells Coolify how to build and run the application
+
+[phases.setup]
+# 强制使用 Node.js 20 和 SQLite
+nixPkgs = ["nodejs_20", "npm-9_x", "sqlite"]
+nixpkgsArchive = "23.11"
+
+[phases.install]
+# 安装所有依赖（构建需要）
+cmds = ["npm ci"]
+
+[phases.build]
+# 创建数据目录，跳过导出脚本，直接构建
+cmds = [
+    "mkdir -p /data",
+    "SKIP_EXPORT=true npm run build"
+]
+
+[start]
+# 启动应用，监听所有网络接口
+cmd = "npm start -- --hostname 0.0.0.0"
+
+[variables]
+NODE_ENV = "production"
+PORT = "3000"
+DATABASE_PATH = "/data/statcal.db"
+HOSTNAME = "0.0.0.0"
+SKIP_EXPORT = "true"
