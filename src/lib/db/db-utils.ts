@@ -1,5 +1,6 @@
 import Database from 'better-sqlite3';
 import path from 'path';
+import fs from 'node:fs';
 import { getVercelDb } from './vercel-db';
 
 // Add debug logging
@@ -9,14 +10,21 @@ const debug = process.env.NODE_ENV === 'development';
 let dbInstance: Database.Database | null = null;
 
 export function getDb(): Database.Database {
-  // Use Vercel-optimized database in Vercel environment
-  if (process.env.VERCEL === '1') {
+  const defaultDbPath = process.env.DATABASE_URL?.replace('file:', '') || 
+    path.join(process.cwd(), 'data', 'statcal.db');
+
+  if (process.env.VERCEL === '1' && process.env.NODE_ENV === 'production') {
+    if (fs.existsSync(defaultDbPath)) {
+      const db = new Database(defaultDbPath, { readonly: true, fileMustExist: true });
+      db.pragma('foreign_keys = ON');
+      db.pragma('query_only = 1');
+      return db;
+    }
     return getVercelDb();
   }
 
   if (!dbInstance) {
-    const dbPath = process.env.DATABASE_URL?.replace('file:', '') || 
-                  path.join(process.cwd(), 'data', 'statcal.db');
+    const dbPath = defaultDbPath;
     if (debug) {
       console.log(`[DB] Connecting to database at: ${dbPath}`);
     }
