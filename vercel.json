@@ -3,13 +3,22 @@
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "framework": "nextjs",
+  "env": {
+    "DATABASE_PATH": ".next/data/statcal.db"
+  },
+  "build": {
+    "env": {
+      "NODE_ENV": "production",
+      "DATABASE_PATH": ".next/data/statcal.db"
+    }
+  },
   "functions": {
     "app/api/**": {
       "maxDuration": 30,
-      "includeFiles": "{data/**/*,migrations/**/*}"
+      "includeFiles": ".next/data/**/*"
     },
     "app/**": {
-      "includeFiles": "{data/**/*,migrations/**/*}"
+      "includeFiles": ".next/data/**/*"
     }
   },
   "headers": [

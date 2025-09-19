@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev -p 3011",
+    "prebuild": "npm run db:prepare && npm run export:calculators",
     "build": "NEXT_LINT=false next build",
+    "postbuild": "echo 'Build completed with database snapshot'",
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
@@ -13,6 +15,8 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "db:migrate": "mkdir -p data && sqlite3 data/statcal.db < migrations/001_init.sql",
+    "db:prepare": "tsx scripts/db-prepare.ts",
+    "db:validate": "tsx scripts/db-prepare.ts --validate-only",
     "db:migrate:slim": "tsx scripts/run-migrations.ts",
     "db:check": "tsx scripts/check-db-ready.ts",
     "db:setup": "npm run db:check && echo 'Database setup complete'",
