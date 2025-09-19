@@ -1,5 +1,5 @@
 {
-  "buildCommand": "SKIP_EXPORT=true npm run build",
+  "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "installCommand": "npm install",
   "framework": "nextjs",

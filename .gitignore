@@ -41,12 +41,15 @@ pids
 *.pid.lock
 
 # Local SQLite databases
-data/*.db
 data/*.db-*
+data/*.db-wal
+data/*.db-shm
 backups/*.db
 backups/**/*.db
 content-backup-*/**/*.db
-statcal.db
+
+# Allow production database file for deployment
+!data/statcal.db
 
 # Coverage directory used by tools like istanbul
 coverage/
