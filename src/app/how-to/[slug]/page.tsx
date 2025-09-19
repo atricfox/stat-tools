@@ -5,6 +5,9 @@ import { EnhancedContentService } from '@/lib/services/enhanced-content';
 import type { THowToStep } from '@/lib/content/contentSchema';
 import HowToDetailClient from './HowToDetailClient';
 
+export const dynamic = 'force-static';
+export const dynamicParams = false;
+
 interface PageProps {
   params: Promise<{
     slug: string;
@@ -48,7 +51,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const { slug } = await params;
   const content = await loadHowToContent(slug);
   if (!content) return {};
-  
+
   return {
     title: `${content.frontmatter.title} | TheStatsCalculator`,
     description: content.frontmatter.seo?.metaDescription || content.frontmatter.summary,
@@ -56,12 +59,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: content.frontmatter.title,
       description: content.frontmatter.summary,
-      url: `https://thestatscalculator.com/how-to/${params.slug}`,
+      url: `https://thestatscalculator.com/how-to/${slug}`,
       siteName: 'TheStatsCalculator',
       type: 'article',
     },
     alternates: {
-      canonical: `https://thestatscalculator.com/how-to/${params.slug}`,
+      canonical: `https://thestatscalculator.com/how-to/${slug}`,
     },
   };
 }
@@ -110,7 +113,7 @@ export default async function HowToDetailPage({ params }: PageProps) {
           caption: step.image.alt
         }
       }),
-      url: `https://thestatscalculator.com/how-to/${params.slug}#${step.id}`
+      url: `https://thestatscalculator.com/how-to/${slug}#${step.id}`
     })),
     ...(content.frontmatter.targetTool && {
       tool: {
@@ -124,7 +127,7 @@ export default async function HowToDetailPage({ params }: PageProps) {
       itemListElement: [
         { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://thestatscalculator.com' },
         { '@type': 'ListItem', position: 2, name: 'How-To Guides', item: 'https://thestatscalculator.com/how-to' },
-        { '@type': 'ListItem', position: 3, name: content.frontmatter.title, item: `https://thestatscalculator.com/how-to/${params.slug}` },
+        { '@type': 'ListItem', position: 3, name: content.frontmatter.title, item: `https://thestatscalculator.com/how-to/${slug}` },
       ],
     },
     author: content.frontmatter.author ? {

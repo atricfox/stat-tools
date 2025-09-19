@@ -258,7 +258,7 @@ The (n-1) adjustment is called "Bessel''s correction" and accounts for the fact 
 ## Related Concepts
 - [Sampling Distribution](/glossary/sampling-distribution)
 - [Central Limit Theorem](/glossary/central-limit-theorem)
-- [Standard Error vs Standard Deviation](/faq/standard-error-vs-deviation)',
+- [Standard Error vs Standard Deviation](/faq/standard-error-vs-standard-deviation)',
 'published', 5, 6, 0, 'intermediate', 'education', '/calculator/standard-deviation', '["statistics", "sampling", "population", "inference"]', '2025-09-19 10:00:00', '2025-09-19 10:00:00'),
 
 (105, 'gpa-calculation-basics', 'faq', 'How is GPA calculated and what do the numbers mean?', 'Master GPA calculation fundamentals, credit weighting, and interpretation of grade point averages.',
