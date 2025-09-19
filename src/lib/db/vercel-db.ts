@@ -72,9 +72,19 @@ function initializeVercelDatabase(db: Database.Database): void {
       for (const file of migrationFiles) {
         const migrationPath = path.join(migrationsDir, file);
         const migrationSQL = fs.readFileSync(migrationPath, 'utf-8');
-        
+
         console.log(`[DB] Running migration: ${file}`);
-        db.exec(migrationSQL);
+        try {
+          db.exec(migrationSQL);
+        } catch (error: any) {
+          // Ignore "duplicate column" errors which can happen with ALTER TABLE
+          if (error.message && error.message.includes('duplicate column')) {
+            console.log(`[DB] Column already exists, skipping: ${file}`);
+          } else {
+            // Re-throw other errors
+            throw error;
+          }
+        }
       }
     }
 
