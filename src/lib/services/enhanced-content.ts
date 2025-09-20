@@ -3,15 +3,12 @@ import type { THowToFrontmatter, THowToStep } from '../content/contentSchema';
 
 export interface HowToStepRow {
   id: number;
-  slug: string;
   howto_slug: string;
   step_order: number;
-  name: string;
-  description: string;
-  tip?: string;
-  warning?: string;
-  image_url?: string;
-  image_alt?: string;
+  step_title: string;
+  step_content: string;
+  step_image?: string;
+  step_code?: string;
   created_at: string;
   updated_at: string;
 }
@@ -248,14 +245,14 @@ export class EnhancedContentService extends BaseService {
    * Convert database rows to THowToStep[]
    */
   private convertToHowToSteps(stepRows: HowToStepRow[]): THowToStep[] {
-    return stepRows.map(row => ({
-      id: row.slug,
-      name: row.name,
-      description: row.description,
-      tip: row.tip || undefined,
-      warning: row.warning || undefined,
-      image: row.image_url && row.image_alt 
-        ? { url: row.image_url, alt: row.image_alt }
+    return stepRows.map((row) => ({
+      id: `step-${row.id}`, // Use database ID for stable, unique IDs
+      name: row.step_title,
+      description: row.step_content,
+      tip: undefined, // No tip field in database
+      warning: undefined, // No warning field in database
+      image: row.step_image
+        ? { url: row.step_image, alt: row.step_title }
         : undefined
     }));
   }
