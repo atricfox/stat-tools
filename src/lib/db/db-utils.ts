@@ -8,6 +8,8 @@ const debug = process.env.NODE_ENV === 'development' || process.env.DEBUG === 't
 
 // Global database connection
 let dbInstance: Database.Database | null = null;
+// Track if cleanup handlers are registered
+let cleanupRegistered = false;
 
 /**
  * 获取数据库连接
@@ -72,11 +74,25 @@ export function getDb(): Database.Database {
       console.log('[DB] Database connected successfully');
     }
 
-    // 清理钩子
-    if (typeof process !== 'undefined') {
-      process.on('exit', closeDb);
-      process.on('SIGINT', closeDb);
-      process.on('SIGTERM', closeDb);
+    // 清理钩子 - 只注册一次
+    if (typeof process !== 'undefined' && !cleanupRegistered) {
+      cleanupRegistered = true;
+
+      // 使用 once 而不是 on 来避免重复监听器
+      // 或者在添加前先移除旧的监听器
+      process.removeListener('exit', closeDb);
+      process.removeListener('SIGINT', closeDb);
+      process.removeListener('SIGTERM', closeDb);
+
+      process.once('exit', closeDb);
+      process.once('SIGINT', () => {
+        closeDb();
+        process.exit(0);
+      });
+      process.once('SIGTERM', () => {
+        closeDb();
+        process.exit(0);
+      });
     }
 
     return dbInstance;
@@ -281,6 +297,8 @@ export function closeDb(): void {
   if (dbInstance) {
     dbInstance.close();
     dbInstance = null;
+    // Reset cleanup flag when closing
+    cleanupRegistered = false;
   }
 }
 
