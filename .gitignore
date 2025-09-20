@@ -51,6 +51,10 @@ content-backup-*/**/*.db
 # Allow production database file for deployment
 !data/statcal.db
 
+# Public database for Vercel deployment
+public/db/
+!public/db/.gitkeep
+
 # Coverage directory used by tools like istanbul
 coverage/
 *.lcov

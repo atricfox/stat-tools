@@ -20,6 +20,7 @@ const PROJECT_ROOT = path.resolve(__dirname, '..');
 const MIGRATIONS_DIR = path.join(PROJECT_ROOT, 'migrations');
 const OUTPUT_DB_PATH = path.join(PROJECT_ROOT, 'data', 'statcal.db');
 const BUILD_DB_PATH = path.join(PROJECT_ROOT, '.next', 'data', 'statcal.db');
+const PUBLIC_DB_PATH = path.join(PROJECT_ROOT, 'public', 'db', 'statcal.db');
 
 // 颜色输出
 const log = {
@@ -58,7 +59,10 @@ class DatabasePreparer {
       // 步骤5: 复制到构建目录
       this.copyToBuildDirectory();
 
-      // 步骤6: 生成元数据
+      // 步骤6: 复制到 public 目录
+      this.copyToPublicDirectory();
+
+      // 步骤7: 生成元数据
       this.generateMetadata(stats);
 
       log.success('Database preparation completed successfully!');
@@ -261,6 +265,33 @@ class DatabasePreparer {
     fs.copyFileSync(OUTPUT_DB_PATH, BUILD_DB_PATH);
 
     log.success('Database copied to build directory');
+  }
+
+  private copyToPublicDirectory(): void {
+    const publicDir = path.dirname(PUBLIC_DB_PATH);
+
+    // 创建 public/db 目录
+    if (!fs.existsSync(publicDir)) {
+      fs.mkdirSync(publicDir, { recursive: true });
+    }
+
+    // 复制数据库文件到 public 目录
+    log.info(`Copying database to public directory: ${PUBLIC_DB_PATH}`);
+    fs.copyFileSync(OUTPUT_DB_PATH, PUBLIC_DB_PATH);
+
+    // 复制 WAL 和 SHM 文件如果存在
+    const walPath = `${OUTPUT_DB_PATH}-wal`;
+    const shmPath = `${OUTPUT_DB_PATH}-shm`;
+    if (fs.existsSync(walPath)) {
+      fs.copyFileSync(walPath, `${PUBLIC_DB_PATH}-wal`);
+    }
+    if (fs.existsSync(shmPath)) {
+      fs.copyFileSync(shmPath, `${PUBLIC_DB_PATH}-shm`);
+    }
+
+    // 验证文件大小
+    const stats = fs.statSync(PUBLIC_DB_PATH);
+    log.success(`Database copied to public directory (${(stats.size / 1024 / 1024).toFixed(2)} MB)`);
   }
 
   private generateMetadata(stats: DBStats): void {
