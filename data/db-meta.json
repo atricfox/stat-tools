@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generatedAt": "2025-09-20T00:26:32.437Z",
+  "generatedAt": "2025-09-20T00:59:17.474Z",
   "stats": {
     "tables": [
       {
@@ -9,7 +9,7 @@
       },
       {
         "name": "calculators",
-        "count": 13
+        "count": 11
       },
       {
         "name": "content_search",
@@ -53,7 +53,7 @@
       },
       {
         "name": "migrations",
-        "count": 9
+        "count": 10
       },
       {
         "name": "slim_content",
@@ -64,7 +64,7 @@
         "count": 8
       }
     ],
-    "totalRows": 137,
+    "totalRows": 136,
     "dbSize": 4096,
     "checksum": "795e63a8c3d625376729949cce95c8bba36b2c9fa6bb91d5cd6e6a9ed8d3b2d5"
   },

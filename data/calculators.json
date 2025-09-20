@@ -6,14 +6,6 @@
       "sort_order": 9999,
       "items": [
         {
-          "name": "Correlation Calculator",
-          "url": "/calculator/correlation",
-          "description": "Calculate correlation coefficient between datasets",
-          "is_hot": false,
-          "is_new": true,
-          "sort_order": 1
-        },
-        {
           "name": "GPA Calculator",
           "url": "/calculator/gpa",
           "description": "Calculate weighted GPA from grades and credits",
@@ -36,14 +28,6 @@
           "is_hot": true,
           "is_new": false,
           "sort_order": 1
-        },
-        {
-          "name": "T-Test Calculator",
-          "url": "/calculator/t-test",
-          "description": "Perform statistical t-tests for hypothesis testing",
-          "is_hot": false,
-          "is_new": true,
-          "sort_order": 2
         },
         {
           "name": "Unweighted GPA Calculator",
