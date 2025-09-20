@@ -12,7 +12,7 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://stattools.example.com'),
+  metadataBase: new URL('https://thestatscalculator.com'),
   title: 'Professional Statistical Calculators | Free Online Tools - TheStatsCalculator',
   description: 'Free statistical calculators with step-by-step solutions. Perfect for students & researchers. Mean, standard deviation, t-tests & more. No signup required.',
   keywords: 'statistical calculators, statistics tools, free calculator, mean calculator, standard deviation, t-test, confidence interval',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     title: 'Professional Statistical Calculators | TheStatsCalculator',
     description: 'Free statistical calculators with step-by-step explanations. Perfect for students, researchers & professionals.',
     type: 'website',
-    url: 'https://stattools.example.com',
+    url: 'https://thestatscalculator.com',
   },
   twitter: {
     card: 'summary_large_image',
