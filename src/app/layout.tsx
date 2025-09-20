@@ -47,7 +47,9 @@ export default async function RootLayout({
 }) {
   const hdrs = await headers()
   const nonce = hdrs.get('x-csp-nonce') || undefined
-  const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID
+  const gaId = process.env.STATS_CALCULATOR_GA_MEASUREMENT_ID
+  const gaAnalyticsConsent = process.env.STATS_CALCULATOR_GA_ANALYTICS_STORAGE ?? 'granted'
+  const clarityId = process.env.STATS_CALCULATOR_CLARITY_PROJECT_ID
   return (
     <html lang="en" className={inter.className}>
       <head>
@@ -69,13 +71,24 @@ export default async function RootLayout({
                 'ad_user_data': 'denied',
                 'ad_personalization': 'denied',
                 'ad_storage': 'denied',
-                'analytics_storage': 'denied'
+                'analytics_storage': '${gaAnalyticsConsent}'
               });
               gtag('js', new Date());
               gtag('config', '${gaId}', { anonymize_ip: true });
             `}
             </Script>
           </>
+        ) : null}
+        {clarityId ? (
+          <Script id="ms-clarity" strategy="afterInteractive">
+            {`
+              (function(c,l,a,r,i,t,y){
+                c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+                t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+                y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+              })(window, document, 'clarity', 'script', '${clarityId}');
+            `}
+          </Script>
         ) : null}
         <Script
           id="ld-json-home"

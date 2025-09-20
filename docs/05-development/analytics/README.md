@@ -3,7 +3,7 @@
 当你准备开启 Google Ads 流量时，请按以下顺序检查：
 
 - 环境与代码
-  - 设置 `NEXT_PUBLIC_GA_MEASUREMENT_ID`
+  - 设置 `STATS_CALCULATOR_GA_MEASUREMENT_ID`
   - 已启用 Consent Mode v2（默认 denied，配合 CMP 同意后 update 为 granted）
   - 代码已捕获 UTM/gclid，并推送 `utm_context` 到 dataLayer
 - GTM/GA4/Ads
@@ -17,4 +17,3 @@
   - 落地页映射：高意图→工具页，泛意图→主题 Hub
 
 以上完成后再发布正式投放。
-

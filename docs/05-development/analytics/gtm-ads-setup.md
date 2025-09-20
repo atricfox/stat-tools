@@ -12,7 +12,7 @@
   - 确认落地页映射与 UTM 规范。
 
 ## 1) 前置条件
-- 环境变量：`NEXT_PUBLIC_GA_MEASUREMENT_ID` 已配置（如 `G-XXXXXXX`）。
+- 环境变量：`STATS_CALCULATOR_GA_MEASUREMENT_ID` 已配置（如 `G-XXXXXXX`）。
 - 代码：已内置 UTM 捕获与事件（`utm_session_start`、`utm_context` dataLayer 推送）。
 - 隐私：Cookie Banner/同意管理工具（CMP）准备就绪。
 
